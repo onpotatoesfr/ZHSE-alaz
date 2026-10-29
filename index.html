@@ -203,12 +203,12 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 .gg-zm{position:absolute;right:12px;bottom:12px;display:flex;gap:4px;background:rgba(17,24,39,.85);border-radius:26px;padding:4px}
 .gg-zm button{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:#fff;font:700 22px system-ui,sans-serif;cursor:pointer}
 </style><style>
-#cal{position:fixed;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);width:min(340px,94vw);box-sizing:border-box;background:var(--fb);color:var(--ff);border:1px solid var(--fl);border-radius:16px;box-shadow:0 8px 30px rgba(10,27,69,.35);padding:12px 14px 14px;animation:zaMid .26s cubic-bezier(.2,.8,.2,1)}#cal[hidden]{display:none}
-#cal.mv{transform:none;animation:none}#cal .fh{cursor:grab;touch-action:none}#cal .b{background:var(--fm);color:var(--ff);width:40px;height:40px}
-#calE{min-height:22px;font:600 16px system-ui,sans-serif;opacity:.65;text-align:right;word-break:break-all;margin:2px 4px}
-#calR{min-height:52px;font:800 42px system-ui,sans-serif;text-align:right;word-break:break-all;margin:0 4px 10px;font-variant-numeric:tabular-nums}
-.calg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
-.calg button{height:52px;border:0;border-radius:12px;background:var(--fm);color:var(--ff);font:700 20px system-ui,sans-serif;cursor:pointer;transition:transform .1s ease}.calg button:active{transform:scale(.93)}
+#cal{position:fixed;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);width:min(276px,94vw);box-sizing:border-box;background:var(--fb);color:var(--ff);border:1px solid var(--fl);border-radius:14px;box-shadow:0 8px 30px rgba(10,27,69,.35);padding:8px 10px 10px;animation:zaMid .26s cubic-bezier(.2,.8,.2,1)}#cal[hidden]{display:none}
+#cal.mv{transform:none;animation:none}#cal .fh{cursor:grab;touch-action:none}#cal .b{background:var(--fm);color:var(--ff);width:36px;height:36px}#cal .fh{margin-bottom:4px}
+#calE{min-height:18px;font:600 13px system-ui,sans-serif;opacity:.65;text-align:right;word-break:break-all;margin:2px 4px}
+#calR{min-height:38px;font:800 30px system-ui,sans-serif;text-align:right;word-break:break-all;margin:0 4px 8px;font-variant-numeric:tabular-nums}
+.calg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.calg button{height:44px;border:0;border-radius:10px;background:var(--fm);color:var(--ff);font:700 17px system-ui,sans-serif;cursor:pointer;transition:transform .1s ease}.calg button:active{transform:scale(.93)}
 .calg .op{background:rgba(46,111,201,.16);color:var(--ac)}.calg .eq{background:var(--ac);color:#fff}
 </style></head><body>
 <div id="spl" aria-label="ZHSE-A is loading" role="status"><div class="spl-sl"><div class="spl-sr" aria-hidden="true"></div><div class="spl-sc"><img id="splImg" alt="Zhyar Educational Foundation logo"></div></div><div class="spl-st"><div class="spl-sn">ZHSE-A</div><div class="spl-sf">Zhyar Educational Foundation</div></div><div class="spl-sb" aria-hidden="true"><i></i></div><div class="spl-sa">made by <b>Alaz</b></div><div class="spl-sv"><span id="splB"></span><b aria-hidden="true">12F</b></div></div>
@@ -239,7 +239,7 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.30',BD='30/10/24';
+const VER='1.1',BUILD='2026.10.30.31',BD='30/10/25';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
