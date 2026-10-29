@@ -730,12 +730,12 @@ if(sd/mu<0.16)return{...base,s:'ell',a,b};
 if(v.length==4)return{...base,s:'rect',a,b};
 return null}
 function snapStart(V){const o=live;if(!o||o.k!='p')return;o._lm=performance.now();o._ls=null;clearInterval(snapIv);snapIv=setInterval(()=>{if(live!==o){clearInterval(snapIv);return}if(performance.now()-o._lm>=2000&&o.p.length>=8){clearInterval(snapIv);const sh=recog(o);if(sh){live=sh;draw(V);try{navigator.vibrate&&navigator.vibrate(25)}catch(e){}log('info','Shape snapped: '+sh.s)}}},100)}
-/* ---- daily wipe: pages clear at 8:00 and 15:00 (a backup is kept for the admin panel) ---- */
-function wipeCheck(){const now=new Date(),b=new Date(now),h=now.getHours();if(h>=15)b.setHours(15,0,0,0);else if(h>=8)b.setHours(8,0,0,0);else{b.setDate(b.getDate()-1);b.setHours(15,0,0,0)}
+/* ---- daily wipe: pages clear at 7:58 and 15:00 (a backup is kept for the admin panel) ---- */
+function wipeCheck(){const now=new Date(),b=new Date(now),mn=now.getHours()*60+now.getMinutes();if(mn>=900)b.setHours(15,0,0,0);else if(mn>=478)b.setHours(7,58,0,0);else{b.setDate(b.getDate()-1);b.setHours(15,0,0,0)}
 let last=0;try{last=+localStorage.getItem('wbw')||0}catch(e){}const mark=()=>{try{localStorage.setItem('wbw',String(Date.now()))}catch(e){}};
 if(!last){mark();return}if(last>=b.getTime())return;mark();if(P.length<2&&!P.some(q=>q.s.length))return;
 try{const o=localStorage.getItem('wb1');if(o)localStorage.setItem('wb1b',o)}catch(e){}
-live=null;D=null;P=[mk()];S.cur=0;S.sel=null;A=WB;doSave();$('#rz').style.display='none';if(S.fly)fly(S.fly);drawAll();clkUpd();log('info','Daily wipe ('+p2(b.getHours())+':00)');toast('Board cleared for the next class')}
+live=null;D=null;P=[mk()];S.cur=0;S.sel=null;A=WB;doSave();$('#rz').style.display='none';if(S.fly)fly(S.fly);drawAll();clkUpd();log('info','Daily wipe ('+p2(b.getHours())+':'+p2(b.getMinutes())+')');toast('Board cleared for the next class')}
 setInterval(wipeCheck,30000);
 /* ---- timer, picker, files, resume ---- */
 const closePops=()=>{$('#fp').hidden=true;$('#jp').hidden=true;$('#tm').hidden=true;$('#sp').hidden=true};
