@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.30.29","disp":"30/10/23","force":true,"notes":"GeoGebra window","items":["New: Tools › GeoGebra opens a full-screen GeoGebra window","Without internet it switches to a built-in graph: type functions like y = 2x + 3 or points like (2, 3)","Copy to board puts the graph on your page"]}
+{"version":"1.1","build":"2026.10.30.30","disp":"30/10/24","force":true,"notes":"Calculator and error reports","items":["New: Tools › Calculator, with a big display you can move anywhere","Admin panel: each class now has its own error log"]}
