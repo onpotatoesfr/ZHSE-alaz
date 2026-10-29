@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.30.22","disp":"30/10/16","force":true,"notes":"Background per page","items":["Background changes now apply only to the page you're on","New pages always start with a white background"]}
+{"version":"1.1","build":"2026.10.30.23","disp":"30/10/17","force":true,"notes":"Board status in the admin panel","items":["Admin panel: see every board, whether it's online, and which build it runs","Each board can be given its own name"]}

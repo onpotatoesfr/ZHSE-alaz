@@ -207,7 +207,7 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.22',BD='30/10/16';
+const VER='1.1',BUILD='2026.10.30.23',BD='30/10/17';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -510,6 +510,21 @@ function fuCount(){let n=5,e=$('#fu');if(!e){e=document.createElement('div');e.i
 const show=()=>{e.innerHTML='<span>Updating ZHSE-A in '+n+' s. Your board is saved.</span><button style="height:44px;border:0;border-radius:12px;padding:0 16px;background:#fff;color:#0C2C69;font:700 14px system-ui,sans-serif;cursor:pointer">Not now</button>';e.querySelector('button').onclick=()=>{clearInterval(FU.cd);e.remove();FU.snooze=Date.now()+600000;FU.busy=false;fuWait();log('info','Forced update postponed 10 min')}};
 show();clearInterval(FU.cd);FU.cd=setInterval(()=>{n--;if(n>0){show();return}clearInterval(FU.cd);e.innerHTML='<span>Installing update...</span>';log('info','Forced update installing '+(UPS.avail&&UPS.avail.build));save(true);saveS();saveAD();upInstall().then(()=>{if(UPS.busy)return;setTimeout(()=>{const f=$('#fu');if(f)f.remove();FU.busy=false;FU.snooze=Date.now()+600000;fuWait()},3000)})},1000)}
 setTimeout(fuCheck,5000);setInterval(fuCheck,15000);addEventListener('online',()=>setTimeout(fuCheck,5000));
+/* ---- board status: each board reports name + build; admin panel lists them ---- */
+const BSU='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4';
+const BS={id:(()=>{let i='';try{i=localStorage.getItem('wbid')||''}catch(e){}if(!i){i=Math.random().toString(36).slice(2,8).toUpperCase();try{localStorage.setItem('wbid',i)}catch(e){}}return i})(),list:null,latest:null,msg:'',busy:false};
+const bsName=()=>{let n='';try{n=localStorage.getItem('wbn')||''}catch(e){}return n||('Board '+BS.id)};
+const bsEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function bsBeat(){if(!navigator.onLine)return;try{await fetch(BSU,{method:'POST',body:JSON.stringify({z:1,id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER})})}catch(e){}}
+setTimeout(bsBeat,20000);setInterval(bsBeat,300000);addEventListener('online',()=>setTimeout(bsBeat,5000));
+async function bsLoad(){if(BS.busy)return;BS.busy=true;BS.msg='Loading boards...';adRender();
+try{const v=await fetch(upBase()+'version.json?t='+Date.now(),{cache:'no-store'});if(v.ok){const j=await v.json();if(j&&j.build)BS.latest=j}}catch(e){}
+try{const r=await fetch(BSU+'/json?poll=1&since=12h',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const t=await r.text(),m={};
+t.split('\n').forEach(l=>{try{const e=JSON.parse(l);if(e.event!='message')return;const d=JSON.parse(e.message);if(!d||d.z!==1||!d.id)return;const o=m[d.id];if(!o||e.time>o.t)m[d.id]={id:String(d.id),n:String(d.n||d.id),b:String(d.b||''),d:String(d.d||''),t:e.time}}catch(_){}});
+BS.list=Object.values(m).sort((a,b)=>a.n.localeCompare(b.n));BS.msg=''}catch(e){BS.msg='Could not load board status: '+noUrl(e.message||e)}BS.busy=false;adRender()}
+function bsAgo(t){const s=Math.max(0,Math.round(Date.now()/1000-t));if(s<90)return'just now';const m=Math.round(s/60);if(m<60)return m+' min ago';const h=Math.round(m/60);return h+' h ago'}
+function bsHTML(){const L=BS.latest,rows=(BS.list||[]).map(o=>{const on=Date.now()/1000-o.t<660,cur=!L||!bnew(L.build,o.b);return `<div class="ar"><span class="al"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:${on?'#16A34A':'#9CA3AF'}"></span>${bsEsc(o.n)}${o.id==BS.id?' (this board)':''}</span><span style="min-width:120px">${on?'Online':'Last seen '+bsAgo(o.t)}</span><span style="min-width:150px;font-weight:700;color:${cur?'#16A34A':'#D97706'}">Build ${bsEsc(o.d||o.b)} ${cur?'&#10003; up to date':'&#8593; needs update'}</span></div>`}).join('');
+return `<h3>Boards</h3><div class="adn">Each board reports in every 5 minutes while the app is open. Boards not seen in the last 12 hours are not listed.</div><div class="ar"><span class="al">This board's name</span><input type="text" id="bsn" maxlength="40" value="${bsEsc(bsName())}" aria-label="This board's name"><button class="ab" data-a="ad_bsn">Save name</button></div><div class="ar"><button class="ab" data-a="ad_bsl">Refresh</button>${L?`<span class="adn">Latest published: build ${bsEsc(L.disp||L.build)}</span>`:''}</div>${BS.msg?`<div class="adn">${bsEsc(BS.msg)}</div>`:''}${BS.list?(rows||'<div class="adn">No boards have reported yet.</div>'):''}`}
 async function upRemove(){try{if(window.ZHSE&&ZHSE.clearUpdate)ZHSE.clearUpdate();await caches.delete('zhse-update');localStorage.removeItem('wbUpd')}catch(e){}UPS.avail=null;UPS.msg='Built-in version restored. Restarting...';log('info','Update removed');adRender();setTimeout(()=>location.reload(),900)}
 /* ---- admin menu ---- */
 const AH='81a6607bec39437b61567c70c776eb92218045bad91257ffea5dbbbff22d19dc',AF=2811130989,AT={n:0,t:0},ADv={chk:null,logs:false,upd:false,conf:'',msg:''};
@@ -520,7 +535,7 @@ $('#apb').addEventListener('click',apGo);$('#apc').addEventListener('click',()=>
 const ADL={np:'New page',pv:'Previous page',nx:'Next page',un:'Undo',re:'Redo',pen:'Pen',hand:'Pan and zoom',eraser:'Eraser','m:pen':'Pen menu','m:graphic':'Graphic menu','m:tools':'Tools menu','m:bg':'BG menu','m:pages':'Pages menu','m:images':'Images menu'};
 const ADH=[['marker','Marker pen type'],['dotted','Dotted pen type'],['laser','Laser pen type'],['text','Text tool'],['select','Select and move tool'],['whole','Whole-stroke eraser mode'],['timer','Timer'],['picker','Student picker'],['record','Record pen sizes']];
 const asIv=[[0,'Instant'],[30,'Every 30 s'],[60,'Every minute'],[300,'Every 5 min']];
-function adOpen(){$('#ad').style.display='flex';ADv.conf='';ADv.msg='';adRender()}
+function adOpen(){$('#ad').style.display='flex';ADv.conf='';ADv.msg='';adRender();if(!BS.busy)bsLoad()}
 function adRender(){const c=$('#adc'),st=c.scrollTop,d=AD.lock?' disabled':'';const sl=(k,l,mx,z)=>`<div class="adr"><span id="adl_${k}">${l}: ${AD[k]||(z?'Auto':0)}</span><input type="range" min="${z?0:1}" max="${mx}" value="${AD[k]}" data-a="ad_r:${k}" aria-label="${l}"></div>`;
 const tb=AD.tbo.map(id=>{const off=AD.tbh.includes(id);return `<div class="ar${off?' off':''}"><span class="al">${ADL[id]}</span><button class="ab" data-a="ad_up:${id}"${d} aria-label="Move up">&#9650;</button><button class="ab" data-a="ad_dn:${id}"${d} aria-label="Move down">&#9660;</button><button class="ab" data-a="ad_vis:${id}"${d}>${off?'Add':'Remove'}</button><button class="ab" data-a="ad_sz:${id}"${d}>Size ${AD.tbs[id]||'M'}</button></div>`}).join('');
 const qa=Object.keys(QA).map(k=>`<button class="ab${AD.qa.includes(k)?' on':''}" data-a="ad_qa:${k}"${d}>${QA[k][1]}</button>`).join(' ');
@@ -547,7 +562,7 @@ c.innerHTML=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x
 <div class="ar"><span class="al">Ask to continue or start new when the app reopens</span><button class="ab${AD.ask?' on':''}" data-a="ad_ask">${AD.ask?'On':'Off'}</button></div>
 <div class="ar"><span class="al">Keep a recovery backup (previous save, at most once a minute)</span><button class="ab${AD.bk?' on':''}" data-a="ad_bk">${AD.bk?'On':'Off'}</button></div>
 <div class="ar"><button class="ab" data-a="ad_sv">Save now</button><button class="ab${ADv.conf=='rbk'?' on':''}" data-a="ad_rbk">${ADv.conf=='rbk'?'Tap again to restore':'Restore recovery backup'}</button></div>
-<h3>Updates</h3><div class="adn">Running version ${VER}, build ${BD}.${upInfo()}</div><div class="ar"><button class="ab" data-a="ad_upc">Check for updates</button>${UPS.avail?`<button class="ab on" data-a="ad_upi">Install ${UPS.avail.version} (build ${UPS.avail.build})</button>`:''}<button class="ab${ADv.conf=='upr'?' on':''}" data-a="ad_upr">${ADv.conf=='upr'?'Tap again to confirm':'Use built-in version'}</button></div>${UPS.msg?`<div class="adn">${UPS.msg}</div>`:''}<h3>Reset</h3><div class="ar"><span class="al">Restores the default button order, sizes, quick-access row and toolbar position.</span><button class="ab${ADv.conf=='rtb'?' on':''}" data-a="ad_rtb"${d}>${ADv.conf=='rtb'?'Tap again to confirm':'Reset toolbar'}</button></div>`;c.scrollTop=st}
+<h3>Updates</h3><div class="adn">Running version ${VER}, build ${BD}.${upInfo()}</div><div class="ar"><button class="ab" data-a="ad_upc">Check for updates</button>${UPS.avail?`<button class="ab on" data-a="ad_upi">Install ${UPS.avail.version} (build ${UPS.avail.build})</button>`:''}<button class="ab${ADv.conf=='upr'?' on':''}" data-a="ad_upr">${ADv.conf=='upr'?'Tap again to confirm':'Use built-in version'}</button></div>${UPS.msg?`<div class="adn">${UPS.msg}</div>`:''}${bsHTML()}<h3>Reset</h3><div class="ar"><span class="al">Restores the default button order, sizes, quick-access row and toolbar position.</span><button class="ab${ADv.conf=='rtb'?' on':''}" data-a="ad_rtb"${d}>${ADv.conf=='rtb'?'Tap again to confirm':'Reset toolbar'}</button></div>`;c.scrollTop=st}
 function adTb(){saveAD();panel();posPanel();if(S.fly)fly(S.fly);adRender()}
 async function adChecks(){const r=[],add=(n,ok,t)=>r.push([n,ok,t]);
 try{const c=document.createElement('canvas');c.width=c.height=8;const g=c.getContext('2d');g.fillStyle='#f00';g.fillRect(0,0,8,8);const px=g.getImageData(1,1,1,1).data;add('Canvas drawing',px[0]==255&&px[3]==255,'pixel test');g.globalCompositeOperation='destination-out';g.fillRect(0,0,8,8);add('Eraser compositing',g.getImageData(1,1,1,1).data[3]==0,'destination-out')}catch(e){add('Canvas drawing',false,e.message)}
@@ -594,6 +609,8 @@ if(k=='ad_ask'){AD.ask=!AD.ask;saveAD();adRender();return}
 if(k=='ad_bk'){AD.bk=!AD.bk;saveAD();adRender();return}
 if(k=='ad_sv'){save(true);ADv.msg='Saved.';adRender();return}
 if(k=='ad_rbk'){if(conf('rbk')){if(load('wb1b')){A=WB;save(true);drawAll();if(S.fly)fly(S.fly);ADv.msg='Recovery backup restored.';log('info','Recovery backup restored')}else ADv.msg='No recovery backup found.'}adRender();return}
+if(k=='ad_bsl'){bsLoad();return}
+if(k=='ad_bsn'){const i=$('#bsn'),v=(i&&i.value||'').trim().slice(0,40);try{if(v)localStorage.setItem('wbn',v);else localStorage.removeItem('wbn')}catch(e){}log('info','Board name set: '+bsName());ADv.msg='Board name saved.';adRender();bsBeat().then(()=>setTimeout(bsLoad,1500));return}
 if(k=='ad_upc'){upCheck(true,true);return}
 if(k=='ad_upi'){upInstall();return}
 if(k=='ad_upr'){if(conf('upr'))upRemove();else adRender();return}
