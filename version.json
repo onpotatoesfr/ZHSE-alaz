@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.30.32","disp":"30/10/26","force":true,"notes":"Kurdish and Arabic interface","items":["New: choose English, کوردی or العربية in Preferences › Language","زمانی کوردی زیادکرا","تمت إضافة اللغة العربية"]}
+{"version":"1.1","build":"2026.10.30.33","disp":"30/10/27","force":true,"notes":"Smooth PDF scrolling, finger drawing off by default","items":["Finger drawing is now off by default. Turn it on in Preferences","Scroll PDFs with one finger in any tool. It moves smoothly and keeps gliding after a flick"]}
