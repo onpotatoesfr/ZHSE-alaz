@@ -207,7 +207,7 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.23',BD='30/10/17';
+const VER='1.1',BUILD='2026.10.30.24',BD='30/10/18';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -524,7 +524,7 @@ t.split('\n').forEach(l=>{try{const e=JSON.parse(l);if(e.event!='message')return
 BS.list=Object.values(m).sort((a,b)=>a.n.localeCompare(b.n));BS.msg=''}catch(e){BS.msg='Could not load board status: '+noUrl(e.message||e)}BS.busy=false;adRender()}
 function bsAgo(t){const s=Math.max(0,Math.round(Date.now()/1000-t));if(s<90)return'just now';const m=Math.round(s/60);if(m<60)return m+' min ago';const h=Math.round(m/60);return h+' h ago'}
 function bsHTML(){const L=BS.latest,rows=(BS.list||[]).map(o=>{const on=Date.now()/1000-o.t<660,cur=!L||!bnew(L.build,o.b);return `<div class="ar"><span class="al"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:${on?'#16A34A':'#9CA3AF'}"></span>${bsEsc(o.n)}${o.id==BS.id?' (this board)':''}</span><span style="min-width:120px">${on?'Online':'Last seen '+bsAgo(o.t)}</span><span style="min-width:150px;font-weight:700;color:${cur?'#16A34A':'#D97706'}">Build ${bsEsc(o.d||o.b)} ${cur?'&#10003; up to date':'&#8593; needs update'}</span></div>`}).join('');
-return `<h3>Boards</h3><div class="adn">Each board reports in every 5 minutes while the app is open. Boards not seen in the last 12 hours are not listed.</div><div class="ar"><span class="al">This board's name</span><input type="text" id="bsn" maxlength="40" value="${bsEsc(bsName())}" aria-label="This board's name"><button class="ab" data-a="ad_bsn">Save name</button></div><div class="ar"><button class="ab" data-a="ad_bsl">Refresh</button>${L?`<span class="adn">Latest published: build ${bsEsc(L.disp||L.build)}</span>`:''}</div>${BS.msg?`<div class="adn">${bsEsc(BS.msg)}</div>`:''}${BS.list?(rows||'<div class="adn">No boards have reported yet.</div>'):''}`}
+return `<h3>Classes</h3><div class="adn">Each board reports in every 5 minutes while the app is open. Boards not seen in the last 12 hours are not listed.</div><div class="ar"><span class="al">This board's class name</span><input type="text" id="bsn" maxlength="40" placeholder="e.g. Class 12A-F" value="${bsEsc(bsName())}" aria-label="This board's class name"><button class="ab" data-a="ad_bsn">Save name</button></div><div class="ar"><button class="ab" data-a="ad_bsl">Refresh</button>${L?`<span class="adn">Latest published: build ${bsEsc(L.disp||L.build)}</span>`:''}</div>${BS.msg?`<div class="adn">${bsEsc(BS.msg)}</div>`:''}${BS.list?(rows||'<div class="adn">No boards have reported yet.</div>'):''}`}
 async function upRemove(){try{if(window.ZHSE&&ZHSE.clearUpdate)ZHSE.clearUpdate();await caches.delete('zhse-update');localStorage.removeItem('wbUpd')}catch(e){}UPS.avail=null;UPS.msg='Built-in version restored. Restarting...';log('info','Update removed');adRender();setTimeout(()=>location.reload(),900)}
 /* ---- admin menu ---- */
 const AH='81a6607bec39437b61567c70c776eb92218045bad91257ffea5dbbbff22d19dc',AF=2811130989,AT={n:0,t:0},ADv={chk:null,logs:false,upd:false,conf:'',msg:''};
@@ -552,7 +552,7 @@ c.innerHTML=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x
 <h3>Mr. Wrya mode: pen tip and pen back</h3><div class="ar"><span class="al">Record the pen tip and the back of the pen once. Kept through every update. Tip ${S.recWT?S.recWT.toFixed(1)+' px':'not recorded'}, back ${S.recB?S.recB.toFixed(1)+' px':'not recorded'}.</span><button class="ab" data-a="ad_rcw">Record pen tip and back</button></div>
 <h3>Mr. Wrya mode: palm and back of hand</h3><div class="ar"><span class="al">Automatic: it recognizes the palm and back of the hand by itself, no recording needed. Palm limit now: ${S.ptw}px. Optional manual record:</span><button class="ab" data-a="ad_rcwh">Record palm or back of hand</button>${S.recT||S.recB||S.recH||S.recWT||S.recWH?'<button class="ab" data-a="ad_rcc">Clear all recordings</button>':''}</div>
 <h3>Recorded pen size</h3><div class="ar"><span class="al">Use the recorded pen tip size${S.recT||S.recB?' (tip '+(S.recT?S.recT.toFixed(1):'-')+' px'+(S.recB?', back '+S.recB.toFixed(1)+' px':'')+')':' (nothing recorded yet)'} instead of the Size slider.</span><button class="ab${S.useRec?' on':''}" data-a="ad_urec">${S.useRec?'On':'Off'}</button></div>
-<h3>App passcode (asked every 6 hours)</h3><div class="ar"><input id="adp1" type="password" placeholder="New passcode (4+ characters)" autocomplete="off"><input id="adp2" type="password" placeholder="Repeat passcode" autocomplete="off"><button class="ab" data-a="ad_pw">Change</button><button class="ab" data-a="ad_pwr">Restore original</button></div>
+<h3>App passcode (asked every 6 hours)</h3><div class="ar"><span class="al">Ask for the passcode when the app opens and every 6 hours</span><button class="ab${AD.nopw?'':' on'}" data-a="ad_pwo">${AD.nopw?'Off':'On'}</button></div><div class="ar"><input id="adp1" type="password" placeholder="New passcode (4+ characters)" autocomplete="off"><input id="adp2" type="password" placeholder="Repeat passcode" autocomplete="off"><button class="ab" data-a="ad_pw">Change</button><button class="ab" data-a="ad_pwr">Restore original</button></div>
 <h3>Touch and pen accuracy test</h3><div class="ar"><span class="al">Tap 9 targets and draw with a finger, pen or palm to see contact size, pressure and error.</span><button class="ab" data-a="ad_tt">Start test</button></div>
 <h3>Rendering check</h3><div class="ar"><button class="ab" data-a="ad_chk">Run check</button></div>${chk}
 <h3>Diagnostic logs</h3><div class="ar"><button class="ab${ADv.logs?' on':''}" data-a="ad_logs">${ADv.logs?'Hide logs':'Show logs'} (${LOG.length})</button></div>${lg}
@@ -590,6 +590,7 @@ if(k=='ad_qa'){const i=AD.qa.indexOf(v);if(i<0){if(AD.qa.length>=6){ADv.msg='Up 
 if(k=='ad_ht'){const i=AD.ht.indexOf(v);if(i<0)AD.ht.push(v);else AD.ht.splice(i,1);if(v=='whole'&&S.em=='s')S.em='n';if(v=='laser'&&S.tool=='laser')S.tool='pen';if(S.fly)fly(S.fly);saveAD();adRender();return}
 if(k=='ad_apply'){S.size=AD.dPen;S.es=AD.dEr;saveS();ADv.msg='Sizes applied.';adRender();return}
 if(k=='ad_pw'){const a=$('#adp1').value,b=$('#adp2').value;if(a.length<4){ADv.msg='Passcode must be at least 4 characters.'}else if(a!=b){ADv.msg='The two passcodes do not match.'}else{sha(a).then(h=>{try{localStorage.setItem('wbp',JSON.stringify({h,f:fnv(a)}))}catch(e){}log('info','Passcode changed');ADv.msg='Passcode changed. It is used from the next unlock.';adRender()});return}adRender();return}
+if(k=='ad_pwo'){AD.nopw=!AD.nopw;try{localStorage.setItem('wbu',String(Date.now()))}catch(e){}saveAD();lockCheck();log('info','Passcode '+(AD.nopw?'turned off':'turned on'));ADv.msg=AD.nopw?'Passcode turned off. The app opens without asking.':'Passcode turned on.';adRender();return}
 if(k=='ad_pwr'){try{localStorage.removeItem('wbp')}catch(e){}log('info','Passcode restored to original');ADv.msg='Original passcode restored.';adRender();return}
 if(k=='ad_tt'){ttOpen();return}
 if(k=='ad_urec'){S.useRec=!S.useRec;saveS();adRender();return}
@@ -610,7 +611,7 @@ if(k=='ad_bk'){AD.bk=!AD.bk;saveAD();adRender();return}
 if(k=='ad_sv'){save(true);ADv.msg='Saved.';adRender();return}
 if(k=='ad_rbk'){if(conf('rbk')){if(load('wb1b')){A=WB;save(true);drawAll();if(S.fly)fly(S.fly);ADv.msg='Recovery backup restored.';log('info','Recovery backup restored')}else ADv.msg='No recovery backup found.'}adRender();return}
 if(k=='ad_bsl'){bsLoad();return}
-if(k=='ad_bsn'){const i=$('#bsn'),v=(i&&i.value||'').trim().slice(0,40);try{if(v)localStorage.setItem('wbn',v);else localStorage.removeItem('wbn')}catch(e){}log('info','Board name set: '+bsName());ADv.msg='Board name saved.';adRender();bsBeat().then(()=>setTimeout(bsLoad,1500));return}
+if(k=='ad_bsn'){const i=$('#bsn'),v=(i&&i.value||'').trim().slice(0,40);try{if(v)localStorage.setItem('wbn',v);else localStorage.removeItem('wbn')}catch(e){}log('info','Class name set: '+bsName());ADv.msg='Class name saved.';adRender();bsBeat().then(()=>setTimeout(bsLoad,1500));return}
 if(k=='ad_upc'){upCheck(true,true);return}
 if(k=='ad_upi'){upInstall();return}
 if(k=='ad_upr'){if(conf('upr'))upRemove();else adRender();return}
@@ -791,7 +792,7 @@ addEventListener('resize',()=>{layout();if(S.wr)hz()});addEventListener('context
 const PH='2b66f929dcaa7eeb47533095e5423bb6ac37637aea395d7ce1a5dd8320dd83d4',PF=954218326;
 function fnv(t){let h=2166136261;for(const c of t){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0}return h}
 async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}
-function lockCheck(){let t=0;try{t=+localStorage.getItem('wbu')||0}catch(e){}const need=Date.now()-t>6*3600*1000||t>Date.now(),lk=$('#lk');if(need&&lk.style.display!='flex'){lk.style.display='flex';$('#lki').value='';$('#lke').textContent='';setTimeout(()=>$('#lki').focus(),60)}else if(!need)lk.style.display='none'}
+function lockCheck(){if(AD.nopw){$('#lk').style.display='none';return}let t=0;try{t=+localStorage.getItem('wbu')||0}catch(e){}const need=Date.now()-t>6*3600*1000||t>Date.now(),lk=$('#lk');if(need&&lk.style.display!='flex'){lk.style.display='flex';$('#lki').value='';$('#lke').textContent='';setTimeout(()=>$('#lki').focus(),60)}else if(!need)lk.style.display='none'}
 const pwc=()=>{try{return JSON.parse(localStorage.getItem('wbp')||'null')}catch(e){return null}};
 async function unlock(){const v=$('#lki').value,c=pwc()||{h:PH,f:PF};let ok=false;try{ok=crypto.subtle?(await sha(v))==c.h:fnv(v)==c.f}catch(e){ok=fnv(v)==c.f}log(ok?'info':'warn','Passcode '+(ok?'accepted':'rejected'));
 if(ok){try{localStorage.setItem('wbu',String(Date.now()))}catch(e){}$('#lk').style.display='none';$('#lke').textContent=''}else{$('#lke').textContent='Wrong password';$('#lki').value='';$('#lki').focus()}}

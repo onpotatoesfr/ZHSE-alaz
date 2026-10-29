@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.30.23","disp":"30/10/17","force":true,"notes":"Board status in the admin panel","items":["Admin panel: see every board, whether it's online, and which build it runs","Each board can be given its own name"]}
+{"version":"1.1","build":"2026.10.30.24","disp":"30/10/18","force":true,"notes":"Class names and passcode switch","items":["Admin panel: give each board a class name, like Class 12A-F","Admin panel: the app passcode can now be turned off"]}
