@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#14438F"><link rel="manifest" href="manifest.webmanifest"><title>ZHSE-A</title>
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="theme-color" content="#14438F"><link rel="manifest" href="manifest.webmanifest"><title>ZHSE-A</title>
 <style>
 :root{--fb:#fff;--ff:#111827;--fm:#F3F4F6;--fl:#D1D5DB;--ac:#14438F;--t0:#2E6FC9;--t1:#14438F;--t2:#0C2C69}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--fb:#1F2937;--ff:#F9FAFB;--fm:#374151;--fl:#4B5563;--ac:#2563EB}}
@@ -137,7 +137,7 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.13',BD='30/10/7';
+const VER='1.1',BUILD='2026.10.30.14',BD='30/10/8';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -407,17 +407,17 @@ function rcOpen(st){RC.st=st||['nt','nh'];fly(null);closePops();RC.i=0;RC.v={};R
 function rcNext(){const st=rcSteps();RC.v[st[RC.i]]=RC.mx;RC.mx=0;if(RC.i<st.length-1){RC.i++;rcUI();return}
 const v=RC.v,nm={nt:'pen tip',nh:'back of hand',wt:'pen tip (Wrya)',wb:'pen back (Wrya)',wh:'palm (Wrya)'};if(v.nt)S.recT=v.nt;if(v.nh){S.recH=v.nh;S.pt=cl(Math.round(v.nh*.7),16,120)}if(v.wt)S.recWT=v.wt;if(v.wb)S.recB=v.wb;if(v.wh){S.recWH=v.wh;S.ptw=cl(Math.round(v.wh*.7),16,120)}S.useRec=true;AD.rec={T:S.recT||0,H:S.recH||0,pt:S.pt,WT:S.recWT||0,B:S.recB||0,WH:S.recWH||0,ptw:S.ptw};saveAD();$('#rc').style.display='none';saveS();toast('Recorded: '+st.map(k=>nm[k]+' '+(v[k]||0).toFixed(1)+' px').join(', '));if(S.fly)fly(S.fly)}
 (()=>{const z=$('#rcp'),m=e=>{const v=Math.max(e.width||0,e.height||0,1.5);if(v>RC.mx){RC.mx=v;$('#rcv').textContent=v.toFixed(1)+' px'}};z.addEventListener('pointerdown',e=>{e.preventDefault();z.setPointerCapture(e.pointerId);RC.mx=0;m(e)});z.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType=='touch')m(e)});z.addEventListener('pointerup',()=>rcUI());z.addEventListener('pointercancel',()=>rcUI())})();
-/* ---- updates from a web address (GitHub Pages) ---- */
+/* ---- updates ---- */
 const UPS={avail:null,msg:'',busy:false},UPK=location.origin+'/__zhse_update__';
 const bnum=v=>String(v).split('.').map(n=>parseInt(n)||0),bnew=(a,b)=>{const x=bnum(a),y=bnum(b);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0}return false};
 function upInfo(){try{const u=JSON.parse(localStorage.getItem('wbUpd')||'null');return u?' Installed web update: '+u.version+' (build '+(u.disp||u.build)+').':''}catch(e){return''}}
-const UP_DEFAULT='https://onpotatoesfr.github.io/ZHSE-alaz/';
+const UP_DEFAULT=atob('aHR0cHM6Ly9vbnBvdGF0b2VzZnIuZ2l0aHViLmlvL1pIU0UtYWxhei8=');
 function upBase(){return UP_DEFAULT}
-const noUrl=t=>String(t).split(UP_DEFAULT).join('').split(UP_DEFAULT.replace(/\/$/,'')).join('').replace(/https?:\/\/\S+/g,'')
+const noUrl=t=>String(t).split(UP_DEFAULT).join('').split(UP_DEFAULT.replace(/\/$/,'')).join('').replace(/https?:\/\/\S+/g,'').replace(/git\s*hub|onpotatoesfr|zhse-alaz|\.io\b/gi,'')
 async function upCheck(manual,inst){const base=upBase();if(!base){return}
 if(!navigator.onLine){UPS.msg='No internet connection.';if(manual)adRender();else toast(UPS.msg);return}
 try{UPS.msg='Checking...';if(manual)adRender();const r=await fetch(base+'version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const v=await r.json();if(!v.build||!v.version)throw new Error('version.json is missing version or build');
-if(bnew(v.build,BUILD)){UPS.avail=v;UPS.msg='Update available: '+v.version+' (build '+(v.disp||v.build)+')'+(v.notes?' - '+String(v.notes).replace(/</g,'&lt;'):'');log('info','Update available '+v.build);}
+if(bnew(v.build,BUILD)){UPS.avail=v;UPS.msg='Update available: '+v.version+' (build '+(v.disp||v.build)+')'+(v.notes?' - '+noUrl(v.notes).replace(/</g,'&lt;'):'');log('info','Update available '+v.build);}
 else{UPS.avail=null;UPS.msg='You are up to date (build '+BD+').'}}
 catch(e){UPS.msg='Could not check: '+noUrl(e.message||e);log('warn','Update check failed: '+noUrl(e.message||e))}
 if($('#ad').style.display=='flex')adRender();else if(inst)toast(UPS.msg.replace(/&lt;/g,'<'));if(inst&&UPS.avail)await upInstall()}
