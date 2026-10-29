@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.30.21","disp":"30/10/15","force":true,"notes":"Smoother animations","items":["Pages slide when you switch, add or go back","Menus, popups and the toolbar now open and close smoothly"]}
+{"version":"1.1","build":"2026.10.30.22","disp":"30/10/16","force":true,"notes":"Background per page","items":["Background changes now apply only to the page you're on","New pages always start with a white background"]}
