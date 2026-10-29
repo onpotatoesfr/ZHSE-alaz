@@ -211,7 +211,7 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.27',BD='30/10/21';
+const VER='1.1',BUILD='2026.10.30.28',BD='30/10/22';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -417,16 +417,16 @@ if(S.tool=='select'){selDown(p,k,q);return}
 if(S.tool=='text'){e.preventDefault();addText(e.clientX,e.clientY,q);return}
 if(S.tool=='laser'){lzCur={V,p:[[sx,sy,performance.now()]]};LZ.push(lzCur);lzGo();return}
 const bk=S.tool=='pen2'||(eb&&S.wr),m=S.type=='marker',sz0=bk&&S.wr?((S.useRec&&S.recB)||AD.dBack||S.size):((S.useRec&&(S.wr?S.recWT:S.recT))||(S.wr&&AD.dTip)||S.size),base={c:bk?S.color2:S.color,w:(m?sz0*3:sz0)/V.b(),al:S.al*(m?.4:1),d:S.dash||S.type=='dotted'};
-live=S.tool=='shape'?{...base,k:'s',s:S.shape,a:q,b:q,f:S.fill}:{...base,k:'p',p:[q]};if(live.k=='p'&&S.tool!='laser'){const ed=insSnap(V,sx,sy);if(ed){const pp=insProj(ed,sx,sy);live.rs=ed;live.p=[[(pp[0]-p.ox)/k-og[0],(pp[1]-p.oy)/k-og[1]]]}}if(live.k=='p'&&!live.rs&&!live.er&&(S.tool=='pen'||S.tool=='pen2')&&S.type=='pen')snapStart(V);drag='d'});
+live=S.tool=='shape'?{...base,k:'s',s:S.shape,a:q,b:q,f:S.fill}:{...base,k:'p',p:[q]};if(live.k=='p'&&S.tool!='laser'){const ed=insSnap(V,sx,sy);if(ed){const pp=insProj(ed,sx,sy);live.rs=ed;live.p=[[(pp[0]-p.ox)/k-og[0],(pp[1]-p.oy)/k-og[1]]]}}drag='d'});
 cv.addEventListener('pointermove',e=>{if(A!==V)return;const p=pg(),k=K(),[sx,sy]=loc(e),og=V.og(),q=[(sx-p.ox)/k-og[0],(sy-p.oy)/k-og[1]];
 if(V===PV&&tp.has(e.pointerId)){tp.set(e.pointerId,[e.clientX,e.clientY]);if(gz){const a=[...tp.values()];if(a.length>=2){const r=cv.getBoundingClientRect(),d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1,cx=(a[0][0]+a[1][0])/2-r.left,cy=(a[0][1]+a[1][1])/2-r.top,nz=cl(gz.z*d/gz.d,1,6);PVP.z=nz;PVP.ox=cx-(gz.cx-r.left-gz.ox)*nz/gz.z;PVP.oy=cy-(gz.cy-r.top-gz.oy)*nz/gz.z;draw(V);schedRender()}return}}
 if(lzCur&&lid==e.pointerId){lzCur.p.push([sx,sy,performance.now()]);return}
 if(ig&&lid==e.pointerId){insMove(V,sx,sy,p,k,og);return}
 if(D&&lid==e.pointerId){selMove(p,q);draw(V);return}
-if(live&&lid==e.pointerId){if(live.k=='s'){if(!live._snap)live.b=q}else if(live.rs){const pp=insProj(live.rs,sx,sy);live.p=[live.p[0],[(pp[0]-p.ox)/k-og[0],(pp[1]-p.oy)/k-og[1]]]}else{const ls=live._ls;if(!ls||Math.hypot(sx-ls[0],sy-ls[1])>6){live._ls=[sx,sy];live._lm=performance.now()}live.p.push(q)}draw(V);return}
+if(live&&lid==e.pointerId){if(live.k=='s')live.b=q;else if(live.rs){const pp=insProj(live.rs,sx,sy);live.p=[live.p[0],[(pp[0]-p.ox)/k-og[0],(pp[1]-p.oy)/k-og[1]]]}else live.p.push(q);draw(V);return}
 if(S.tool=='hand'){const o=ptr.get(e.pointerId);if(!o)return;ptr.set(e.pointerId,[e.clientX,e.clientY]);if(ptr.size==2&&pz){const a=[...ptr.values()],d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]),r=cv.getBoundingClientRect();zoomAt((a[0][0]+a[1][0])/2-r.left,(a[0][1]+a[1][1])/2-r.top,cl(pz.z*d/pz.d,V===PV?1:.25,6))}else if(ptr.size==1){p.ox+=e.clientX-o[0];p.oy+=e.clientY-o[1]}draw(V);if(V===PV)schedRender();return}
 if(drag=='e'){er(q,k);draw(V)}});
-const up=e=>{if(A!==V)return;tp.delete(e.pointerId);if(tp.size<2)gz=null;if(lzCur&&e.pointerId==lid)lzCur=null;if(ig&&e.pointerId==lid)ig=null;ptr.delete(e.pointerId);if(ptr.size<2)pz=null;if(D&&e.pointerId==lid){const dn=D.done;D=null;if(dn)persist();draw(V);return}if(live&&e.pointerId!=lid)return;if(live){const o=live,sn=!!o._snap;live=null;clearInterval(snapIv);delete o.rs;delete o._snap;delete o._lm;delete o._ls;mut(a=>a.push(o));if(!sn&&o.k=='s'&&(S.fill||o.s=='brect')&&(SH[o.s]||SH.rect)[1])askFill(o)}else if(drag||pan){persist();draw(V)}if(!ptr.size)pan=0;drag=null};
+const up=e=>{if(A!==V)return;tp.delete(e.pointerId);if(tp.size<2)gz=null;if(lzCur&&e.pointerId==lid)lzCur=null;if(ig&&e.pointerId==lid)ig=null;ptr.delete(e.pointerId);if(ptr.size<2)pz=null;if(D&&e.pointerId==lid){const dn=D.done;D=null;if(dn)persist();draw(V);return}if(live&&e.pointerId!=lid)return;if(live){const o=live;live=null;delete o.rs;mut(a=>a.push(o));if(o.k=='s'&&(S.fill||o.s=='brect')&&(SH[o.s]||SH.rect)[1])askFill(o)}else if(drag||pan){persist();draw(V)}if(!ptr.size)pan=0;drag=null};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 cv.addEventListener('wheel',e=>{if(V===PV&&S.tool!='hand'&&doc){e.preventDefault();A=V;const k=PVV.z*PV.b(),tot=(offY[pdfN-1]+sz(pdfN-1)[1])*k;PVV.oy=PVV.oy-e.deltaY;draw(V);schedRender();return}if(S.tool!='hand')return;e.preventDefault();A=V;const p=pg(),[sx,sy]=loc(e);zoomAt(sx,sy,cl(p.z*(e.deltaY<0?1.1:.9),.25,6));draw(V);if(V===PV)schedRender();persist()},{passive:false})}
 /* flyouts */
@@ -704,32 +704,6 @@ let dark=false;if(V===WB){const h=String(bgFill(CP())).replace('#','');if(h.leng
 e.style.color=dark?'rgba(255,255,255,.34)':'rgba(17,24,39,.26)';e.style.top=(V.t+12)+'px';e.style.right=Math.max(8,innerWidth-(V.l+V.W)+16)+'px';e.style.display='block';
 const d=new Date(),p=n=>String(n).padStart(2,'0');$('#clkT').textContent=p(d.getHours())+':'+p(d.getMinutes());try{$('#clkD').textContent=d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})}catch(x){$('#clkD').textContent=''}}
 window.clkUpd=clkUpd;setInterval(clkUpd,1000);
-/* ---- shape snapping: hold the normal pen still for 2 s to turn the stroke into a clean shape ---- */
-let snapIv=0;
-const segD=(q,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],l=dx*dx+dy*dy;if(!l)return Math.hypot(q[0]-a[0],q[1]-a[1]);const t=Math.max(0,Math.min(1,((q[0]-a[0])*dx+(q[1]-a[1])*dy)/l));return Math.hypot(q[0]-a[0]-t*dx,q[1]-a[1]-t*dy)};
-function rdp(a,e){if(a.length<3)return a.slice();const s0=a[0],t=a[a.length-1];let mi=0,md=0;for(let i=1;i<a.length-1;i++){const d=segD(a[i],s0,t);if(d>md){md=d;mi=i}}if(md>e){const l=rdp(a.slice(0,mi+1),e),r=rdp(a.slice(mi),e);return l.slice(0,-1).concat(r)}return[s0,t]}
-function polyV(p,e){let k=0,kd=0;for(let i=1;i<p.length;i++){const d=Math.hypot(p[i][0]-p[0][0],p[i][1]-p[0][1]);if(d>kd){kd=d;k=i}}let v=rdp(p.slice(0,k+1),e).slice(0,-1).concat(rdp(p.slice(k),e).slice(0,-1));
-for(let it=0;it<6;it++){if(v.length<3)break;let ch=false;for(let i=0;i<v.length&&v.length>3;i++){const a=v[(i+v.length-1)%v.length],b=v[(i+1)%v.length];if(segD(v[i],a,b)<e||Math.hypot(v[i][0]-a[0],v[i][1]-a[1])<e){v.splice(i,1);ch=true;i--}}if(!ch)break}return v}
-function recog(o){const p=o.p;if(!p||p.length<8)return null;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9,L=0;
-for(let i=0;i<p.length;i++){const q=p[i];if(q[0]<x0)x0=q[0];if(q[1]<y0)y0=q[1];if(q[0]>x1)x1=q[0];if(q[1]>y1)y1=q[1];if(i)L+=Math.hypot(q[0]-p[i-1][0],q[1]-p[i-1][1])}
-const w=x1-x0,h=y1-y0,dg=Math.hypot(w,h);if(dg<20||!L)return null;
-const f=p[0],l=p[p.length-1],ce=Math.hypot(l[0]-f[0],l[1]-f[1]),base={c:o.c,w:o.w,al:o.al,d:o.d,k:'s',f:false,_snap:true};
-if(ce/L>0.9)return{...base,s:'l',a:f.slice(),b:l.slice()};
-{const av=rdp(p,dg*0.06);let si=-1,sl=0;for(let i=0;i<av.length-1;i++){const d=Math.hypot(av[i+1][0]-av[i][0],av[i+1][1]-av[i][1]);if(d>sl){sl=d;si=i}}
-if(si>=0&&sl>0.33*L&&av.length>=3){const s0=av[si],s1=av[si+1],ex=av.filter((q,i)=>i!=si&&i!=si+1);let n0=0,n1=0,far=0;ex.forEach(q=>{const d0=Math.hypot(q[0]-s0[0],q[1]-s0[1]),d1=Math.hypot(q[0]-s1[0],q[1]-s1[1]);if(Math.min(d0,d1)>0.45*sl)far++;else if(d0<d1)n0++;else n1++});
-if(!far&&(n0||n1)){if(n0&&n1)return{...base,s:'da',a:s0.slice(),b:s1.slice()};if(sl>0.5*L)return n1?{...base,s:'a',a:s0.slice(),b:s1.slice()}:{...base,s:'a',a:s1.slice(),b:s0.slice()}}}}
-if(ce>0.3*Math.max(w,h)||w<10||h<10)return null;
-const a=[x0,y0],b=[x1,y1],c=[(x0+x1)/2,(y0+y1)/2];
-const nE=p.filter(q=>Math.min((q[0]-x0)/w,(x1-q[0])/w,(q[1]-y0)/h,(y1-q[1])/h)<0.09).length/p.length;
-if(nE>0.78)return{...base,s:'rect',a,b};
-const v=polyV(p,dg*0.07);
-if(v.length==3){const top=v.filter(q=>q[1]<y0+h*0.3).length,up=top==1,ap=up?v.reduce((m,q)=>q[1]<m[1]?q:m):v.reduce((m,q)=>q[1]>m[1]?q:m),rx=(ap[0]-x0)/w;
-let sh='tri',sx=1;if(rx<0.18)sh='rtri';else if(rx>0.82){sh='rtri';sx=-1}const sy=up?1:-1,o2={...base,s:sh,a,b};if(sx!=1||sy!=1)o2.m=about(scl(sx,sy),c);return o2}
-const rs=p.map(q=>Math.hypot((q[0]-c[0])/(w/2),(q[1]-c[1])/(h/2))),mu=rs.reduce((x,y)=>x+y)/rs.length,sd=Math.sqrt(rs.reduce((x,y)=>x+(y-mu)*(y-mu),0)/rs.length);
-if(sd/mu<0.16)return{...base,s:'ell',a,b};
-if(v.length==4)return{...base,s:'rect',a,b};
-return null}
-function snapStart(V){const o=live;if(!o||o.k!='p')return;o._lm=performance.now();o._ls=null;clearInterval(snapIv);snapIv=setInterval(()=>{if(live!==o){clearInterval(snapIv);return}if(performance.now()-o._lm>=2000&&o.p.length>=8){clearInterval(snapIv);const sh=recog(o);if(sh){live=sh;draw(V);try{navigator.vibrate&&navigator.vibrate(25)}catch(e){}log('info','Shape snapped: '+sh.s)}}},100)}
 /* ---- daily wipe: pages clear at 7:58 and 15:00 (a backup is kept for the admin panel) ---- */
 function wipeCheck(){const now=new Date(),b=new Date(now),mn=now.getHours()*60+now.getMinutes();if(mn>=900)b.setHours(15,0,0,0);else if(mn>=478)b.setHours(7,58,0,0);else{b.setDate(b.getDate()-1);b.setHours(15,0,0,0)}
 let last=0;try{last=+localStorage.getItem('wbw')||0}catch(e){}const mark=()=>{try{localStorage.setItem('wbw',String(Date.now()))}catch(e){}};
