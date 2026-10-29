@@ -175,7 +175,7 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.18',BD='30/10/12';
+const VER='1.1',BUILD='2026.10.30.19',BD='30/10/13';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -472,11 +472,11 @@ const FU={last:Date.now(),snooze:0,cd:0,t:0,busy:false};
 ['pointerdown','keydown'].forEach(t=>document.addEventListener(t,()=>{FU.last=Date.now()},true));
 async function fuCheck(){if(FU.busy||UPS.busy||!navigator.onLine)return;const base=upBase();if(!base)return;
 try{const r=await fetch(base+'version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=await r.json();if(!v||!v.force||!v.build||!bnew(v.build,BUILD))return;UPS.avail=v;fuWait()}catch(e){}}
-function fuWait(){if(FU.busy)return;FU.busy=true;clearInterval(FU.t);FU.t=setInterval(()=>{if(Date.now()<FU.snooze)return;if(Date.now()-FU.last<60000)return;clearInterval(FU.t);fuCount()},2000)}
-function fuCount(){let n=10,e=$('#fu');if(!e){e=document.createElement('div');e.id='fu';e.setAttribute('role','alertdialog');e.style.cssText='position:fixed;z-index:2147482000;left:50%;bottom:40px;transform:translateX(-50%);display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,var(--t0),var(--t2));color:#fff;border-radius:16px;padding:12px 14px 12px 18px;box-shadow:0 8px 30px rgba(10,27,69,.45);font:600 16px system-ui,sans-serif';document.body.append(e)}
+function fuWait(){if(FU.busy)return;FU.busy=true;clearInterval(FU.t);FU.t=setInterval(()=>{if(Date.now()<FU.snooze)return;clearInterval(FU.t);fuCount()},1000)}
+function fuCount(){let n=5,e=$('#fu');if(!e){e=document.createElement('div');e.id='fu';e.setAttribute('role','alertdialog');e.style.cssText='position:fixed;z-index:2147482000;left:50%;bottom:40px;transform:translateX(-50%);display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,var(--t0),var(--t2));color:#fff;border-radius:16px;padding:12px 14px 12px 18px;box-shadow:0 8px 30px rgba(10,27,69,.45);font:600 16px system-ui,sans-serif';document.body.append(e)}
 const show=()=>{e.innerHTML='<span>Updating ZHSE-A in '+n+' s. Your board is saved.</span><button style="height:44px;border:0;border-radius:12px;padding:0 16px;background:#fff;color:#0C2C69;font:700 14px system-ui,sans-serif;cursor:pointer">Not now</button>';e.querySelector('button').onclick=()=>{clearInterval(FU.cd);e.remove();FU.snooze=Date.now()+600000;FU.busy=false;fuWait();log('info','Forced update postponed 10 min')}};
 show();clearInterval(FU.cd);FU.cd=setInterval(()=>{n--;if(n>0){show();return}clearInterval(FU.cd);e.innerHTML='<span>Installing update...</span>';log('info','Forced update installing '+(UPS.avail&&UPS.avail.build));save(true);saveS();saveAD();upInstall().then(()=>{if(UPS.busy)return;setTimeout(()=>{const f=$('#fu');if(f)f.remove();FU.busy=false;FU.snooze=Date.now()+600000;fuWait()},3000)})},1000)}
-setTimeout(fuCheck,15000);setInterval(fuCheck,300000);addEventListener('online',()=>setTimeout(fuCheck,5000));
+setTimeout(fuCheck,5000);setInterval(fuCheck,15000);addEventListener('online',()=>setTimeout(fuCheck,5000));
 async function upRemove(){try{if(window.ZHSE&&ZHSE.clearUpdate)ZHSE.clearUpdate();await caches.delete('zhse-update');localStorage.removeItem('wbUpd')}catch(e){}UPS.avail=null;UPS.msg='Built-in version restored. Restarting...';log('info','Update removed');adRender();setTimeout(()=>location.reload(),900)}
 /* ---- admin menu ---- */
 const AH='81a6607bec39437b61567c70c776eb92218045bad91257ffea5dbbbff22d19dc',AF=2811130989,AT={n:0,t:0},ADv={chk:null,logs:false,upd:false,conf:'',msg:''};
