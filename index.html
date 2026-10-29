@@ -137,7 +137,7 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.14',BD='30/10/8';
+const VER='1.1',BUILD='2026.10.30.15',BD='30/10/9';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -316,9 +316,10 @@ function save(force){if(!AD.as&&!force)return;if(!force&&AD.asI>0&&Date.now()-la
 function doSave(){try{if(AD.bk&&Date.now()-lastBk>60000){const o=localStorage.getItem('wb1');if(o){localStorage.setItem('wb1b',o);lastBk=Date.now()}}localStorage.setItem('wb1',JSON.stringify({P:P.map(p=>({s:p.s.map(o=>o.k=='i'?{...o,img:null}:o),ox:p.ox,oy:p.oy,z:p.z})),cur:S.cur}));lastSv=Date.now();dirty=0}catch(e){log('error','Autosave failed: '+(e.message||e))}}
 setInterval(()=>{if(dirty)doSave()},4000);addEventListener('pagehide',()=>{if(dirty)doSave()});document.addEventListener('visibilitychange',()=>{if(document.hidden&&dirty)doSave()});
 function load(key='wb1'){try{const d=JSON.parse(localStorage.getItem(key)||'null');if(!d)return false;P=d.P.map(p=>({s:p.s.map(o=>{if(o.k=='i'){o.img=new Image();o.img.onload=()=>draw(WB);o.img.src=o.src}return o}),u:[],r:[],ox:p.ox||0,oy:p.oy||0,z:p.z||1}));S.cur=Math.min(d.cur||0,P.length-1);return true}catch(e){log('error','Load failed: '+(e.message||e));return false}}
-const SK=['sw','size','recT','recB','recH','recWT','recWH','ptw','useRec','al','lc','ld','tt','tx','ty','mode','sp','bg','bgc','pt','finger','wr','color','color2','cc','nx','ny'];
+const SK=['type','es','em','dash','fill','shape','ct','tool','hid','sw','size','recT','recB','recH','recWT','recWH','ptw','useRec','al','lc','ld','tt','tx','ty','mode','sp','bg','bgc','pt','finger','wr','color','color2','cc','nx','ny'];
 function saveS(){try{localStorage.setItem('wb2',JSON.stringify(Object.fromEntries(SK.map(k=>[k,S[k]]))))}catch(e){}}
-function loadS(){try{Object.assign(S,JSON.parse(localStorage.getItem('wb2')||'{}'));if(!['w','g','r','u'].includes(S.bg))S.bg='w';if(!T[S.tt])S.tt=0}catch(e){}}
+function loadS(){try{Object.assign(S,JSON.parse(localStorage.getItem('wb2')||'{}'));if(!['w','g','r','u'].includes(S.bg))S.bg='w';if(!T[S.tt])S.tt=0;if(!['pen','pen2','hand','eraser','shape','laser'].includes(S.tool))S.tool='pen';if(S.tool=='pen2'&&!S.wr)S.tool='pen'}catch(e){}}
+let _as=0;const autoSave=()=>{clearTimeout(_as);_as=setTimeout(()=>{saveS();saveAD()},250)};['click','input','change','pointerup'].forEach(t=>document.addEventListener(t,autoSave,true));addEventListener('pagehide',()=>{saveS();saveAD()});document.addEventListener('visibilitychange',()=>{if(document.hidden){saveS();saveAD()}});
 const persist=()=>A===WB?save():saveQ();
 /* editing */
 function mut(f){const p=pg();p.u.push(p.s);p.s=p.s.slice();f(p.s);p.r=[];persist();draw(A)}
@@ -450,7 +451,7 @@ c.innerHTML=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x
 <h3>Toolbar layout</h3><div class="ar"><span class="al">Lock toolbar customization (also locks moving and hiding the toolbar)</span><button class="ab${AD.lock?' on':''}" data-a="ad_lock">${AD.lock?'Locked':'Unlocked'}</button></div>${tb}
 <h3>Quick-access tools (extra row at the top, up to 6)</h3><div class="ar">${qa}</div>
 <h3>Visible tools</h3>${ht}
-<h3>Default sizes (applied at every start)</h3>${sl('dPen','Default pen size',24)}${sl('dEr','Default eraser size',60)}${sl('dTip','Pen tip size, Mr. Wrya (0 = use Size slider)',24,1)}${sl('dBack','Pen back size, Mr. Wrya (0 = use Size slider)',24,1)}${sl('ebs','Back-end eraser size, stylus eraser end (0 = same as eraser)',60,1)}<div class="ar"><button class="ab" data-a="ad_apply">Apply to current session now</button></div>
+<h3>Default sizes (used until a size is changed)</h3>${sl('dPen','Default pen size',24)}${sl('dEr','Default eraser size',60)}${sl('dTip','Pen tip size, Mr. Wrya (0 = use Size slider)',24,1)}${sl('dBack','Pen back size, Mr. Wrya (0 = use Size slider)',24,1)}${sl('ebs','Back-end eraser size, stylus eraser end (0 = same as eraser)',60,1)}<div class="ar"><button class="ab" data-a="ad_apply">Apply to current session now</button></div>
 <h3>Normal mode: pen tip and hand</h3><div class="ar"><span class="al">Automatic by default: the board learns the pen tip and the palm or back of the hand by itself as you use it. Palm limit now: ${S.pt}px. Recording is optional.</span><button class="ab${AD.auto!==false?' on':''}" data-a="ad_auto">${AD.auto!==false?'Automatic on':'Automatic off'}</button></div><div class="ar"><span class="al">Optional: record the pen tip and the back of the hand (normal mode).</span><button class="ab" data-a="ad_rc">Record pen tip and back of hand</button></div>
 <h3>Mr. Wrya mode: pen tip and pen back</h3><div class="ar"><span class="al">Record the pen tip and the back of the pen once. Kept through every update. Tip ${S.recWT?S.recWT.toFixed(1)+' px':'not recorded'}, back ${S.recB?S.recB.toFixed(1)+' px':'not recorded'}.</span><button class="ab" data-a="ad_rcw">Record pen tip and back</button></div>
 <h3>Mr. Wrya mode: palm and back of hand</h3><div class="ar"><span class="al">Automatic: it recognizes the palm and back of the hand by itself, no recording needed. Palm limit now: ${S.ptw}px. Optional manual record:</span><button class="ab" data-a="ad_rcwh">Record palm or back of hand</button>${S.recT||S.recB||S.recH||S.recWT||S.recWH?'<button class="ab" data-a="ad_rcc">Clear all recordings</button>':''}</div>
@@ -696,7 +697,7 @@ const pwc=()=>{try{return JSON.parse(localStorage.getItem('wbp')||'null')}catch(
 async function unlock(){const v=$('#lki').value,c=pwc()||{h:PH,f:PF};let ok=false;try{ok=crypto.subtle?(await sha(v))==c.h:fnv(v)==c.f}catch(e){ok=fnv(v)==c.f}log(ok?'info':'warn','Passcode '+(ok?'accepted':'rejected'));
 if(ok){try{localStorage.setItem('wbu',String(Date.now()))}catch(e){}$('#lk').style.display='none';$('#lke').textContent=''}else{$('#lke').textContent='Wrong password';$('#lki').value='';$('#lki').focus()}}
 $('#lkb').addEventListener('click',unlock);$('#lki').addEventListener('keydown',e=>{if(e.key=='Enter')unlock()});setInterval(lockCheck,60000);
-lockCheck();loadS();if(AD.rec){const r=AD.rec;if(!S.recT&&r.T)S.recT=r.T;if(!S.recH&&r.H){S.recH=r.H;if(r.pt)S.pt=r.pt}if(!S.recWT&&r.WT)S.recWT=r.WT;if(!S.recB&&r.B)S.recB=r.B;if(!S.recWH&&r.WH){S.recWH=r.WH;if(r.ptw)S.ptw=r.ptw}}S.size=AD.dPen;S.es=AD.dEr;load();applyTheme();panel();hz(false);bind(WB);bind(PV);layout();resumeCheck();
+lockCheck();const _sv=(()=>{try{return JSON.parse(localStorage.getItem('wb2')||'{}')}catch(e){return{}}})();loadS();if(AD.rec){const r=AD.rec;if(!S.recT&&r.T)S.recT=r.T;if(!S.recH&&r.H){S.recH=r.H;if(r.pt)S.pt=r.pt}if(!S.recWT&&r.WT)S.recWT=r.WT;if(!S.recB&&r.B)S.recB=r.B;if(!S.recWH&&r.WH){S.recWH=r.WH;if(r.ptw)S.ptw=r.ptw}}if(_sv.size==null)S.size=AD.dPen;if(_sv.es==null)S.es=AD.dEr;load();applyTheme();panel();hz(false);bind(WB);bind(PV);layout();resumeCheck();
 try{if(!(window.ZHSE&&window.ZHSE.saveUpdate)&&navigator.serviceWorker)navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 if(navigator.onLine)setTimeout(()=>{pdfLib().catch(()=>{})},4000);
 try{if(window.ZHSE&&ZHSE.ready)ZHSE.ready()}catch(e){}
