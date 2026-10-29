@@ -137,13 +137,13 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.10';
+const VER='1.1',BUILD='2026.10.30.11',BD='30/10/5';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
 addEventListener('unhandledrejection',e=>log('error','Promise: '+(e.reason&&e.reason.message||e.reason)));
 ['error','warn'].forEach(k=>{const o=console[k];console[k]=function(){try{log(k,[...arguments].join(' '))}catch(e){}return o.apply(this,arguments)}});
-log('info','App started v'+VER+' build '+BUILD);
+log('info','App started v'+VER+' build '+BD);
 const COL=[['Black','#111827'],['Dark gray','#4B5563'],['Gray','#9CA3AF'],['Brown','#78350F'],['Magenta','#BE185D'],['Red','#DC2626'],['Orange','#F97316'],['Yellow','#FACC15'],['Lime','#84CC16'],['Green','#16A34A'],['Teal','#0D9488'],['Cyan','#06B6D4'],['Blue','#2563EB'],['Indigo','#4F46E5'],['Purple','#7C3AED'],['Violet','#C026D3'],['Pink','#F472B6'],['Peach','#FDBA74'],['Mint','#86EFAC'],['Sky','#93C5FD']];
 const BG={w:'#ffffff',g:'#ffffff',r:'#1F2937'};
 const T=[['Blue',['#2E6FC9','#14438F','#0C2C69']],['Graphite',['#4B5563','#1F2937','#111827']],['Forest',['#2F9E6B','#17694A','#0D3F2D']],['Purple',['#8B5CF6','#5B21B6','#3B0F7A']],['Rose',['#F472B6','#BE185D','#7A0E3B']],['Sunset',['#FB923C','#C2410C','#7C2D12']],['Teal',['#2DD4BF','#0F766E','#0A4A45']]];
@@ -408,22 +408,22 @@ const v=RC.v;if(v.tip)S.recT=v.tip;if(v.back)S.recB=v.back;if(v.hand){S.recH=v.h
 /* ---- updates from a web address (GitHub Pages) ---- */
 const UPS={avail:null,msg:'',busy:false},UPK=location.origin+'/__zhse_update__';
 const bnum=v=>String(v).split('.').map(n=>parseInt(n)||0),bnew=(a,b)=>{const x=bnum(a),y=bnum(b);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0}return false};
-function upInfo(){try{const u=JSON.parse(localStorage.getItem('wbUpd')||'null');return u?' Installed web update: '+u.version+' (build '+u.build+').':''}catch(e){return''}}
+function upInfo(){try{const u=JSON.parse(localStorage.getItem('wbUpd')||'null');return u?' Installed web update: '+u.version+' (build '+(u.disp||u.build)+').':''}catch(e){return''}}
 const UP_DEFAULT='https://onpotatoesfr.github.io/ZHSE-alaz/';
 function upBase(){return UP_DEFAULT}
 const noUrl=t=>String(t).split(UP_DEFAULT).join('').split(UP_DEFAULT.replace(/\/$/,'')).join('').replace(/https?:\/\/\S+/g,'')
 async function upCheck(manual,inst){const base=upBase();if(!base){return}
 if(!navigator.onLine){UPS.msg='No internet connection.';if(manual)adRender();else toast(UPS.msg);return}
 try{UPS.msg='Checking...';if(manual)adRender();const r=await fetch(base+'version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const v=await r.json();if(!v.build||!v.version)throw new Error('version.json is missing version or build');
-if(bnew(v.build,BUILD)){UPS.avail=v;UPS.msg='Update available: '+v.version+' (build '+v.build+')'+(v.notes?' - '+String(v.notes).replace(/</g,'&lt;'):'');log('info','Update available '+v.build);}
-else{UPS.avail=null;UPS.msg='You are up to date (build '+BUILD+').'}}
+if(bnew(v.build,BUILD)){UPS.avail=v;UPS.msg='Update available: '+v.version+' (build '+(v.disp||v.build)+')'+(v.notes?' - '+String(v.notes).replace(/</g,'&lt;'):'');log('info','Update available '+v.build);}
+else{UPS.avail=null;UPS.msg='You are up to date (build '+BD+').'}}
 catch(e){UPS.msg='Could not check: '+noUrl(e.message||e);log('warn','Update check failed: '+noUrl(e.message||e))}
 if($('#ad').style.display=='flex')adRender();else if(inst)toast(UPS.msg.replace(/&lt;/g,'<'));if(inst&&UPS.avail)await upInstall()}
 async function upInstall(){const v=UPS.avail,base=upBase();if(!v||!base||UPS.busy)return;if(!(window.ZHSE&&ZHSE.saveUpdate)&&!(navigator.serviceWorker&&navigator.serviceWorker.controller)){UPS.msg='The offline worker is not active yet. Close and reopen the app once, then try again.';toast(UPS.msg);adRender();return}
 UPS.busy=true;UPS.msg='Downloading update...';adRender();
 try{const r=await fetch(base+'index.html?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const txt=await r.text(),m=/BUILD='([^']+)'/.exec(txt);
 if(!/<!doctype html>/i.test(txt)||!/const VER=/.test(txt)||!m||txt.length<50000)throw new Error('The downloaded file is not a valid app file');if(m[1]!=v.build)throw new Error('Downloaded build '+m[1]+' does not match version.json '+v.build);
-if(window.ZHSE&&ZHSE.saveUpdate){if(ZHSE.saveUpdate(txt,m[1])!='ok')throw new Error('Could not store the update')}else{const c=await caches.open('zhse-update');await c.put(UPK,new Response(txt,{headers:{'content-type':'text/html;charset=utf-8'}}))}try{localStorage.setItem('wbUpd',JSON.stringify({version:v.version,build:v.build,t:Date.now()}))}catch(e){}
+if(window.ZHSE&&ZHSE.saveUpdate){if(ZHSE.saveUpdate(txt,m[1])!='ok')throw new Error('Could not store the update')}else{const c=await caches.open('zhse-update');await c.put(UPK,new Response(txt,{headers:{'content-type':'text/html;charset=utf-8'}}))}try{localStorage.setItem('wbUpd',JSON.stringify({version:v.version,build:v.build,disp:v.disp||'',t:Date.now()}))}catch(e){}
 save(true);log('info','Update installed '+v.build);toast('Update installed. Restarting...');setTimeout(()=>location.reload(),900)}
 catch(e){UPS.msg='Update failed: '+noUrl(e.message||e);log('error',UPS.msg);toast('Update failed')}UPS.busy=false;adRender()}
 async function upRemove(){try{if(window.ZHSE&&ZHSE.clearUpdate)ZHSE.clearUpdate();await caches.delete('zhse-update');localStorage.removeItem('wbUpd')}catch(e){}UPS.avail=null;UPS.msg='Built-in version restored. Restarting...';log('info','Update removed');adRender();setTimeout(()=>location.reload(),900)}
@@ -444,7 +444,7 @@ const ht=ADH.map(([k,l])=>`<div class="ar"><span class="al">${l}</span><button c
 const chk=ADv.chk?ADv.chk.map(([n,r,t])=>`<div class="adres"><b>${r===true?'&#10003;':r===false?'&#10007;':'&#8226;'}</b>${n}: ${t}</div>`).join(''):'<div class="adn">Not run yet.</div>';
 const lg=ADv.logs?`<div class="adlog">${LOG.length?LOG.slice().reverse().slice(0,120).map(([t,l,m])=>new Date(t).toLocaleString()+'  ['+l+']  '+m.replace(/</g,'&lt;')).join('\n'):'No log entries.'}</div><div class="ar"><button class="ab" data-a="ad_logc">Copy</button><button class="ab" data-a="ad_logx">Clear logs</button></div>`:'';
 c.innerHTML=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x">Close</button></div>${ADv.msg?`<div class="adn" style="color:var(--ac);font-weight:700">${ADv.msg}</div>`:''}
-<h3>About</h3><div class="adr"><span>Version</span>${VER}</div><div class="adr"><span>Build number</span>${BUILD}</div>
+<h3>About</h3><div class="adr"><span>Version</span>${VER}</div><div class="adr"><span>Build number</span>${BD}</div>
 <h3>Toolbar layout</h3><div class="ar"><span class="al">Lock toolbar customization (also locks moving and hiding the toolbar)</span><button class="ab${AD.lock?' on':''}" data-a="ad_lock">${AD.lock?'Locked':'Unlocked'}</button></div>${tb}
 <h3>Quick-access tools (extra row at the top, up to 6)</h3><div class="ar">${qa}</div>
 <h3>Visible tools</h3>${ht}
@@ -461,7 +461,7 @@ c.innerHTML=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x
 <div class="ar"><span class="al">Ask to continue or start new when the app reopens</span><button class="ab${AD.ask?' on':''}" data-a="ad_ask">${AD.ask?'On':'Off'}</button></div>
 <div class="ar"><span class="al">Keep a recovery backup (previous save, at most once a minute)</span><button class="ab${AD.bk?' on':''}" data-a="ad_bk">${AD.bk?'On':'Off'}</button></div>
 <div class="ar"><button class="ab" data-a="ad_sv">Save now</button><button class="ab${ADv.conf=='rbk'?' on':''}" data-a="ad_rbk">${ADv.conf=='rbk'?'Tap again to restore':'Restore recovery backup'}</button></div>
-<h3>Updates</h3><div class="adn">Running version ${VER}, build ${BUILD}.${upInfo()}</div><div class="ar"><button class="ab" data-a="ad_upc">Check for updates</button>${UPS.avail?`<button class="ab on" data-a="ad_upi">Install ${UPS.avail.version} (build ${UPS.avail.build})</button>`:''}<button class="ab${ADv.conf=='upr'?' on':''}" data-a="ad_upr">${ADv.conf=='upr'?'Tap again to confirm':'Use built-in version'}</button></div>${UPS.msg?`<div class="adn">${UPS.msg}</div>`:''}<h3>Reset</h3><div class="ar"><span class="al">Restores the default button order, sizes, quick-access row and toolbar position.</span><button class="ab${ADv.conf=='rtb'?' on':''}" data-a="ad_rtb"${d}>${ADv.conf=='rtb'?'Tap again to confirm':'Reset toolbar'}</button></div>`;c.scrollTop=st}
+<h3>Updates</h3><div class="adn">Running version ${VER}, build ${BD}.${upInfo()}</div><div class="ar"><button class="ab" data-a="ad_upc">Check for updates</button>${UPS.avail?`<button class="ab on" data-a="ad_upi">Install ${UPS.avail.version} (build ${UPS.avail.build})</button>`:''}<button class="ab${ADv.conf=='upr'?' on':''}" data-a="ad_upr">${ADv.conf=='upr'?'Tap again to confirm':'Use built-in version'}</button></div>${UPS.msg?`<div class="adn">${UPS.msg}</div>`:''}<h3>Reset</h3><div class="ar"><span class="al">Restores the default button order, sizes, quick-access row and toolbar position.</span><button class="ab${ADv.conf=='rtb'?' on':''}" data-a="ad_rtb"${d}>${ADv.conf=='rtb'?'Tap again to confirm':'Reset toolbar'}</button></div>`;c.scrollTop=st}
 function adTb(){saveAD();panel();posPanel();if(S.fly)fly(S.fly);adRender()}
 async function adChecks(){const r=[],add=(n,ok,t)=>r.push([n,ok,t]);
 try{const c=document.createElement('canvas');c.width=c.height=8;const g=c.getContext('2d');g.fillStyle='#f00';g.fillRect(0,0,8,8);const px=g.getImageData(1,1,1,1).data;add('Canvas drawing',px[0]==255&&px[3]==255,'pixel test');g.globalCompositeOperation='destination-out';g.fillRect(0,0,8,8);add('Eraser compositing',g.getImageData(1,1,1,1).data[3]==0,'destination-out')}catch(e){add('Canvas drawing',false,e.message)}
