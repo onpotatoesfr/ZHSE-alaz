@@ -137,7 +137,7 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.11',BD='30/10/5';
+const VER='1.1',BUILD='2026.10.30.12',BD='30/10/6';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -153,7 +153,9 @@ const AD={tbo:TBD.slice(),tbh:[],tbs:{},qa:[],ht:[],lock:false,dPen:4,dEr:20,dTi
 try{Object.assign(AD,JSON.parse(localStorage.getItem('wba')||'{}'))}catch(e){}
 AD.tbo=AD.tbo.filter(i=>TBD.includes(i));TBD.forEach(i=>{if(!AD.tbo.includes(i))AD.tbo.push(i)});
 const saveAD=()=>{try{localStorage.setItem('wba',JSON.stringify(AD))}catch(e){}},vt=id=>!AD.ht.includes(id);
-let S={tool:'pen',type:'pen',color:'#111827',size:4,dash:false,al:1,fill:false,shape:'rect',bg:'w',bgc:'#DBEAFE',color2:'#DC2626',ct:'t',cc:[],wr:false,nx:10,ny:10,sel:null,cur:0,finger:true,pt:36,em:'n',es:20,fly:null,pf:null,mode:'wb',sp:.5,tt:0,tx:10,ty:10,hid:false,useRec:true,size2:8,lr:255,lg:30,lb:30,ld:3};
+const CS=[];
+let S={tool:'pen',type:'pen',color:'#111827',size:4,dash:false,al:1,fill:false,shape:'rect',bg:'w',bgc:'#DBEAFE',color2:'#DC2626',ct:'t',cc:[],wr:false,nx:10,ny:10,sel:null,cur:0,finger:true,pt:36,ptw:36,recWT:0,recWH:0,em:'n',es:20,fly:null,pf:null,mode:'wb',sp:.5,tt:0,tx:10,ty:10,hid:false,useRec:true,size2:8,lr:255,lg:30,lb:30,ld:3};
+const PT=()=>S.wr?S.ptw:S.pt,setPT=t=>{if(S.wr)S.ptw=t;else S.pt=t};
 const mk=()=>({s:[],u:[],r:[],ox:0,oy:0,z:1});
 let P=[mk()],Q=[],doc=null,pdfN=0,pdfCur=0,pdfKey='';
 const Qm=i=>Q[i]||(Q[i]=mk());
@@ -216,7 +218,7 @@ let FM='f';
 function askFill(o,mode='f'){FT=o;FM=mode;const f=$('#fp'),c=mode=='c';f.innerHTML=`<div class="fh"><b>${c?'Change color':'Fill with a color'}</b><button class="b" data-a="fx" aria-label="Close">${ic(I.x,18)}</button></div><div class="cg">${COL.map(([m,k])=>`<button class="sw" data-a="fc:${k}" aria-label="${m}" style="background:${k}"></button>`).join('')}</div><label class="li" style="margin-top:0">Custom color<input type="color" value="#FACC15" data-a="fci" aria-label="Pick a custom color" style="margin-left:auto;width:48px;height:32px;border:0;background:none"></label>${c?'':'<button class="li" data-a="fc:">No fill (outline only)</button>'}`;f.hidden=false}
 function setFill(c){const o=FT;$('#fp').hidden=true;FT=null;if(!o)return;const p=pg(),i=p.s.indexOf(o);if(i<0)return;const n=FM=='c'?{...o,c:c||o.c}:{...o,fc:c};mut(a=>{a[i]=n});if(S.sel===o)S.sel=n}
 function hz(dock=true){setTimeout(wmPos,0);const w=$('#w');w.classList.toggle('hz',S.wr);if(!S.hid)w.style.display='block';if(S.wr&&dock){S.tx=Math.max(0,(innerWidth-w.offsetWidth)/2);S.ty=Math.max(0,innerHeight-FH-w.offsetHeight-8)}posPanel();place()}
-function setWr(on){if(on===S.wr)return;S.hid=false;if(on){S.nx=S.tx;S.ny=S.ty}else{S.tx=S.nx;S.ty=S.ny;S.ct='t'}S.wr=on;fly(null);if(S.tool=='pen2'&&!on)S.tool='pen';panel();hz(on);saveS()}
+function setWr(on){if(on===S.wr)return;CS.length=0;S.hid=false;if(on){S.nx=S.tx;S.ny=S.ty}else{S.tx=S.nx;S.ty=S.ny;S.ct='t'}S.wr=on;fly(null);if(S.tool=='pen2'&&!on)S.tool='pen';panel();hz(on);saveS()}
 const curCol=()=>S.wr&&S.ct=='b'?S.color2:S.color;
 const ccHtml=()=>{const c0=curCol();return [].map(c=>`<button class="sw${c0==c?' on':''}" data-a="c:${c}" aria-label="Saved custom color" style="background:${c}"></button>`).join('')};
 const penGrid=()=>{const c0=curCol();return COL.map(([m,c])=>`<button class="sw${c0==c?' on':''}" data-a="c:${c}" aria-label="${m}" style="background:${c}"></button>`).join('')+`<label class="sw" aria-label="Custom color" style="display:block;position:relative;background:conic-gradient(#DC2626,#D97706,#FDE047,#15803D,#2563EB,#7C3AED,#DC2626)"><input type="color" value="${c0}" data-a="pci" aria-label="Pick a custom color" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer"></label><span id="ccs" style="display:contents">${ccHtml()}</span>`};
@@ -314,7 +316,7 @@ function save(force){if(!AD.as&&!force)return;if(!force&&AD.asI>0&&Date.now()-la
 function doSave(){try{if(AD.bk&&Date.now()-lastBk>60000){const o=localStorage.getItem('wb1');if(o){localStorage.setItem('wb1b',o);lastBk=Date.now()}}localStorage.setItem('wb1',JSON.stringify({P:P.map(p=>({s:p.s.map(o=>o.k=='i'?{...o,img:null}:o),ox:p.ox,oy:p.oy,z:p.z})),cur:S.cur}));lastSv=Date.now();dirty=0}catch(e){log('error','Autosave failed: '+(e.message||e))}}
 setInterval(()=>{if(dirty)doSave()},4000);addEventListener('pagehide',()=>{if(dirty)doSave()});document.addEventListener('visibilitychange',()=>{if(document.hidden&&dirty)doSave()});
 function load(key='wb1'){try{const d=JSON.parse(localStorage.getItem(key)||'null');if(!d)return false;P=d.P.map(p=>({s:p.s.map(o=>{if(o.k=='i'){o.img=new Image();o.img.onload=()=>draw(WB);o.img.src=o.src}return o}),u:[],r:[],ox:p.ox||0,oy:p.oy||0,z:p.z||1}));S.cur=Math.min(d.cur||0,P.length-1);return true}catch(e){log('error','Load failed: '+(e.message||e));return false}}
-const SK=['sw','size','recT','recB','recH','useRec','al','lc','ld','tt','tx','ty','mode','sp','bg','bgc','pt','finger','wr','color','color2','cc','nx','ny'];
+const SK=['sw','size','recT','recB','recH','recWT','recWH','ptw','useRec','al','lc','ld','tt','tx','ty','mode','sp','bg','bgc','pt','finger','wr','color','color2','cc','nx','ny'];
 function saveS(){try{localStorage.setItem('wb2',JSON.stringify(Object.fromEntries(SK.map(k=>[k,S[k]]))))}catch(e){}}
 function loadS(){try{Object.assign(S,JSON.parse(localStorage.getItem('wb2')||'{}'));if(!['w','g','r','u'].includes(S.bg))S.bg='w';if(!T[S.tt])S.tt=0}catch(e){}}
 const persist=()=>A===WB?save():saveQ();
@@ -324,8 +326,8 @@ const er=(q,k)=>{const p=pg();p.s=p.s.filter(o=>o.er||!hit(o,q[0],q[1],14/k))};
 function zoomAt(cx,cy,nz){const p=pg();p.ox=cx-(cx-p.ox)*nz/p.z;p.oy=cy-(cy-p.oy)*nz/p.z;p.z=nz}
 function addText(cx,cy,q){const fs=S.size*3+14,i=document.createElement('input');i.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;font:${fs*pg().z}px ${FF};color:${S.color};background:#fff9;border:1px dashed #2563EB;z-index:9;min-width:140px`;document.body.append(i);i.focus();let done=0;const f=()=>{if(done)return;done=1;const v=i.value.trim();i.remove();if(v)mut(a=>a.push({k:'t',s:v,x:q[0],y:q[1],z:fs/A.b(),c:S.color,w:1,al:S.al}))};i.onkeydown=e=>{if(e.key=='Enter')f()};i.onblur=f}
 function bind(V){const cv=V.cv,loc=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
-const CS=[];function autoLearn(e){if(AD.auto===false||e.pointerType!='touch')return;const v=Math.max(e.width||0,e.height||0);if(v<3)return;CS.push(v);if(CS.length>80)CS.shift();if(CS.length<6)return;let lo=Math.min(...CS),hi=Math.max(...CS);for(let i=0;i<12;i++){const a=CS.filter(x=>Math.abs(x-lo)<=Math.abs(x-hi)),b=CS.filter(x=>Math.abs(x-lo)>Math.abs(x-hi));if(a.length<3||b.length<3)return;lo=a.reduce((x,y)=>x+y)/a.length;hi=b.reduce((x,y)=>x+y)/b.length}if(hi/lo<1.8)return;const t=Math.round(cl(Math.sqrt(lo*hi),28,120));if(Math.abs(t-S.pt)>=2){S.pt=t;saveS()}}
-cv.addEventListener('pointerdown',e=>{A=V;lid=e.pointerId;const big=e.pointerType=='touch'&&Math.max(e.width,e.height)>=S.pt;autoLearn(e);const eb=e.pointerType=='pen'&&((e.buttons&32)||e.button===5);
+function autoLearn(e){if(AD.auto===false||e.pointerType!='touch')return;const v=Math.max(e.width||0,e.height||0);if(v<3)return;CS.push(v);if(CS.length>80)CS.shift();if(CS.length<6)return;let lo=Math.min(...CS),hi=Math.max(...CS);for(let i=0;i<12;i++){const a=CS.filter(x=>Math.abs(x-lo)<=Math.abs(x-hi)),b=CS.filter(x=>Math.abs(x-lo)>Math.abs(x-hi));if(a.length<3||b.length<3)return;lo=a.reduce((x,y)=>x+y)/a.length;hi=b.reduce((x,y)=>x+y)/b.length}if(hi/lo<1.8)return;const t=Math.round(cl(Math.sqrt(lo*hi),28,120));if(Math.abs(t-PT())>=2){setPT(t);saveS()}}
+cv.addEventListener('pointerdown',e=>{A=V;lid=e.pointerId;const big=e.pointerType=='touch'&&Math.max(e.width,e.height)>=PT();autoLearn(e);const eb=e.pointerType=='pen'&&((e.buttons&32)||e.button===5);
 if(V===PV&&doc&&e.pointerType=='touch'&&!big&&S.tool!='hand'){if(gz)return;cv.setPointerCapture(e.pointerId);tp.set(e.pointerId,[e.clientX,e.clientY]);if(tp.size==2){live=null;drag=null;D=null;lzCur=null;const a=[...tp.values()];gz={d:Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1,z:PVP.z,cx:(a[0][0]+a[1][0])/2,cy:(a[0][1]+a[1][1])/2,ox:PVP.ox,oy:PVP.oy};return}}
 if(!big){const r0=cv.getBoundingClientRect(),hx=e.clientX-r0.left,hy=e.clientY-r0.top,h=insHit(V,hx,hy);if(h){e.preventDefault();cv.setPointerCapture(e.pointerId);const o=INS[h.k];if(h.part=='x'){INS[h.k]=null;draw(V);return}if(h.part=='tog'){o.dr=!o.dr;draw(V);return}ig={k:h.k,part:h.part,dx:hx-(h.part=='mv'?o.x:0),dy:hy-(h.part=='mv'?o.y:0)};if(h.k=='c'&&h.part=='pen'&&o.dr){const p1=pg(),k1=K(),og1=V.og();live={k:'p',p:[[(h.x-p1.ox)/k1-og1[0],(h.y-p1.oy)/k1-og1[1]]],c:S.color,w:((S.useRec&&S.recT)||S.size)/V.b(),al:S.al,d:false}}return}}
 if(e.pointerType=='touch'&&!big&&!S.finger&&S.tool!='hand'&&S.tool!='eraser')return;cv.setPointerCapture(e.pointerId);
@@ -337,7 +339,7 @@ if(S.tool=='eraser'){p.u.push(p.s);p.s=p.s.slice();p.r=[];drag='e';er(q,k);draw(
 if(S.tool=='select'){selDown(p,k,q);return}
 if(S.tool=='text'){e.preventDefault();addText(e.clientX,e.clientY,q);return}
 if(S.tool=='laser'){lzCur={V,p:[[sx,sy,performance.now()]]};LZ.push(lzCur);lzGo();return}
-const bk=S.tool=='pen2'||(eb&&S.wr),m=S.type=='marker',sz0=bk&&S.wr?((S.useRec&&S.recB)||AD.dBack||S.size):((S.useRec&&S.recT)||(S.wr&&AD.dTip)||S.size),base={c:bk?S.color2:S.color,w:(m?sz0*3:sz0)/V.b(),al:S.al*(m?.4:1),d:S.dash||S.type=='dotted'};
+const bk=S.tool=='pen2'||(eb&&S.wr),m=S.type=='marker',sz0=bk&&S.wr?((S.useRec&&S.recB)||AD.dBack||S.size):((S.useRec&&(S.wr?S.recWT:S.recT))||(S.wr&&AD.dTip)||S.size),base={c:bk?S.color2:S.color,w:(m?sz0*3:sz0)/V.b(),al:S.al*(m?.4:1),d:S.dash||S.type=='dotted'};
 live=S.tool=='shape'?{...base,k:'s',s:S.shape,a:q,b:q,f:S.fill}:{...base,k:'p',p:[q]};if(live.k=='p'&&S.tool!='laser'){const ed=insSnap(V,sx,sy);if(ed){const pp=insProj(ed,sx,sy);live.rs=ed;live.p=[[(pp[0]-p.ox)/k-og[0],(pp[1]-p.oy)/k-og[1]]]}}drag='d'});
 cv.addEventListener('pointermove',e=>{if(A!==V)return;const p=pg(),k=K(),[sx,sy]=loc(e),og=V.og(),q=[(sx-p.ox)/k-og[0],(sy-p.oy)/k-og[1]];
 if(V===PV&&tp.has(e.pointerId)){tp.set(e.pointerId,[e.clientX,e.clientY]);if(gz){const a=[...tp.values()];if(a.length>=2){const r=cv.getBoundingClientRect(),d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1,cx=(a[0][0]+a[1][0])/2-r.left,cy=(a[0][1]+a[1][1])/2-r.top,nz=cl(gz.z*d/gz.d,1,6);PVP.z=nz;PVP.ox=cx-(gz.cx-r.left-gz.ox)*nz/gz.z;PVP.oy=cy-(gz.cy-r.top-gz.oy)*nz/gz.z;draw(V);schedRender()}return}}
@@ -394,16 +396,16 @@ const dvu=()=>{if(dq){dq=0;if(!dv._m){dv.classList.toggle('op');clearTimeout(dv.
 document.addEventListener('input',e=>{const a=e.target.dataset.a,v=e.target.value;if(a=='rg'){S.size=+v;$('#sv').textContent='Size '+v;saveS()}else if(a=='ld'){S.ld=+v;$('#ldv').textContent='Fades after '+v+' s';saveS()}else if(a=='rg2'){S.es=+v;$('#sv').textContent='Size '+S.es}else if(a=='rg3'){S.pt=+v;$('#sv').textContent='Palm size '+S.pt;saveS()}else if(a=='rg4'){S.al=+v/100;$('#ov').textContent='Opacity '+v+'%'}else if(a=='bgi'){S.bgc=v;S.bg='u';drawAll();saveS()}else if(a=='pci'){if(S.wr&&S.ct=='b')S.color2=v;else S.color=v;penDot();}});
 document.addEventListener('change',e=>{const a=e.target.dataset&&e.target.dataset.a;if(a=='pci'){const v=e.target.value;if(S.tool=='select'&&S.sel&&pg().s.includes(S.sel)){const o=S.sel,n={...o,c:v};mut(a2=>{a2[a2.indexOf(o)]=n});S.sel=n}}else if(a=='fci')setFill(e.target.value)});
 /* eraser outline (normal erase only) */
-(()=>{const ec=$('#ec'),hide=()=>{ec.style.display='none'},show=e=>{const pe=(e.pointerType=='touch'&&Math.max(e.width,e.height)>=S.pt);if((pe||(S.tool=='eraser'&&S.em=='n'))&&e.target.classList&&e.target.classList.contains('sf')){const d=pe?60:S.es;ec.style.cssText='display:block;width:'+d+'px;height:'+d+'px;left:'+e.clientX+'px;top:'+e.clientY+'px'}else hide()};
+(()=>{const ec=$('#ec'),hide=()=>{ec.style.display='none'},show=e=>{const pe=(e.pointerType=='touch'&&Math.max(e.width,e.height)>=PT());if((pe||(S.tool=='eraser'&&S.em=='n'))&&e.target.classList&&e.target.classList.contains('sf')){const d=pe?60:S.es;ec.style.cssText='display:block;width:'+d+'px;height:'+d+'px;left:'+e.clientX+'px;top:'+e.clientY+'px'}else hide()};
 document.addEventListener('pointermove',show);document.addEventListener('pointerdown',show);
 document.addEventListener('pointerup',e=>{if(e.pointerType=='touch')hide()});document.addEventListener('pointercancel',hide);document.addEventListener('pointerout',e=>{if(!e.relatedTarget)hide()})})();
 /* record pen tip / back / hand */
-const RC={i:0,v:{},mx:0},rcSteps=()=>S.wr?['tip','back','hand']:['tip','hand'];
-const RCT={tip:['the pen TIP','Press the pen tip here and hold'],back:['the BACK of the pen','Press the back of the pen here and hold'],hand:['the BACK of your HAND (erases only)','Press the back of your hand here and hold']};
+const RC={i:0,v:{},mx:0},rcSteps=()=>RC.st||['nt','nh'];
+const RCT={nt:['the pen TIP (normal mode)','Press the pen tip here and hold'],nh:['the BACK of your HAND (normal mode, erases only)','Press the back of your hand here and hold'],wt:['the pen TIP (Mr. Wrya mode)','Press the pen tip here and hold'],wb:['the BACK of the pen (Mr. Wrya mode)','Press the back of the pen here and hold'],wh:['the PALM or BACK of your HAND (Mr. Wrya mode, erases only)','Press your palm or the back of your hand here and hold']};
 function rcUI(){const st=rcSteps(),k=st[RC.i],last=RC.i==st.length-1;$('#rct').textContent='Step '+(RC.i+1)+' of '+st.length+': '+RCT[k][0];$('#rcp').textContent=RCT[k][1];$('#rcv').textContent=RC.mx?RC.mx.toFixed(1)+' px':'';$('#rcb').innerHTML=(RC.mx?`<button class="li" data-a="rck" style="justify-content:center;background:var(--ac);color:#fff">${last?'Save':'Keep, next'}</button>`:'')+`<button class="li" data-a="rcx" style="justify-content:center">Cancel</button>`}
-function rcOpen(){fly(null);closePops();RC.i=0;RC.v={};RC.mx=0;$('#rc').style.display='flex';rcUI()}
+function rcOpen(st){RC.st=st||['nt','nh'];fly(null);closePops();RC.i=0;RC.v={};RC.mx=0;$('#rc').style.display='flex';rcUI()}
 function rcNext(){const st=rcSteps();RC.v[st[RC.i]]=RC.mx;RC.mx=0;if(RC.i<st.length-1){RC.i++;rcUI();return}
-const v=RC.v;if(v.tip)S.recT=v.tip;if(v.back)S.recB=v.back;if(v.hand){S.recH=v.hand;S.pt=cl(Math.round(v.hand*.7),16,120)}S.useRec=true;$('#rc').style.display='none';saveS();toast('Recorded: '+st.map(k=>({tip:'tip',back:'back',hand:'hand'})[k]+' '+(v[k]||0).toFixed(1)+' px').join(', '));if(S.fly)fly(S.fly)}
+const v=RC.v,nm={nt:'pen tip',nh:'back of hand',wt:'pen tip (Wrya)',wb:'pen back (Wrya)',wh:'palm (Wrya)'};if(v.nt)S.recT=v.nt;if(v.nh){S.recH=v.nh;S.pt=cl(Math.round(v.nh*.7),16,120)}if(v.wt)S.recWT=v.wt;if(v.wb)S.recB=v.wb;if(v.wh){S.recWH=v.wh;S.ptw=cl(Math.round(v.wh*.7),16,120)}S.useRec=true;AD.rec={T:S.recT||0,H:S.recH||0,pt:S.pt,WT:S.recWT||0,B:S.recB||0,WH:S.recWH||0,ptw:S.ptw};saveAD();$('#rc').style.display='none';saveS();toast('Recorded: '+st.map(k=>nm[k]+' '+(v[k]||0).toFixed(1)+' px').join(', '));if(S.fly)fly(S.fly)}
 (()=>{const z=$('#rcp'),m=e=>{const v=Math.max(e.width||0,e.height||0,1.5);if(v>RC.mx){RC.mx=v;$('#rcv').textContent=v.toFixed(1)+' px'}};z.addEventListener('pointerdown',e=>{e.preventDefault();z.setPointerCapture(e.pointerId);RC.mx=0;m(e)});z.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType=='touch')m(e)});z.addEventListener('pointerup',()=>rcUI());z.addEventListener('pointercancel',()=>rcUI())})();
 /* ---- updates from a web address (GitHub Pages) ---- */
 const UPS={avail:null,msg:'',busy:false},UPK=location.origin+'/__zhse_update__';
@@ -449,7 +451,9 @@ c.innerHTML=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x
 <h3>Quick-access tools (extra row at the top, up to 6)</h3><div class="ar">${qa}</div>
 <h3>Visible tools</h3>${ht}
 <h3>Default sizes (applied at every start)</h3>${sl('dPen','Default pen size',24)}${sl('dEr','Default eraser size',60)}${sl('dTip','Pen tip size, Mr. Wrya (0 = use Size slider)',24,1)}${sl('dBack','Pen back size, Mr. Wrya (0 = use Size slider)',24,1)}${sl('ebs','Back-end eraser size, stylus eraser end (0 = same as eraser)',60,1)}<div class="ar"><button class="ab" data-a="ad_apply">Apply to current session now</button></div>
-<h3>Pen tip and palm recognition</h3><div class="ar"><span class="al">Automatic: the board learns the contact size of the pen tip and the palm as you use it, so the palm erases and the pen writes. Palm limit now: ${S.pt}px.</span><button class="ab${AD.auto!==false?' on':''}" data-a="ad_auto">${AD.auto!==false?'Automatic on':'Automatic off'}</button></div><div class="ar"><span class="al">Manual calibration (optional): record the pen tip and hand once.</span><button class="ab" data-a="ad_rc">Record pen tip and hand</button>${S.recT||S.recB||S.recH?'<button class="ab" data-a="ad_rcc">Clear recording</button>':''}</div>
+<h3>Normal mode: pen tip and hand</h3><div class="ar"><span class="al">Automatic by default: the board learns the pen tip and the palm or back of the hand by itself as you use it. Palm limit now: ${S.pt}px. Recording is optional.</span><button class="ab${AD.auto!==false?' on':''}" data-a="ad_auto">${AD.auto!==false?'Automatic on':'Automatic off'}</button></div><div class="ar"><span class="al">Optional: record the pen tip and the back of the hand (normal mode).</span><button class="ab" data-a="ad_rc">Record pen tip and back of hand</button></div>
+<h3>Mr. Wrya mode: pen tip and pen back</h3><div class="ar"><span class="al">Record the pen tip and the back of the pen once. Kept through every update. Tip ${S.recWT?S.recWT.toFixed(1)+' px':'not recorded'}, back ${S.recB?S.recB.toFixed(1)+' px':'not recorded'}.</span><button class="ab" data-a="ad_rcw">Record pen tip and back</button></div>
+<h3>Mr. Wrya mode: palm and back of hand</h3><div class="ar"><span class="al">Automatic: it recognizes the palm and back of the hand by itself, no recording needed. Palm limit now: ${S.ptw}px. Optional manual record:</span><button class="ab" data-a="ad_rcwh">Record palm or back of hand</button>${S.recT||S.recB||S.recH||S.recWT||S.recWH?'<button class="ab" data-a="ad_rcc">Clear all recordings</button>':''}</div>
 <h3>Recorded pen size</h3><div class="ar"><span class="al">Use the recorded pen tip size${S.recT||S.recB?' (tip '+(S.recT?S.recT.toFixed(1):'-')+' px'+(S.recB?', back '+S.recB.toFixed(1)+' px':'')+')':' (nothing recorded yet)'} instead of the Size slider.</span><button class="ab${S.useRec?' on':''}" data-a="ad_urec">${S.useRec?'On':'Off'}</button></div>
 <h3>App passcode (asked every 6 hours)</h3><div class="ar"><input id="adp1" type="password" placeholder="New passcode (4+ characters)" autocomplete="off"><input id="adp2" type="password" placeholder="Repeat passcode" autocomplete="off"><button class="ab" data-a="ad_pw">Change</button><button class="ab" data-a="ad_pwr">Restore original</button></div>
 <h3>Touch and pen accuracy test</h3><div class="ar"><span class="al">Tap 9 targets and draw with a finger, pen or palm to see contact size, pressure and error.</span><button class="ab" data-a="ad_tt">Start test</button></div>
@@ -493,8 +497,10 @@ if(k=='ad_pwr'){try{localStorage.removeItem('wbp')}catch(e){}log('info','Passcod
 if(k=='ad_tt'){ttOpen();return}
 if(k=='ad_urec'){S.useRec=!S.useRec;saveS();adRender();return}
 if(k=='ad_auto'){AD.auto=AD.auto===false;saveAD();if(AD.auto!==false){CS.length=0}adRender();return}
-if(k=='ad_rc'){rcOpen();return}
-if(k=='ad_rcc'){S.recT=S.recB=S.recH=0;S.pt=36;CS.length=0;saveS();adRender();return}
+if(k=='ad_rc'){rcOpen(['nt','nh']);return}
+if(k=='ad_rcw'){rcOpen(['wt','wb']);return}
+if(k=='ad_rcwh'){rcOpen(['wh']);return}
+if(k=='ad_rcc'){S.recT=S.recB=S.recH=S.recWT=S.recWH=0;S.pt=S.ptw=36;CS.length=0;delete AD.rec;saveAD();saveS();adRender();return}
 if(k=='ad_chk'){ADv.chk=[['Running','',' please wait...']];adRender();adChecks();return}
 if(k=='ad_logs'){ADv.logs=!ADv.logs;adRender();return}
 if(k=='ad_logc'){try{navigator.clipboard.writeText(LOG.map(([t,l,m])=>new Date(t).toISOString()+' ['+l+'] '+m).join('\n'));ADv.msg='Logs copied.'}catch(e){ADv.msg='Could not copy.'}adRender();return}
@@ -614,7 +620,7 @@ if(k=='urec'){S.useRec=!S.useRec;saveS();if(S.fly)fly(S.fly);return}
 if(k=='rc'){rcOpen();return}
 if(k=='rcx'){$('#rc').style.display='none';return}
 if(k=='rck'){rcNext();return}
-if(k=='rcc'){S.recT=S.recB=S.recH=0;S.pt=36;saveS();if(S.fly)fly(S.fly);return}
+if(k=='rcc'){S.recT=S.recB=S.recH=S.recWT=S.recWH=0;S.pt=S.ptw=36;saveS();if(S.fly)fly(S.fly);return}
 if(k=='rzc'){$('#rz').style.display='none';return}
 if(k=='rzn'){P=[mk()];S.cur=0;A=WB;save();$('#rz').style.display='none';drawAll();if(S.fly)fly(S.fly);return}
 if(k=='tm'){fly(null);closePops();$('#tm').hidden=false;tmHTML();tmShow();return}
@@ -690,7 +696,7 @@ const pwc=()=>{try{return JSON.parse(localStorage.getItem('wbp')||'null')}catch(
 async function unlock(){const v=$('#lki').value,c=pwc()||{h:PH,f:PF};let ok=false;try{ok=crypto.subtle?(await sha(v))==c.h:fnv(v)==c.f}catch(e){ok=fnv(v)==c.f}log(ok?'info':'warn','Passcode '+(ok?'accepted':'rejected'));
 if(ok){try{localStorage.setItem('wbu',String(Date.now()))}catch(e){}$('#lk').style.display='none';$('#lke').textContent=''}else{$('#lke').textContent='Wrong password';$('#lki').value='';$('#lki').focus()}}
 $('#lkb').addEventListener('click',unlock);$('#lki').addEventListener('keydown',e=>{if(e.key=='Enter')unlock()});setInterval(lockCheck,60000);
-lockCheck();loadS();S.size=AD.dPen;S.es=AD.dEr;load();applyTheme();panel();hz(false);bind(WB);bind(PV);layout();resumeCheck();
+lockCheck();loadS();if(AD.rec){const r=AD.rec;if(!S.recT&&r.T)S.recT=r.T;if(!S.recH&&r.H){S.recH=r.H;if(r.pt)S.pt=r.pt}if(!S.recWT&&r.WT)S.recWT=r.WT;if(!S.recB&&r.B)S.recB=r.B;if(!S.recWH&&r.WH){S.recWH=r.WH;if(r.ptw)S.ptw=r.ptw}}S.size=AD.dPen;S.es=AD.dEr;load();applyTheme();panel();hz(false);bind(WB);bind(PV);layout();resumeCheck();
 try{if(!window.ZHSE&&navigator.serviceWorker)navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 if(navigator.onLine)setTimeout(()=>{pdfLib().catch(()=>{})},4000);
 try{if(window.ZHSE&&ZHSE.ready)ZHSE.ready()}catch(e){}
