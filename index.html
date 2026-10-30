@@ -949,8 +949,8 @@ function ssWake(){SS.last=Date.now();if(!SS.on)return;SS.on=false;clearInterval(
 ['pointerdown','pointermove','keydown','wheel'].forEach(t=>document.addEventListener(t,()=>{SS.last=Date.now()},{capture:true,passive:true}));
 $('#ss').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();ssWake()});
 setInterval(()=>{if(SS.on){if(ssBusy())ssWake();return}if(Date.now()-SS.last>=SS.idle&&!ssBusy()&&!document.hidden)ssShow()},SS.idle<5000?250:5000);
-/* ---- handwriting beautification: only on the board named "Naz's tablet" ---- */
-function bwOn(){try{return bsName().toLowerCase().replace(/[‘’`´]/g,"'").replace(/\s+/g,' ').trim()=="naz's tablet"}catch(e){return false}}
+/* ---- handwriting beautification: only on the board named "Naz Tablet" ---- */
+function bwOn(){try{const n=bsName().toLowerCase().replace(/['\u2018\u2019`\u00b4]/g,'').replace(/\s+/g,' ').trim();return n=='naz tablet'||n=='nazs tablet'}catch(e){return false}}
 function bwStart(o,q,k){o.f=[.45];o._r=[q.slice()];o.p=[q.slice()];o._t=performance.now();o._k=k}
 const bwD=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
 function bwCorner(o,i){const r=o._r,R=10/o._k;if(i<=0||i>=r.length-1)return false;let a=i,b=i,da=0,db=0;while(a>0&&da<R){da+=bwD(r[a],r[a-1]);a--}while(b<r.length-1&&db<R){db+=bwD(r[b],r[b+1]);b++}if(da<R*.8||db<R*.8)return false;
