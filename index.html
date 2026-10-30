@@ -214,12 +214,12 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 html.rtl #fl,html.rtl #fp,html.rtl #sp,html.rtl #rz .lkb,html.rtl #lk .lkb,html.rtl #toast,html.rtl #fu,html.rtl #wn .wn-card,html.rtl #ggList,html.rtl #ggMsg,html.rtl #tm .fh,html.rtl #cal .fh{direction:rtl}
 html.rtl .li,html.rtl .gi,html.rtl .m{text-align:right}
 </style><style>
-.pvs{position:fixed;z-index:3;width:28px;display:none;touch-action:none;cursor:pointer;animation:zaFade .25s ease}
-.pvs-t{position:absolute;left:12px;top:0;bottom:0;width:4px;border-radius:2px;background:rgba(17,24,39,.18)}
-.pvs-h{position:absolute;left:8px;width:12px;height:44px;border-radius:6px;background:var(--ac);opacity:.85;box-shadow:0 1px 4px rgba(0,0,0,.3);transition:opacity .15s ease}
-.pvs-n{position:absolute;top:50%;transform:translateY(-50%);background:rgba(17,24,39,.85);color:#fff;font:700 12px system-ui,sans-serif;padding:3px 7px;border-radius:10px;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums;transition:font-size .15s ease,padding .15s ease}
-#pvsR .pvs-n{right:18px}#pvsL .pvs-n{left:18px}
-.pvs.drag .pvs-h{opacity:1}.pvs.drag .pvs-n{font-size:15px;padding:5px 10px}
+.pvs{position:fixed;z-index:3;width:22px;display:none;touch-action:none;cursor:pointer;animation:zaFade .25s ease}
+.pvs-t{position:absolute;left:15px;top:0;bottom:0;width:3px;border-radius:2px;background:rgba(17,24,39,.18)}
+.pvs-h{position:absolute;left:12px;width:9px;height:34px;border-radius:5px;background:var(--ac);opacity:.85;box-shadow:0 1px 4px rgba(0,0,0,.3);transition:opacity .15s ease}
+.pvs-n{position:absolute;top:50%;transform:translateY(-50%);background:rgba(17,24,39,.85);color:#fff;font:700 11px system-ui,sans-serif;padding:2px 6px;border-radius:9px;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums;transition:font-size .15s ease,padding .15s ease}
+#pvsR .pvs-n{right:14px}#pvsL .pvs-n{left:14px}#pvsL .pvs-t{left:4px}#pvsL .pvs-h{left:1px}
+.pvs.drag .pvs-h{opacity:1}.pvs.drag .pvs-n{font-size:14px;padding:4px 9px}
 </style></head><body>
 <div id="spl" aria-label="ZHSE-A is loading" role="status"><div class="spl-sl"><div class="spl-sr" aria-hidden="true"></div><div class="spl-sc"><img id="splImg" alt="Zhyar Educational Foundation logo"></div></div><div class="spl-st"><div class="spl-sn">ZHSE-A</div><div class="spl-sf">Zhyar Educational Foundation</div></div><div class="spl-sb" aria-hidden="true"><i></i></div><div class="spl-sa">made by <b>Alaz</b></div><div class="spl-sv"><span id="splB"></span><b aria-hidden="true">12F</b></div></div>
 <div id="clk" aria-hidden="true"><div id="clkT"></div><div id="clkD"></div></div>
@@ -837,10 +837,10 @@ const step=()=>{const n=performance.now(),dt=Math.min(40,n-lt);lt=n;const f=Math
 if(Math.hypot(vx,vy)<.02){pvIn=0;schedRender();return}pvRend();pvIn=requestAnimationFrame(step)};pvIn=requestAnimationFrame(step)}
 /* ---- PDF slider (small, on the PDF's outer edge) + remember the page per book ---- */
 let pvTarget=null;
-function pvsGeo(){if(!doc||!PV.on||!pdfN)return null;const k=PVV.z*PV.b(),tot=(offY[pdfN-1]+sz(pdfN-1)[1])*k;if(tot<=PV.H+2)return null;const top=PV.t+70,h=Math.max(120,PV.H-170);return{k,tot,top,h,th:44}}
+function pvsGeo(){if(!doc||!PV.on||!pdfN)return null;const k=PVV.z*PV.b(),tot=(offY[pdfN-1]+sz(pdfN-1)[1])*k;if(tot<=PV.H+2)return null;const top=PV.t+70,h=Math.max(120,PV.H-170);return{k,tot,top,h,th:34}}
 function pvsUpd(){const g=pvsGeo(),sides=!g?[]:S.mode=='pdf'?['L','R']:S.mode=='split'?[S.sw?'L':'R']:[];
 ['L','R'].forEach(sd=>{const el=$('#pvs'+sd);if(!el)return;if(!sides.includes(sd)){el.style.display='none';return}const f=cl(-PVV.oy/(g.tot-PV.H),0,1);
-el.style.display='block';el.style.top=g.top+'px';el.style.height=g.h+'px';el.style.left=(sd=='R'?PV.l+PV.W-30:PV.l+2)+'px';el.querySelector('.pvs-h').style.top=(f*(g.h-g.th))+'px';el.querySelector('.pvs-n').textContent=String(pageAt((PV.H*.4-PVV.oy)/g.k)+1)})}
+el.style.display='block';el.style.top=g.top+'px';el.style.height=g.h+'px';el.style.left=(sd=='R'?PV.l+PV.W-22:PV.l)+'px';el.querySelector('.pvs-h').style.top=(f*(g.h-g.th))+'px';el.querySelector('.pvs-n').textContent=String(pageAt((PV.H*.4-PVV.oy)/g.k)+1)})}
 window.pvsUpd=pvsUpd;
 ['L','R'].forEach(sd=>{const el=$('#pvs'+sd);let on=false;const mv=e=>{const g=pvsGeo();if(!g)return;const f=cl((e.clientY-g.top-g.th/2)/(g.h-g.th),0,1);PVV.oy=-f*(g.tot-PV.H);draw(PV);pvRend()};
 el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();el.setPointerCapture(e.pointerId);on=true;pvStop();pvTarget=null;el.classList.add('drag');A=PV;mv(e)});
