@@ -89,7 +89,7 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <div id="toast"></div>
 <script>
 (()=>{
-const PANEL_VER='8';
+const PANEL_VER='9';
 const ST='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4',CMD=ST+'-c',RSP=ST+'-r';
 const UPB=atob('aHR0cHM6Ly9vbnBvdGF0b2VzZnIuZ2l0aHViLmlvL1pIU0UtYWxhei8=');
 const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -131,11 +131,12 @@ async function sendCmd(to,c,a){const body=await sign(to,c,a),r=await fetch(CMD,{
 async function loadBoards(ask){if(ask){try{await sendCmd('all','who',null)}catch(e){toast('Could not ask boards: '+e.message)}}
 try{const v=await fetch(UPB+'version.json?t='+Date.now(),{cache:'no-store'});if(v.ok)B.latest=await v.json()}catch(e){}
 try{const r=await fetch(ST+'/json?poll=1&since=12h',{cache:'no-store'});const t=await r.text();t.split('\n').forEach(l=>{try{const e=JSON.parse(l);if(e.event!='message')return;const d=JSON.parse(e.message);if(d&&d.id&&(d.z===1||d.z===3))seen(d,e.time)}catch(_){}})}catch(e){toast('Could not load boards')}renderList()}
-function seen(d,t){const o=B.list[d.id]||{id:d.id};if(!o.t||t>=o.t){o.n=d.n||o.n||d.id;if(d.b)o.b=d.b;if(d.d)o.d=d.d;o.t=t}B.list[d.id]=o}
+const HID=new Set((()=>{try{return JSON.parse(localStorage.getItem('zhse-hidden')||'[]')}catch(e){return[]}})());function saveHid(){try{localStorage.setItem('zhse-hidden',JSON.stringify([...HID]))}catch(e){}}
+function seen(d,t){if(HID.has(d.id))return;const o=B.list[d.id]||{id:d.id};if(!o.t||t>=o.t){o.n=d.n||o.n||d.id;if(d.b)o.b=d.b;if(d.d)o.d=d.d;o.t=t}B.list[d.id]=o}
 const newer=(a,b)=>{const x=String(a).split('.').map(n=>+n||0),y=String(b).split('.').map(n=>+n||0);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0}return false};
 function ago(t){const s=Math.max(0,Math.round(Date.now()/1000-t));if(s<90)return'just now';const m=Math.round(s/60);if(m<60)return m+' min ago';return Math.round(m/60)+' h ago'}
 function boardRow(o){const on=Date.now()/1000-o.t<660,old=B.latest&&newer(B.latest.build,o.b),ck=B.checked.has(o.id),pad=CATS.cats.length?'16px':'10px';
-return `<div class="bd${B.sel===o.id?' sel':''}" style="padding-left:${pad}"><span class="cb ${ck?'on':''}" data-ck="${esc(o.id)}" title="Select"></span><button class="tx" data-id="${esc(o.id)}" style="border:0;background:transparent;padding:0;cursor:pointer;min-width:0"><div class="nm">${esc(o.n)}</div><div class="sub">${on?'Online':'Seen '+ago(o.t)} · ${esc(o.d||o.b||'?')}${old?' <span style="color:var(--warn)">↑</span>':''}</div></button></div>`}
+return `<div class="bd${B.sel===o.id?' sel':''}" style="padding-left:${pad}"><span class="cb ${ck?'on':''}" data-ck="${esc(o.id)}" title="Select"></span><button class="tx" data-id="${esc(o.id)}" style="border:0;background:transparent;padding:0;cursor:pointer;min-width:0"><div class="nm">${esc(o.n)}</div><div class="sub">${on?'Online':'Seen '+ago(o.t)} · ${esc(o.d||o.b||'?')}${old?' <span style="color:var(--warn)">↑</span>':''}</div></button><button class="fg" data-forget="${esc(o.id)}" title="Forget this board" style="border:0;background:transparent;color:var(--mute);cursor:pointer;padding:2px 7px;font-size:13px;line-height:1;opacity:.5">✕</button></div>`}
 function renderList(){const L=$('#list'),arr=Object.values(B.list).sort((a,b)=>String(a.n).localeCompare(String(b.n)));
 let h=`<button class="bd${B.sel==='all'?' sel':''}" data-id="all"><span class="dot on" style="background:var(--ac)"></span><span class="tx"><div class="nm">All boards</div><div class="sub">Change every board at once</div></span></button>`;
 for(const c of CATS.cats){const items=arr.filter(o=>CATS.of[o.id]===c),ids=items.map(o=>o.id),nck=ids.filter(id=>B.checked.has(id)).length,cls=!ids.length||nck===0?'':nck===ids.length?'on':'part';
@@ -143,18 +144,30 @@ h+=`<div class="cath"><span class="cb ${cls}" data-cat="${esc(c)}" title="Select
 const un=arr.filter(o=>!CATS.of[o.id]||!CATS.cats.includes(CATS.of[o.id]));
 if(CATS.cats.length&&un.length)h+=`<div class="cath"><span style="width:18px"></span><span style="flex:1">Ungrouped</span><span>${un.length}</span></div>`;
 h+=un.map(boardRow).join('');
+if(HID.size)h+='<button class="bd" id="unhide" style="opacity:.6"><span style="width:18px"></span><span class="tx"><div class="sub">'+HID.size+' hidden · tap to restore</div></span></button>';
 L.innerHTML=h;
-L.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>pick(b.dataset.id));
+L.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>pick(b.dataset.id));if(B.sel==='all'&&$('#stmsg').style.display==='block')showHealth();
 L.querySelectorAll('[data-ck]').forEach(b=>b.onclick=e=>{e.stopPropagation();const id=b.dataset.ck;B.checked.has(id)?B.checked.delete(id):B.checked.add(id);renderList();renderSide()});
 L.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{const ids=arr.filter(o=>CATS.of[o.id]===b.dataset.cat).map(o=>o.id);const allck=ids.length&&ids.every(id=>B.checked.has(id));ids.forEach(id=>allck?B.checked.delete(id):B.checked.add(id));renderList();renderSide()});
+L.querySelectorAll('[data-forget]').forEach(b=>b.onclick=e=>{e.stopPropagation();const id=b.dataset.forget,nm=(B.list[id]||{}).n||id;if(!confirm('Forget board "'+nm+'"? It will be hidden from this list on this PC. You can restore hidden boards from the bottom of the list.'))return;HID.add(id);saveHid();delete B.list[id];if(CATS.of[id]){delete CATS.of[id];saveCats()}B.checked.delete(id);if(B.sel===id)B.sel=null;renderList();renderSide()});
+const uh=L.querySelector('#unhide');if(uh)uh.onclick=()=>{HID.clear();saveHid();toast('Restored — click Refresh if a board is missing');loadBoards(false)};
 renderTgt()}
 $('#refresh').onclick=()=>{toast('Asking boards…');loadBoards(true);setTimeout(()=>loadBoards(false),5000)};
 try{const es=new EventSource(ST+'/sse');es.onmessage=ev=>{try{const e=JSON.parse(ev.data);if(e.event!='message')return;const d=JSON.parse(e.message);if(d&&d.id&&(d.z===1||d.z===3)){seen(d,e.time);renderList()}}catch(_){}}}catch(e){}
 function pick(id){if(C.id&&C.id!==id)disconnect();B.sel=id;renderList();const o=B.list[id];
-if(id==='all'){$('#bName').textContent='All boards';$('#bMeta').textContent='Settings and actions here are sent to every board. Live view is per board.';$('#connect').hidden=true;stageMsg('All boards','Pick one board on the left to see it live.')}
+if(id==='all'){$('#bName').textContent='All boards';$('#bMeta').textContent='Settings and actions here are sent to every board. Live view is per board.';$('#connect').hidden=true;showHealth()}
 else{$('#bName').textContent=o?o.n:id;$('#bMeta').textContent=o?`ID ${o.id} · build ${o.d||o.b||'?'} · ${Date.now()/1000-o.t<660?'online':'seen '+ago(o.t)}`:'';$('#connect').hidden=false;$('#connect').textContent='Connect';$('#connect').disabled=false;stageMsg('Not connected','Connect to see the board live and control it with your mouse and keyboard.')}
 renderSide()}
 function stageMsg(t,s){$('#cv').hidden=true;$('#live').style.display='none';$('#stmsg').style.display='flex';$('#stmsg').innerHTML=`<b>${esc(t)}</b><span>${esc(s)}</span>`}
+function showHealth(){$('#cv').hidden=true;$('#live').style.display='none';const el=$('#stmsg');el.style.display='block';el.style.textAlign='left';el.style.justifyContent='flex-start';el.style.overflow='auto';
+const arr=Object.values(B.list).sort((a,b)=>String(a.n).localeCompare(String(b.n)));
+const isOn=o=>Date.now()/1000-o.t<660,need=o=>B.latest&&newer(B.latest.build,o.b);
+const nOn=arr.filter(isOn).length,nUp=arr.filter(need).length;
+const chip=(l,v,c)=>'<span style="display:inline-flex;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--mute)"><b style="color:'+c+'">'+v+'</b> '+l+'</span>';
+let h='<div style="width:100%;max-width:720px;margin:0 auto"><div style="font-size:18px;font-weight:800;color:var(--ink);margin-bottom:3px">Board health</div><div style="font-size:13px;color:var(--mute);margin-bottom:14px">Every board this PC has seen recently.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">'+chip('boards',arr.length,'var(--ink)')+chip('online',nOn,'var(--ok)')+chip('offline',arr.length-nOn,'var(--mute)')+chip('need update',nUp,nUp?'var(--warn)':'var(--ok)')+'</div>';
+if(!arr.length)h+='<div style="color:var(--mute)">No boards yet — click Refresh.</div>';
+else h+='<div style="display:flex;flex-direction:column;gap:8px">'+arr.map(o=>{const on=isOn(o),up=need(o);return '<div style="display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px"><span style="width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:'+(on?'var(--ok)':'#9aa7bd')+';'+(on?'box-shadow:0 0 0 4px rgba(22,163,74,.15)':'')+'"></span><span style="flex:1;min-width:0"><div style="font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(o.n)+'</div><div style="font-size:12px;color:var(--mute)">'+(on?'Online':'Seen '+ago(o.t))+' · ID '+esc(o.id)+'</div></span><span style="text-align:right;flex:0 0 auto"><div style="font-family:ui-monospace,monospace;font-size:13px;color:var(--ink)">'+esc(o.d||o.b||'?')+'</div>'+(up?'<div style="font-size:11px;font-weight:700;color:var(--warn)">update ready ↑</div>':'<div style="font-size:11px;color:var(--ok)">up to date</div>')+'</span></div>';}).join('')+'</div>';
+el.innerHTML=h+'</div>';}
 /* ---------- settings + actions panel ---------- */
 function renderSide(){const I=C.info||{},all=(B.sel==='all'||B.checked.size>0),on=k=>I[k]?' on':'',S=$('#side');if(!B.sel&&!B.checked.size){S.innerHTML='';return}
 const sw=(k,l,v)=>`<div class="row"><span class="lb">${l}</span><button class="sw${v?' on':''}" data-set="${k}" aria-label="${l}"></button></div>`;
