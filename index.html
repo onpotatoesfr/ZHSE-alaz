@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.53',BD='30/10/47';
+const VER='1.1',BUILD='2026.10.30.54',BD='30/10/48';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -665,7 +665,7 @@ c.innerHTML=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x
 <div class="ar"><span class="al">Ask to continue or start new when the app reopens</span><button class="ab${AD.ask?' on':''}" data-a="ad_ask">${AD.ask?'On':'Off'}</button></div>
 <div class="ar"><span class="al">Keep a recovery backup (previous save, at most once a minute)</span><button class="ab${AD.bk?' on':''}" data-a="ad_bk">${AD.bk?'On':'Off'}</button></div>
 <div class="ar"><button class="ab" data-a="ad_sv">Save now</button><button class="ab${ADv.conf=='rbk'?' on':''}" data-a="ad_rbk">${ADv.conf=='rbk'?'Tap again to restore':'Restore recovery backup'}</button></div>
-<h3>Updates</h3><div class="adn">Running version ${VER}, build ${BD}.${upInfo()}</div><div class="ar"><button class="ab" data-a="ad_upc">Check for updates</button>${UPS.avail?`<button class="ab on" data-a="ad_upi">Install ${UPS.avail.version} (build ${UPS.avail.build})</button>`:''}<button class="ab${ADv.conf=='upr'?' on':''}" data-a="ad_upr">${ADv.conf=='upr'?'Tap again to confirm':'Use built-in version'}</button></div>${UPS.msg?`<div class="adn">${UPS.msg}</div>`:''}${bsHTML()}<h3>Reset</h3><div class="ar"><span class="al">Restores the default button order, sizes, quick-access row and toolbar position.</span><button class="ab${ADv.conf=='rtb'?' on':''}" data-a="ad_rtb"${d}>${ADv.conf=='rtb'?'Tap again to confirm':'Reset toolbar'}</button></div>`;c.scrollTop=st}
+<h3>Updates</h3><div class="adn">Running version ${VER}, build ${BD}.${upInfo()}</div><div class="ar"><button class="ab" data-a="ad_upc">Check for updates</button>${UPS.avail?`<button class="ab on" data-a="ad_upi">Install ${UPS.avail.version} (build ${UPS.avail.build})</button>`:''}<button class="ab${ADv.conf=='upr'?' on':''}" data-a="ad_upr">${ADv.conf=='upr'?'Tap again to confirm':'Use built-in version'}</button></div>${UPS.msg?`<div class="adn">${UPS.msg}</div>`:''}<h3>Screen saver background</h3><div class="adn">Now: ${AD.ssBg=='img'?'custom picture':AD.ssBg&&AD.ssBg!='navy'?'set from the admin panel':'original (navy)'}</div><div class="ar"><button class="ab" data-a="ad_ssimg">Choose picture</button><button class="ab" data-a="ad_ssorig">Back to original</button><button class="ab" data-a="ad_sstest">Preview</button></div><input type="file" id="ssPic" accept="image/*" hidden>${bsHTML()}<h3>Reset</h3><div class="ar"><span class="al">Restores the default button order, sizes, quick-access row and toolbar position.</span><button class="ab${ADv.conf=='rtb'?' on':''}" data-a="ad_rtb"${d}>${ADv.conf=='rtb'?'Tap again to confirm':'Reset toolbar'}</button></div>`;c.scrollTop=st}
 function adTb(){saveAD();panel();posPanel();if(S.fly)fly(S.fly);adRender()}
 async function adChecks(){const r=[],add=(n,ok,t)=>r.push([n,ok,t]);
 try{const c=document.createElement('canvas');c.width=c.height=8;const g=c.getContext('2d');g.fillStyle='#f00';g.fillRect(0,0,8,8);const px=g.getImageData(1,1,1,1).data;add('Canvas drawing',px[0]==255&&px[3]==255,'pixel test');g.globalCompositeOperation='destination-out';g.fillRect(0,0,8,8);add('Eraser compositing',g.getImageData(1,1,1,1).data[3]==0,'destination-out')}catch(e){add('Canvas drawing',false,e.message)}
@@ -715,6 +715,9 @@ if(k=='ad_ask'){AD.ask=!AD.ask;saveAD();adRender();return}
 if(k=='ad_bk'){AD.bk=!AD.bk;saveAD();adRender();return}
 if(k=='ad_sv'){save(true);ADv.msg='Saved.';adRender();return}
 if(k=='ad_rbk'){if(conf('rbk')){if(load('wb1b')){A=WB;save(true);drawAll();if(S.fly)fly(S.fly);ADv.msg='Recovery backup restored.';log('info','Recovery backup restored')}else ADv.msg='No recovery backup found.'}adRender();return}
+if(k=='ad_ssimg'){const f=$('#ssPic');if(f)f.click();return}
+if(k=='ad_ssorig'){AD.ssBg='navy';try{localStorage.removeItem('wbssimg')}catch(e){}saveAD();ssBgApply();ADv.msg='Screen saver is back to the original.';log('info','Screen saver background reset');adRender();return}
+if(k=='ad_sstest'){$('#ad').style.display='none';ssShow();return}
 if(k=='ad_bsl'){bsLoad();return}
 if(k=='ad_bsa'){bsSend('all');return}
 if(k=='ad_bsg'){BSE.open[v]=!BSE.open[v];adRender();return}
@@ -950,8 +953,11 @@ setInterval(()=>{if(exActive()){const d=new Date();$('#exClk').textContent=p2(d.
 const SS={last:Date.now(),on:false,iv:0,idle:600000};
 function ssBusy(){try{if(window.exActive&&exActive())return true}catch(e){}if(TM.st=='run'||TM.st=='ring')return true;if(doc&&PV.on)return true;if($('#fu'))return true;if($('#ad').style.display=='flex'||$('#tt').style.display=='block')return true;return false}
 function ssClock(){const d=new Date(),p=n=>String(n).padStart(2,'0'),loc=S.lang=='ckb'?'ckb-u-nu-latn':S.lang=='ar'?'ar-u-nu-latn':undefined;const h=d.getHours(),ap=(S.lang=='ar'?['ص','م']:S.lang=='ckb'?['پ.ن','د.ن']:['AM','PM'])[h<12?0:1];$('#ssT').innerHTML=((h%12)||12)+':'+p(d.getMinutes())+'<small class="ss-ap">'+ap+'</small>';try{$('#ssD').textContent=d.toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long'})}catch(e){$('#ssD').textContent=d.toDateString()}}
+document.addEventListener('change',e=>{if(!e.target||e.target.id!='ssPic')return;const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();r.onload=()=>{const m=new Image();m.onload=()=>{const k=Math.min(1,1600/Math.max(m.width,m.height)),c=document.createElement('canvas');c.width=Math.round(m.width*k);c.height=Math.round(m.height*k);c.getContext('2d').drawImage(m,0,0,c.width,c.height);
+let ok=false;for(const q of[.8,.65,.5]){const d=c.toDataURL('image/jpeg',q);try{localStorage.setItem('wbssimg',d);ok=true;break}catch(x){}}
+if(ok){AD.ssBg='img';saveAD();ssBgApply();ADv.msg='Screen saver picture saved.';log('info','Screen saver picture set')}else ADv.msg='That picture is too big to save. Try a smaller one.';adRender()};m.onerror=()=>{ADv.msg='That file is not a picture.';adRender()};m.src=r.result};r.readAsDataURL(f)});
 const SSBG={navy:'radial-gradient(circle at 50% 45%,#10255A 0%,#0A1838 55%,#050C1F 100%)',black:'radial-gradient(circle at 50% 45%,#1F2937 0%,#0B0F17 60%,#000 100%)',forest:'radial-gradient(circle at 50% 45%,#17694A 0%,#0D3F2D 55%,#06231A 100%)',purple:'radial-gradient(circle at 50% 45%,#5B21B6 0%,#3B0F7A 55%,#1E0742 100%)',sunset:'radial-gradient(circle at 50% 45%,#C2410C 0%,#7C2D12 55%,#3B1407 100%)',teal:'radial-gradient(circle at 50% 45%,#0F766E 0%,#0A4A45 55%,#042624 100%)',rose:'radial-gradient(circle at 50% 45%,#BE185D 0%,#7A0E3B 55%,#3D0620 100%)'};
-function ssBgApply(){const e=$('#ss');if(!e)return;const v=AD.ssBg||'navy';if(SSBG[v])e.style.background=SSBG[v];else if(/^#[0-9a-f]{6}$/i.test(v)){const h=v.slice(1),r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16),d=f=>'rgb('+Math.round(r*f)+','+Math.round(g*f)+','+Math.round(b*f)+')';e.style.background='radial-gradient(circle at 50% 45%,'+v+' 0%,'+d(.6)+' 55%,'+d(.3)+' 100%)'}else e.style.background=SSBG.navy}
+function ssBgApply(){const e=$('#ss');if(!e)return;const v=AD.ssBg||'navy';if(v=='img'){let d='';try{d=localStorage.getItem('wbssimg')||''}catch(x){}if(d){e.style.background='linear-gradient(rgba(5,12,31,.38),rgba(5,12,31,.38)),center/cover no-repeat url("'+d+'")';return}e.style.background=SSBG.navy;return}if(SSBG[v])e.style.background=SSBG[v];else if(/^#[0-9a-f]{6}$/i.test(v)){const h=v.slice(1),r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16),d=f=>'rgb('+Math.round(r*f)+','+Math.round(g*f)+','+Math.round(b*f)+')';e.style.background='radial-gradient(circle at 50% 45%,'+v+' 0%,'+d(.6)+' 55%,'+d(.3)+' 100%)'}else e.style.background=SSBG.navy}
 function ssShow(){ssBgApply();if(SS.on)return;SS.on=true;const e=$('#ss');try{const l=$('#lgo');if(l&&!$('#ssI').src)$('#ssI').src=l.src}catch(x){}$('#ssH').textContent=tl('Touch anywhere to wake');e.classList.remove('out');e.hidden=false;ssClock();clearInterval(SS.iv);SS.iv=setInterval(ssClock,1000);fly(null);log('info','Screen saver on')}
 function ssWake(){SS.last=Date.now();if(!SS.on)return;SS.on=false;clearInterval(SS.iv);const e=$('#ss');e.classList.add('out');setTimeout(()=>{if(!SS.on){e.hidden=true;e.classList.remove('out')}},350)}
 ['pointerdown','pointermove','keydown','wheel'].forEach(t=>document.addEventListener(t,()=>{SS.last=Date.now()},{capture:true,passive:true}));
@@ -1030,7 +1036,7 @@ else if(k=='wrName'){AD.wrb=v=='bottom';saveAD()}
 else if(k=='tt'){const i=+v;if(T[i]){S.tt=i;applyTheme();saveS()}}
 else if(k=='bw'){AD.bw=['on','off'].includes(v)?v:'auto';saveAD()}
 else if(k=='saver'){AD.ssOff=!v;saveAD();if(!v)ssWake()}
-else if(k=='ssBg'){const sv=String(v||'navy');AD.ssBg=(SSBG[sv]||/^#[0-9a-f]{6}$/i.test(sv))?sv:'navy';saveAD();ssBgApply()}
+else if(k=='ssBg'){const sv=String(v||'navy');AD.ssBg=(SSBG[sv]||/^#[0-9a-f]{6}$/i.test(sv)||sv=='img')?sv:'navy';saveAD();ssBgApply()}
 else if(k=='aiOff'){AD.aiOff=!!v;saveAD()}
 else if(k=='name'){const n=String(v||'').trim().slice(0,40);try{if(n)localStorage.setItem('wbn',n);else localStorage.removeItem('wbn')}catch(e){}bsBeat(true)}
 if(S.fly)fly(S.fly);mark();log('info','Remote setting: '+k)}
