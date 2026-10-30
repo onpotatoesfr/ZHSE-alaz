@@ -76,8 +76,7 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <p>This key lives only on this PC. Boards obey commands only when they're signed with it. Send the code below to Claude <b>once</b> so the boards learn to trust it.</p>
 <div class="code" id="pubCode">…</div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn pri" id="copyCode">Copy code</button><button class="btn" id="backup">Download key backup</button><label class="btn" style="display:inline-flex;align-items:center">Import key backup<input type="file" id="imp" accept=".json,application/json" hidden></label><span class="sp" style="flex:1"></span><button class="btn" id="keyClose">Close</button></div>
-<p class="muted" style="margin:8px 0 0">A password-protected backup is safe to keep anywhere (email it to yourself, a USB stick). Without the password it is useless, so it never exposes the boards. On a new PC: open the panel, click <b>Unlock with password</b>, pick the file and type the password.</p>
-<p class="muted" style="margin-top:14px">Keep the plain backup file private: anyone with it can control the boards. If it's ever lost or shared, make a new key and send the new code.</p>
+<p class="muted" style="margin:8px 0 0"><b>Download key backup</b> saves the key to a file so you can move it to another PC: there, open the panel and click <b>Import key backup</b>. Keep that file private — anyone who has it can control the boards. If it's ever lost or shared, make a new key and send the new code.</p>
 <button class="btn red sm" id="newKey">Make a new key</button>
 </div></div>
 <div class="modal" id="catM" hidden><div class="mc">
