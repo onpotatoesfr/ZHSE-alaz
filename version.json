@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.30.33","disp":"30/10/27","force":true,"notes":"Smooth PDF scrolling, finger drawing off by default","items":["Finger drawing is now off by default. Turn it on in Preferences","Scroll PDFs with one finger in any tool. It moves smoothly and keeps gliding after a flick"]}
+{"version":"1.1","build":"2026.10.30.34","disp":"30/10/28","force":true,"notes":"PDF slider and remembered page","items":["PDF books reopen at the page you were on","A small slider on the side of the PDF lets you move through the whole book, with the page number next to it"]}
