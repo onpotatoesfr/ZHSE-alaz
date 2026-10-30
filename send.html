@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#14438F">
+<title>ZHSE-A</title>
+<style>
+:root{--ac:#14438F;--t0:#2E6FC9;--t2:#0C2C69;--fb:#fff;--ff:#111827;--fm:#F3F4F6;--fl:#D1D5DB}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#E9EEF6;color:var(--ff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(180deg,var(--t0),var(--ac) 55%,var(--t2));color:#fff;padding:22px 20px 20px}
+header h1{margin:0;font:800 26px system-ui,sans-serif;letter-spacing:-.3px}header p{margin:6px 0 0;opacity:.85;font:500 15px system-ui,sans-serif}
+main{max-width:480px;margin:0 auto;padding:18px 16px 40px}
+.card{background:var(--fb);border-radius:16px;box-shadow:0 4px 18px rgba(10,27,69,.12);padding:18px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;border:0;border-radius:14px;font:700 17px system-ui,sans-serif;cursor:pointer;margin-top:10px}
+.pri{background:var(--ac);color:#fff}.sec{background:var(--fm);color:var(--ff)}.btn[disabled]{opacity:.45}
+#pv{display:none;width:100%;max-height:300px;object-fit:contain;border-radius:12px;background:var(--fm);margin-top:6px}
+#fn{display:none;font:600 15px system-ui,sans-serif;background:var(--fm);border-radius:12px;padding:14px;word-break:break-all;margin-top:6px}
+#bar{display:none;height:8px;border-radius:4px;background:var(--fm);overflow:hidden;margin-top:14px}#bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .2s}
+#st{min-height:22px;margin:14px 2px 0;font:600 15px system-ui,sans-serif;text-align:center}
+#st.ok{color:#15803D}#st.err{color:#DC2626}
+input[type=file]{display:none}
+[dir=rtl] header,[dir=rtl] main{text-align:right}
+</style>
+</head>
+<body>
+<header><h1 id="h1">ZHSE-A</h1><p id="sub"></p></header>
+<main><div class="card">
+<label class="btn pri" id="bTake" for="fTake"></label><input type="file" id="fTake" accept="image/*" capture="environment">
+<label class="btn sec" id="bPick" for="fPick"></label><input type="file" id="fPick">
+<img id="pv" alt=""><div id="fn"></div>
+<button class="btn pri" id="bSend" disabled></button>
+<div id="bar"><i></i></div><div id="st" role="status"></div>
+</div></main>
+<script>
+(function(){
+const q=new URLSearchParams(location.hash.slice(1)),topic=q.get('t')||'',mode=q.get('m')=='f'?'f':'p',lang=['ckb','ar'].includes(q.get('l'))?q.get('l'):'en';
+const T={
+en:{subP:'Send a photo to the board',subF:'Send a PDF to the board',take:'Take photo',pick:'Choose photo',pickF:'Choose PDF',send:'Send to board',sending:'Sending...',sent:'Sent! Look at the board.',again:'You can send another one.',bad:'This link is not valid. Scan the code on the board again.',notImg:'That file is not a photo.',notPdf:'That file is not a PDF.',big:'This file is too big to send this way. Use a USB stick instead.',fail:'Could not send. Check the internet and try again.',expired:'The board stopped waiting. Open the window on the board again and scan the new code.'},
+ckb:{subP:'وێنەیەک بنێرە بۆ تەختەکە',subF:'فایلێکی PDF بنێرە بۆ تەختەکە',take:'وێنە بگرە',pick:'وێنە هەڵبژێرە',pickF:'PDF هەڵبژێرە',send:'ناردن بۆ تەختە',sending:'دەنێردرێت...',sent:'نێردرا! سەیری تەختەکە بکە.',again:'دەتوانیت یەکێکی تر بنێریت.',bad:'ئەم بەستەرە دروست نییە. دووبارە کۆدەکەی سەر تەختەکە سکان بکە.',notImg:'ئەم فایلە وێنە نییە.',notPdf:'ئەم فایلە PDF نییە.',big:'ئەم فایلە زۆر گەورەیە بۆ ناردن بەم شێوەیە. فلاش بەکاربهێنە.',fail:'نەنێردرا. ئینتەرنێت بپشکنە و دووبارە هەوڵ بدەرەوە.',expired:'تەختەکە چاوەڕێ ناکات. پەنجەرەکە لەسەر تەختە دووبارە بکەرەوە و کۆدە نوێیەکە سکان بکە.'},
+ar:{subP:'أرسل صورة إلى السبورة',subF:'أرسل ملف PDF إلى السبورة',take:'التقط صورة',pick:'اختر صورة',pickF:'اختر ملف PDF',send:'إرسال إلى السبورة',sending:'جارٍ الإرسال...',sent:'تم الإرسال! انظر إلى السبورة.',again:'يمكنك إرسال ملف آخر.',bad:'هذا الرابط غير صالح. امسح الرمز على السبورة مرة أخرى.',notImg:'هذا الملف ليس صورة.',notPdf:'هذا الملف ليس PDF.',big:'هذا الملف كبير جدًا للإرسال بهذه الطريقة. استخدم ذاكرة USB.',fail:'تعذّر الإرسال. تحقق من الإنترنت وحاول مرة أخرى.',expired:'توقفت السبورة عن الانتظار. افتح النافذة على السبورة مرة أخرى وامسح الرمز الجديد.'}}[lang];
+const $=s=>document.getElementById(s),st=(t,c)=>{$('st').textContent=t||'';$('st').className=c||''};
+document.documentElement.lang=lang;if(lang!='en')document.documentElement.dir='rtl';
+$('sub').textContent=mode=='p'?T.subP:T.subF;$('bSend').textContent=T.send;
+if(mode=='p'){$('bTake').textContent=T.take;$('bPick').textContent=T.pick;$('fPick').accept='image/*'}else{$('bTake').style.display='none';$('bPick').textContent=T.pickF;$('bPick').className='btn pri';$('fPick').accept='application/pdf,.pdf'}
+if(!/^zhse-a-px-[a-f0-9]{16}$/.test(topic)){st(T.bad,'err');$('bTake').style.display=$('bPick').style.display='none';return}
+let file=null,name='';
+async function shrink(f){const u=URL.createObjectURL(f);try{const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=u});const k=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);return await new Promise(ok=>c.toBlob(ok,'image/jpeg',.82))}finally{URL.revokeObjectURL(u)}}
+async function chosen(f){if(!f)return;st('');$('bar').style.display='none';
+if(mode=='p'){if(!/^image\//.test(f.type)){st(T.notImg,'err');return}try{file=await shrink(f)}catch(e){st(T.notImg,'err');return}name='photo.jpg';$('pv').src=URL.createObjectURL(file);$('pv').style.display='block'}
+else{if(!(f.type=='application/pdf'||/\.pdf$/i.test(f.name))){st(T.notPdf,'err');return}if(f.size>15*1024*1024){st(T.big,'err');return}file=f;name=(f.name||'book.pdf').replace(/[^\w.\- ]+/g,'_').slice(0,80);if(!/\.pdf$/i.test(name))name+='.pdf';$('fn').textContent=f.name;$('fn').style.display='block'}
+$('bSend').disabled=false}
+$('fTake').onchange=e=>chosen(e.target.files[0]);$('fPick').onchange=e=>chosen(e.target.files[0]);
+$('bSend').onclick=()=>{if(!file)return;$('bSend').disabled=true;st(T.sending);$('bar').style.display='block';$('bar').firstChild.style.width='0';
+const x=new XMLHttpRequest();x.open('PUT','https://ntfy.sh/'+topic+'?filename='+encodeURIComponent(name)+'&message='+encodeURIComponent(mode=='p'?'photo':'pdf'));
+x.upload.onprogress=e=>{if(e.lengthComputable)$('bar').firstChild.style.width=Math.round(e.loaded/e.total*100)+'%'};
+x.onload=()=>{if(x.status>=200&&x.status<300){$('bar').firstChild.style.width='100%';st(T.sent+' '+T.again,'ok');file=null;$('pv').style.display='none';$('fn').style.display='none'}else{st(x.status==413||/too large|limit/i.test(x.responseText)?T.big:T.fail,'err');$('bSend').disabled=false}};
+x.onerror=()=>{st(T.fail,'err');$('bSend').disabled=false};x.send(file)};
+})();
+</script>
+</body>
+</html>
