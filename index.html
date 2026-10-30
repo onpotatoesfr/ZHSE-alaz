@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.52',BD='30/10/46';
+const VER='1.1',BUILD='2026.10.30.53',BD='30/10/47';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -950,7 +950,9 @@ setInterval(()=>{if(exActive()){const d=new Date();$('#exClk').textContent=p2(d.
 const SS={last:Date.now(),on:false,iv:0,idle:600000};
 function ssBusy(){try{if(window.exActive&&exActive())return true}catch(e){}if(TM.st=='run'||TM.st=='ring')return true;if(doc&&PV.on)return true;if($('#fu'))return true;if($('#ad').style.display=='flex'||$('#tt').style.display=='block')return true;return false}
 function ssClock(){const d=new Date(),p=n=>String(n).padStart(2,'0'),loc=S.lang=='ckb'?'ckb-u-nu-latn':S.lang=='ar'?'ar-u-nu-latn':undefined;const h=d.getHours(),ap=(S.lang=='ar'?['ص','م']:S.lang=='ckb'?['پ.ن','د.ن']:['AM','PM'])[h<12?0:1];$('#ssT').innerHTML=((h%12)||12)+':'+p(d.getMinutes())+'<small class="ss-ap">'+ap+'</small>';try{$('#ssD').textContent=d.toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long'})}catch(e){$('#ssD').textContent=d.toDateString()}}
-function ssShow(){if(SS.on)return;SS.on=true;const e=$('#ss');try{const l=$('#lgo');if(l&&!$('#ssI').src)$('#ssI').src=l.src}catch(x){}$('#ssH').textContent=tl('Touch anywhere to wake');e.classList.remove('out');e.hidden=false;ssClock();clearInterval(SS.iv);SS.iv=setInterval(ssClock,1000);fly(null);log('info','Screen saver on')}
+const SSBG={navy:'radial-gradient(circle at 50% 45%,#10255A 0%,#0A1838 55%,#050C1F 100%)',black:'radial-gradient(circle at 50% 45%,#1F2937 0%,#0B0F17 60%,#000 100%)',forest:'radial-gradient(circle at 50% 45%,#17694A 0%,#0D3F2D 55%,#06231A 100%)',purple:'radial-gradient(circle at 50% 45%,#5B21B6 0%,#3B0F7A 55%,#1E0742 100%)',sunset:'radial-gradient(circle at 50% 45%,#C2410C 0%,#7C2D12 55%,#3B1407 100%)',teal:'radial-gradient(circle at 50% 45%,#0F766E 0%,#0A4A45 55%,#042624 100%)',rose:'radial-gradient(circle at 50% 45%,#BE185D 0%,#7A0E3B 55%,#3D0620 100%)'};
+function ssBgApply(){const e=$('#ss');if(!e)return;const v=AD.ssBg||'navy';if(SSBG[v])e.style.background=SSBG[v];else if(/^#[0-9a-f]{6}$/i.test(v)){const h=v.slice(1),r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16),d=f=>'rgb('+Math.round(r*f)+','+Math.round(g*f)+','+Math.round(b*f)+')';e.style.background='radial-gradient(circle at 50% 45%,'+v+' 0%,'+d(.6)+' 55%,'+d(.3)+' 100%)'}else e.style.background=SSBG.navy}
+function ssShow(){ssBgApply();if(SS.on)return;SS.on=true;const e=$('#ss');try{const l=$('#lgo');if(l&&!$('#ssI').src)$('#ssI').src=l.src}catch(x){}$('#ssH').textContent=tl('Touch anywhere to wake');e.classList.remove('out');e.hidden=false;ssClock();clearInterval(SS.iv);SS.iv=setInterval(ssClock,1000);fly(null);log('info','Screen saver on')}
 function ssWake(){SS.last=Date.now();if(!SS.on)return;SS.on=false;clearInterval(SS.iv);const e=$('#ss');e.classList.add('out');setTimeout(()=>{if(!SS.on){e.hidden=true;e.classList.remove('out')}},350)}
 ['pointerdown','pointermove','keydown','wheel'].forEach(t=>document.addEventListener(t,()=>{SS.last=Date.now()},{capture:true,passive:true}));
 $('#ss').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();ssWake()});
@@ -1018,7 +1020,7 @@ if(v.c=='who'){if(Date.now()-RA.lastWho>30000){RA.lastWho=Date.now();bsBeat(true
 if(v.c=='rtc'){raRtc(v.a);return}
 try{raExec(v.c,v.a)}catch(x){log('error','Remote command failed: '+(x&&x.message||x))}}
 /* settings + actions shared by signed commands and the live connection */
-function raInfo(){return{ai:{name:window.aiName?aiName():false,key:window.aiKey?!!aiKey():false,off:!!AD.aiOff},id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER,lang:S.lang||'en',pass:!AD.nopw,clk:!!S.clk,finger:!!S.finger,wrOn:!AD.nowr,wrName:AD.wrb?'bottom':'wrya',wr:!!S.wr,tt:S.tt,bw:AD.bw||'auto',saver:!AD.ssOff,mode:S.mode,pages:P.length,cur:S.cur+1,pdf:!!doc,pdfPages:pdfN,exam:!!(window.exActive&&exActive()),asleep:!!SS.on,locked:$('#lk').style.display=='flex',vw:innerWidth,vh:innerHeight,online:navigator.onLine,crypto:!!(window.crypto&&crypto.subtle)}}
+function raInfo(){return{ai:{name:window.aiName?aiName():false,key:window.aiKey?!!aiKey():false,off:!!AD.aiOff},id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER,lang:S.lang||'en',pass:!AD.nopw,clk:!!S.clk,finger:!!S.finger,wrOn:!AD.nowr,wrName:AD.wrb?'bottom':'wrya',wr:!!S.wr,tt:S.tt,bw:AD.bw||'auto',saver:!AD.ssOff,ssBg:AD.ssBg||'navy',mode:S.mode,pages:P.length,cur:S.cur+1,pdf:!!doc,pdfPages:pdfN,exam:!!(window.exActive&&exActive()),asleep:!!SS.on,locked:$('#lk').style.display=='flex',vw:innerWidth,vh:innerHeight,online:navigator.onLine,crypto:!!(window.crypto&&crypto.subtle)}}
 function raSet(k,v){if(k=='pass'){AD.nopw=!v;try{localStorage.setItem('wbu',String(Date.now()))}catch(e){}saveAD();lockCheck()}
 else if(k=='clk'){S.clk=!!v;saveS();clkUpd()}
 else if(k=='lang'){S.lang=['en','ckb','ar'].includes(v)?v:'en';applyLang();panel();saveS()}
@@ -1028,6 +1030,7 @@ else if(k=='wrName'){AD.wrb=v=='bottom';saveAD()}
 else if(k=='tt'){const i=+v;if(T[i]){S.tt=i;applyTheme();saveS()}}
 else if(k=='bw'){AD.bw=['on','off'].includes(v)?v:'auto';saveAD()}
 else if(k=='saver'){AD.ssOff=!v;saveAD();if(!v)ssWake()}
+else if(k=='ssBg'){const sv=String(v||'navy');AD.ssBg=(SSBG[sv]||/^#[0-9a-f]{6}$/i.test(sv))?sv:'navy';saveAD();ssBgApply()}
 else if(k=='aiOff'){AD.aiOff=!!v;saveAD()}
 else if(k=='name'){const n=String(v||'').trim().slice(0,40);try{if(n)localStorage.setItem('wbn',n);else localStorage.removeItem('wbn')}catch(e){}bsBeat(true)}
 if(S.fly)fly(S.fly);mark();log('info','Remote setting: '+k)}
