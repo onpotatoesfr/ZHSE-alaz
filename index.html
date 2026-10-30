@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.49',BD='30/10/43';
+const VER='1.1',BUILD='2026.10.30.50',BD='30/10/44';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -1097,7 +1097,7 @@ else if(a.k=='w'){const tg=document.elementFromPoint(x,y);if(tg)tg.dispatchEvent
 function raKeyIn(a){const el=document.activeElement;if(!a)return;if(a.key){const k=a.key;if(el&&/^(INPUT|TEXTAREA)$/.test(el.tagName)&&k=='Backspace'){el.value=el.value.slice(0,-1);el.dispatchEvent(new Event('input',{bubbles:true}));return}(el||document).dispatchEvent(new KeyboardEvent('keydown',{key:k,bubbles:true}));(el||document).dispatchEvent(new KeyboardEvent('keyup',{key:k,bubbles:true}));return}
 if(typeof a.text=='string'&&el&&/^(INPUT|TEXTAREA)$/.test(el.tagName)){el.value+=a.text;el.dispatchEvent(new Event('input',{bubbles:true}))}}
 /* ---- AI neat writing (online, Naz Tablet only): each finished word is read by Gemini and redrawn in a neat handwriting font ---- */
-const AIW={q:[],busy:false,wid:0,font:false,models:['gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash'],mi:0,fails:0,pauseUntil:0};
+const AIW={q:[],busy:false,wid:0,font:false,models:['gemini-flash-latest','gemini-2.5-flash','gemini-flash-lite-latest','gemini-2.5-flash-lite','gemini-2.0-flash','gemini-2.0-flash-lite'],mi:0,fails:0,pauseUntil:0};
 const NEATFF="'Patrick Hand','Aref Ruqaa Ink','Aref Ruqaa','Segoe Print','Comic Sans MS',cursive";
 function aiKey(){try{return localStorage.getItem('wbai')||''}catch(e){return''}}
 function aiName(){try{const n=bsName().toLowerCase().replace(/['‘’`´]/g,'').replace(/\s+/g,' ').trim();return n=='naz tablet'||n=='nazs tablet'}catch(e){return false}}
@@ -1110,9 +1110,11 @@ function aiImg(objs){const all=[];objs.forEach(o=>bwPts(o).forEach(q=>all.push(q
 const W=x1-x0||1,H=y1-y0||1,pad=Math.max(W,H)*.12,sc=Math.min(110/(H+2*pad),1100/(W+2*pad)),c=document.createElement('canvas');c.width=Math.ceil((W+2*pad)*sc);c.height=Math.ceil((H+2*pad)*sc);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.setTransform(sc,0,0,sc,(pad-x0)*sc,(pad-y0)*sc);
 const ox=x;x=g;objs.forEach(o=>R({...o,c:'#000',al:1,w:Math.max(o.w,2.6/sc)}));x=ox;return{png:c.toDataURL('image/png').split(',')[1],box:[x0,y0,x1,y1]}}
 async function aiAsk(png){const key=aiKey();if(!key)throw new Error('no key');const body={contents:[{parts:[{text:'This image shows one short handwritten word or a few words from a school whiteboard. The writing may be English, Arabic, or Kurdish (Sorani, written in Arabic script), or numbers and math. Transcribe it exactly as written, keeping the same language, spelling and punctuation. Reply with ONLY the text, nothing else. If it is a drawing, a shape, an arrow, or you are not sure what it says, reply with exactly: ?'},{inline_data:{mime_type:'image/png',data:png}}]}],generationConfig:{temperature:0,maxOutputTokens:40}};
-for(let t=0;t<AIW.models.length;t++){const m=AIW.models[(AIW.mi+t)%AIW.models.length];let r;try{r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)})}catch(e){throw new Error('network')}
-if(r.status==404||r.status==400&&t<AIW.models.length-1){continue}if(r.status==429){AIW.pauseUntil=Date.now()+60000;throw new Error('daily or per-minute AI limit reached')}if(r.status==401||r.status==403){AIW.pauseUntil=Date.now()+600000;throw new Error('AI key not accepted')}if(!r.ok)throw new Error('AI HTTP '+r.status);
-AIW.mi=(AIW.mi+t)%AIW.models.length;const j=await r.json(),txt=(((j.candidates||[])[0]||{}).content||{}).parts;return(txt||[]).map(p=>p.text||'').join('').trim()}throw new Error('no AI model available')}
+let busy=0;for(let round=0;round<2;round++){for(let t=0;t<AIW.models.length;t++){const mi=(AIW.mi+t)%AIW.models.length,m=AIW.models[mi];let r;try{r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)})}catch(e){throw new Error('network')}
+if(r.status==404||r.status==400||r.status==500||r.status==502||r.status==503||r.status==504){if(r.status>=500)busy++;continue}
+if(r.status==429){AIW.pauseUntil=Date.now()+60000;throw new Error('AI limit reached (per minute or per day)')}if(r.status==401||r.status==403){AIW.pauseUntil=Date.now()+600000;throw new Error('AI key not accepted')}if(!r.ok)throw new Error('AI HTTP '+r.status);
+AIW.mi=mi;const j=await r.json(),txt=(((j.candidates||[])[0]||{}).content||{}).parts;return(txt||[]).map(p=>p.text||'').join('').trim()}
+if(!busy)break;await new Promise(ok=>setTimeout(ok,1500))}throw new Error(busy?'Google AI is busy right now (all models)':'no AI model available')}
 async function aiWord(j){const p=j.pg;if(!p)return;let objs=p.s.filter(o=>o.wd===j.wid&&o.k=='p');if(!objs.length)return;
 const all=[];objs.forEach(o=>bwPts(o).forEach(q=>all.push(q)));if(all.length<6)return;const k=j.V.page()===p?p.z*j.V.b():1;
 const im=aiImg(objs),[x0,y0,x1,y1]=im.box,H=y1-y0,W=x1-x0;if(H*k<12||H*k>170)return;
