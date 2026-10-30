@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.47',BD='30/10/41';
+const VER='1.1',BUILD='2026.10.30.48',BD='30/10/42';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -410,7 +410,7 @@ function R(o){x.save();if(o.m)x.transform(o.m[0],o.m[1],o.m[2],o.m[3],o.m[4],o.m
 if(o.k=='p'&&o.f&&o.f.length==o.p.length&&o.p.length>2){bwDraw(o)}else if(o.k=='p'){const q=o.p;x.beginPath();x.moveTo(q[0][0],q[0][1]);if(q.length==1)x.lineTo(q[0][0]+.1,q[0][1]);for(let i=1;i<q.length-1;i++)x.quadraticCurveTo(q[i][0],q[i][1],(q[i][0]+q[i+1][0])/2,(q[i][1]+q[i+1][1])/2);if(q.length>1)x.lineTo(q[q.length-1][0],q[q.length-1][1]);x.stroke()}
 else if(o.k=='s'){const Q2=new Path2D(sp(o.s,o.a,o.b));if(o.fc&&(SH[o.s]||SH.rect)[1]){x.fillStyle=o.fc;x.fill(Q2);x.fillStyle=o.c}x.stroke(Q2)}
 else if(o.k=='i'){if(o.img&&o.img.complete)x.drawImage(o.img,o.x,o.y,o.w,o.h)}
-else{x.font=o.z+'px '+FF;x.textBaseline='top';x.fillText(o.s,o.x,o.y)}x.restore()}
+else{x.font=o.z+'px '+(o.ff&&typeof NEATFF!='undefined'?NEATFF:FF);x.textBaseline='top';x.fillText(o.s,o.x,o.y)}x.restore()}
 function pts(o){if(o.k=='p')return o.p;if(o.k=='s')return[o.a,o.b];const r=[],w=o.k=='i'?o.w:o.s.length*o.z*.55,h=o.k=='i'?o.h:o.z*1.2;for(let i=0;i<=1;i+=.1)for(let j=0;j<=1;j+=.5)r.push([o.x+w*i,o.y+h*j]);return r}
 const bb=o=>{const q=pts(o),X=q.map(a=>a[0]),Y=q.map(a=>a[1]);return[Math.min(...X),Math.min(...Y),Math.max(...X),Math.max(...Y)]};
 const hit=(o,px,py,r)=>{if(o.m){const q=ap(mi(o.m),[px,py]);px=q[0];py=q[1];r/=Math.sqrt(Math.abs(o.m[0]*o.m[3]-o.m[1]*o.m[2]))||1}if(o.k=='s'){const Q2=new Path2D(sp(o.s,o.a,o.b)),m=WB.mx;m.save();m.setTransform(1,0,0,1,0,0);m.lineWidth=2*r+o.w;const h=m.isPointInStroke(Q2,px,py)||(o.fc&&m.isPointInPath(Q2,px,py));m.restore();return h}return pts(o).some(q=>Math.hypot(q[0]-px,q[1]-py)<r+(o.k=='p'?o.w/2:0))};
@@ -958,7 +958,7 @@ setInterval(()=>{if(SS.on){if(ssBusy()||AD.ssOff)ssWake();return}if(!AD.ssOff&&D
 /* ---- handwriting beautification: only on the board named "Naz Tablet" ---- */
 const BW_ALL=true;
 function bwOn(){if(AD.bw=='on')return true;if(AD.bw=='off')return false;if(BW_ALL)return true;try{const n=bsName().toLowerCase().replace(/['\u2018\u2019`\u00b4]/g,'').replace(/\s+/g,' ').trim();return n=='naz tablet'||n=='nazs tablet'}catch(e){return false}}
-function bwStart(o,q,k){o.f=[.45];o._r=[q.slice()];o.p=[q.slice()];o._t=performance.now();o._k=k}
+function bwStart(o,q,k){o._ts=Date.now();o.f=[.45];o._r=[q.slice()];o.p=[q.slice()];o._t=performance.now();o._k=k}
 const bwD=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
 function bwCorner(o,i){const r=o._r,R=10/o._k;if(i<=0||i>=r.length-1)return false;let a=i,b=i,da=0,db=0;while(a>0&&da<R){da+=bwD(r[a],r[a-1]);a--}while(b<r.length-1&&db<R){db+=bwD(r[b],r[b+1]);b++}if(da<R*.8||db<R*.8)return false;
 const u=[r[i][0]-r[a][0],r[i][1]-r[a][1]],v=[r[b][0]-r[i][0],r[b][1]-r[i][1]],lu=Math.hypot(u[0],u[1]),lv=Math.hypot(v[0],v[1]);if(lu<1e-6||lv<1e-6)return false;
@@ -974,12 +974,13 @@ for(let i=1;i<n-1;i++){const s0=i==1?q[0]:mid(q[i-1],q[i]),e0=i==n-2?q[n-1]:mid(
 /* ---- word neatening (with beautification): after each word, level it, make it upright, match size/line with the previous word ---- */
 const BWW={cur:null,t:0,line:null,anim:0};
 function bwPts(o){const m=o.m||I3;return o.p.map(q=>ap(m,q))}
-function bwWord(o,V){const now=Date.now(),k=V.page().z*V.b(),pts=bwPts(o);let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;pts.forEach(q=>{x0=Math.min(x0,q[0]);y0=Math.min(y0,q[1]);x1=Math.max(x1,q[0]);y1=Math.max(y1,q[1])});
-const w=BWW.cur;let join=false;if(w&&w.V===V&&w.pg===V.page()&&now-w.t<1300){const h=Math.max(w.y1-w.y0,18/k),gx=Math.max(h*.9,22/k),gy=h*.6;join=x0<=w.x1+gx&&x1>=w.x0-gx&&y0<=w.y1+gy&&y1>=w.y0-gy}
-if(!join){bwFinish();BWW.cur={V,pg:V.page(),objs:[o],x0,y0,x1,y1,t:now,k}}else{w.objs.push(o);w.x0=Math.min(w.x0,x0);w.y0=Math.min(w.y0,y0);w.x1=Math.max(w.x1,x1);w.y1=Math.max(w.y1,y1);w.t=now}
-clearTimeout(BWW.t);BWW.t=setTimeout(bwFinish,850)}
+function bwWord(o,V){const now=Date.now(),ts=o._ts||now;delete o._ts;const k=V.page().z*V.b(),pts=bwPts(o);let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;pts.forEach(q=>{x0=Math.min(x0,q[0]);y0=Math.min(y0,q[1]);x1=Math.max(x1,q[0]);y1=Math.max(y1,q[1])});
+const w=BWW.cur;let join=false;if(w&&w.V===V&&w.pg===V.page()&&ts-w.t<1300){const h=Math.max(w.y1-w.y0,18/k),gx=Math.max(h*.9,22/k),gy=h*.6;join=x0<=w.x1+gx&&x1>=w.x0-gx&&y0<=w.y1+gy&&y1>=w.y0-gy}
+if(!join){bwFinish();BWW.n=(BWW.n||0)+1;BWW.cur={wid:BWW.n,V,pg:V.page(),objs:[o],x0,y0,x1,y1,t:now,k}}else{w.objs.push(o);w.x0=Math.min(w.x0,x0);w.y0=Math.min(w.y0,y0);w.x1=Math.max(w.x1,x1);w.y1=Math.max(w.y1,y1);w.t=now}
+o.wd=BWW.cur.wid;clearTimeout(BWW.t);BWW.t=setTimeout(bwFinish,850)}
 function bwQ(a,f){const s=a.slice().sort((p,q)=>p-q);return s[Math.min(s.length-1,Math.max(0,Math.round((s.length-1)*f)))]}
-function bwFinish(){clearTimeout(BWW.t);const w=BWW.cur;BWW.cur=null;if(!w)return;const p=w.pg;if(w.V.page()!==p)return;const objs=w.objs.filter(o=>p.s.includes(o));if(!objs.length)return;
+function bwFinish(){const w=BWW.cur;bwFinish0();if(w&&window.aiQueue)setTimeout(()=>aiQueue(w.wid,w.pg,w.V),320)}
+function bwFinish0(){clearTimeout(BWW.t);const w=BWW.cur;BWW.cur=null;if(!w)return;const p=w.pg;if(w.V.page()!==p)return;const objs=w.objs.filter(o=>p.s.includes(o));if(!objs.length)return;
 const k=w.k,all=[];objs.forEach(o=>bwPts(o).forEach(q=>all.push(q)));if(all.length<6)return;
 const W=w.x1-w.x0,H=w.y1-w.y0,hs=H*k;if(hs<12||hs>170)return;
 for(const o of objs){const q=bwPts(o);let L=0;for(let i=1;i<q.length;i++)L+=Math.hypot(q[i][0]-q[i-1][0],q[i][1]-q[i-1][1]);const c=Math.hypot(q[q.length-1][0]-q[0][0],q[q.length-1][1]-q[0][1]);if(L>0&&c/L>.93&&c>2.6*H&&objs.length==1)return}
@@ -1017,7 +1018,7 @@ if(v.c=='who'){if(Date.now()-RA.lastWho>30000){RA.lastWho=Date.now();bsBeat(true
 if(v.c=='rtc'){raRtc(v.a);return}
 try{raExec(v.c,v.a)}catch(x){log('error','Remote command failed: '+(x&&x.message||x))}}
 /* settings + actions shared by signed commands and the live connection */
-function raInfo(){return{id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER,lang:S.lang||'en',pass:!AD.nopw,clk:!!S.clk,finger:!!S.finger,wrOn:!AD.nowr,wrName:AD.wrb?'bottom':'wrya',wr:!!S.wr,tt:S.tt,bw:AD.bw||'auto',saver:!AD.ssOff,mode:S.mode,pages:P.length,cur:S.cur+1,pdf:!!doc,pdfPages:pdfN,exam:!!(window.exActive&&exActive()),asleep:!!SS.on,locked:$('#lk').style.display=='flex',vw:innerWidth,vh:innerHeight,online:navigator.onLine,crypto:!!(window.crypto&&crypto.subtle)}}
+function raInfo(){return{ai:{name:window.aiName?aiName():false,key:window.aiKey?!!aiKey():false,off:!!AD.aiOff},id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER,lang:S.lang||'en',pass:!AD.nopw,clk:!!S.clk,finger:!!S.finger,wrOn:!AD.nowr,wrName:AD.wrb?'bottom':'wrya',wr:!!S.wr,tt:S.tt,bw:AD.bw||'auto',saver:!AD.ssOff,mode:S.mode,pages:P.length,cur:S.cur+1,pdf:!!doc,pdfPages:pdfN,exam:!!(window.exActive&&exActive()),asleep:!!SS.on,locked:$('#lk').style.display=='flex',vw:innerWidth,vh:innerHeight,online:navigator.onLine,crypto:!!(window.crypto&&crypto.subtle)}}
 function raSet(k,v){if(k=='pass'){AD.nopw=!v;try{localStorage.setItem('wbu',String(Date.now()))}catch(e){}saveAD();lockCheck()}
 else if(k=='clk'){S.clk=!!v;saveS();clkUpd()}
 else if(k=='lang'){S.lang=['en','ckb','ar'].includes(v)?v:'en';applyLang();panel();saveS()}
@@ -1027,6 +1028,7 @@ else if(k=='wrName'){AD.wrb=v=='bottom';saveAD()}
 else if(k=='tt'){const i=+v;if(T[i]){S.tt=i;applyTheme();saveS()}}
 else if(k=='bw'){AD.bw=['on','off'].includes(v)?v:'auto';saveAD()}
 else if(k=='saver'){AD.ssOff=!v;saveAD();if(!v)ssWake()}
+else if(k=='aiOff'){AD.aiOff=!!v;saveAD()}
 else if(k=='name'){const n=String(v||'').trim().slice(0,40);try{if(n)localStorage.setItem('wbn',n);else localStorage.removeItem('wbn')}catch(e){}bsBeat(true)}
 if(S.fly)fly(S.fly);mark();log('info','Remote setting: '+k)}
 function raAct(n,a){a=a||{};if(n=='update'){fuRemote()}
@@ -1062,7 +1064,7 @@ function raOn(data){let m;try{m=JSON.parse(data)}catch(e){return}const q=m.q;con
 try{if(m.c=='info')reply(raInfo());else if(m.c=='live'){RA.live=!!m.a;RA.fps=Math.max(1,Math.min(6,+m.fps||3));RA.w=Math.max(480,Math.min(1600,+m.w||1000));if(RA.live)raFrame();reply(true)}
 else if(m.c=='in')raIn(m.a);else if(m.c=='key')raKeyIn(m.a);
 else if(m.c=='logs')reply(LOG.slice(-200));
-else if(m.c=='set'){raSet(m.a.k,m.a.v);reply(raInfo())}else if(m.c=='act'){raAct(m.a.n,m.a);setTimeout(()=>raSend({k:'info',d:raInfo()}),400);reply(true)}
+else if(m.c=='set'){if(m.a.k=='aikey'){const v=String(m.a.v||'').trim();try{if(v&&/^[\w-]{20,120}$/.test(v)){localStorage.setItem('wbai',v);log('info','AI key saved');aiFont()}else{localStorage.removeItem('wbai');log('info','AI key removed')}}catch(e){}}else raSet(m.a.k,m.a.v);reply(raInfo())}else if(m.c=='act'){raAct(m.a.n,m.a);setTimeout(()=>raSend({k:'info',d:raInfo()}),400);reply(true)}
 else if(m.c=='bye')raClose()}catch(e){reply({error:String(e&&e.message||e)})}}
 /* live view: board drawing + a map of the on-screen controls */
 function raUI(){const out=[],cs=getComputedStyle.bind(window),vis=e=>{if(!e||!e.isConnected)return null;const r=e.getBoundingClientRect();if(r.width<2||r.height<2||r.bottom<0||r.right<0||r.top>innerHeight||r.left>innerWidth)return null;const s=cs(e);if(s.visibility=='hidden'||s.display=='none'||+s.opacity<.05)return null;return[r,s]};
@@ -1094,6 +1096,35 @@ tg.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,clientX:x,
 else if(a.k=='w'){const tg=document.elementFromPoint(x,y);if(tg)tg.dispatchEvent(new WheelEvent('wheel',{bubbles:true,cancelable:true,clientX:x,clientY:y,deltaY:+a.dy||0}))}}
 function raKeyIn(a){const el=document.activeElement;if(!a)return;if(a.key){const k=a.key;if(el&&/^(INPUT|TEXTAREA)$/.test(el.tagName)&&k=='Backspace'){el.value=el.value.slice(0,-1);el.dispatchEvent(new Event('input',{bubbles:true}));return}(el||document).dispatchEvent(new KeyboardEvent('keydown',{key:k,bubbles:true}));(el||document).dispatchEvent(new KeyboardEvent('keyup',{key:k,bubbles:true}));return}
 if(typeof a.text=='string'&&el&&/^(INPUT|TEXTAREA)$/.test(el.tagName)){el.value+=a.text;el.dispatchEvent(new Event('input',{bubbles:true}))}}
+/* ---- AI neat writing (online, Naz Tablet only): each finished word is read by Gemini and redrawn in a neat handwriting font ---- */
+const AIW={q:[],busy:false,wid:0,font:false,models:['gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash'],mi:0,fails:0,pauseUntil:0};
+const NEATFF="'Patrick Hand','Aref Ruqaa Ink','Aref Ruqaa','Segoe Print','Comic Sans MS',cursive";
+function aiKey(){try{return localStorage.getItem('wbai')||''}catch(e){return''}}
+function aiName(){try{const n=bsName().toLowerCase().replace(/['‘’`´]/g,'').replace(/\s+/g,' ').trim();return n=='naz tablet'||n=='nazs tablet'}catch(e){return false}}
+function aiOn(){return aiName()&&!!aiKey()&&!AD.aiOff&&navigator.onLine&&Date.now()>AIW.pauseUntil}
+function aiFont(){if(AIW.font)return;AIW.font=true;try{const l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Aref+Ruqaa+Ink:wght@400;700&display=swap';l.onload=()=>{try{document.fonts.ready.then(()=>drawAll())}catch(e){}};document.head.append(l)}catch(e){}}
+setTimeout(()=>{if(aiName()&&aiKey())aiFont()},4000);
+function aiQueue(wid,pg,V){if(!aiOn())return;aiFont();AIW.q.push({wid,pg,V});if(AIW.q.length>6)AIW.q.splice(0,AIW.q.length-6);aiNext()}
+async function aiNext(){if(AIW.busy||!AIW.q.length)return;AIW.busy=true;const j=AIW.q.shift();try{await aiWord(j)}catch(e){log('warn','AI writing skipped: '+noUrl(e&&e.message||e).slice(0,120))}AIW.busy=false;if(AIW.q.length)setTimeout(aiNext,250)}
+function aiImg(objs){const all=[];objs.forEach(o=>bwPts(o).forEach(q=>all.push(q)));let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;all.forEach(q=>{x0=Math.min(x0,q[0]);y0=Math.min(y0,q[1]);x1=Math.max(x1,q[0]);y1=Math.max(y1,q[1])});
+const W=x1-x0||1,H=y1-y0||1,pad=Math.max(W,H)*.12,sc=Math.min(110/(H+2*pad),1100/(W+2*pad)),c=document.createElement('canvas');c.width=Math.ceil((W+2*pad)*sc);c.height=Math.ceil((H+2*pad)*sc);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.setTransform(sc,0,0,sc,(pad-x0)*sc,(pad-y0)*sc);
+const ox=x;x=g;objs.forEach(o=>R({...o,c:'#000',al:1,w:Math.max(o.w,2.6/sc)}));x=ox;return{png:c.toDataURL('image/png').split(',')[1],box:[x0,y0,x1,y1]}}
+async function aiAsk(png){const key=aiKey();if(!key)throw new Error('no key');const body={contents:[{parts:[{text:'This image shows one short handwritten word or a few words from a school whiteboard. The writing may be English, Arabic, or Kurdish (Sorani, written in Arabic script), or numbers and math. Transcribe it exactly as written, keeping the same language, spelling and punctuation. Reply with ONLY the text, nothing else. If it is a drawing, a shape, an arrow, or you are not sure what it says, reply with exactly: ?'},{inline_data:{mime_type:'image/png',data:png}}]}],generationConfig:{temperature:0,maxOutputTokens:40}};
+for(let t=0;t<AIW.models.length;t++){const m=AIW.models[(AIW.mi+t)%AIW.models.length];let r;try{r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)})}catch(e){throw new Error('network')}
+if(r.status==404||r.status==400&&t<AIW.models.length-1){continue}if(r.status==429){AIW.pauseUntil=Date.now()+60000;throw new Error('daily or per-minute AI limit reached')}if(r.status==401||r.status==403){AIW.pauseUntil=Date.now()+600000;throw new Error('AI key not accepted')}if(!r.ok)throw new Error('AI HTTP '+r.status);
+AIW.mi=(AIW.mi+t)%AIW.models.length;const j=await r.json(),txt=(((j.candidates||[])[0]||{}).content||{}).parts;return(txt||[]).map(p=>p.text||'').join('').trim()}throw new Error('no AI model available')}
+async function aiWord(j){const p=j.pg;if(!p)return;let objs=p.s.filter(o=>o.wd===j.wid&&o.k=='p');if(!objs.length)return;
+const all=[];objs.forEach(o=>bwPts(o).forEach(q=>all.push(q)));if(all.length<6)return;const k=j.V.page()===p?p.z*j.V.b():1;
+const im=aiImg(objs),[x0,y0,x1,y1]=im.box,H=y1-y0,W=x1-x0;if(H*k<12||H*k>170)return;
+let t=await aiAsk(im.png);t=t.replace(/^["'`]+|["'`]+$/g,'').replace(/\s+/g,' ').trim();if(!t||t=='?'||t.length>40||/\?\s*$/.test(t)&&t.length<2)return;
+objs=p.s.filter(o=>o.wd===j.wid&&o.k=='p');if(!objs.length)return;
+const ys=all.map(q=>q[1]),base=bwQ(ys,.85),core=Math.max(1e-6,base-bwQ(ys,.2)),rtl=/[؀-ۿ]/.test(t);
+const mc=document.createElement('canvas').getContext('2d');let fs=Math.max(core*1.9,H*.95);mc.font=fs+'px '+NEATFF;let tw=mc.measureText(t).width;if(tw>W*1.35&&tw>0){fs*=W*1.35/tw;mc.font=fs+'px '+NEATFF;tw=mc.measureText(t).width}
+const ink=objs[0].c,tx=rtl?x1-tw:x0,ty=base-fs*.8;
+const no={k:'t',s:t,x:tx,y:ty,z:fs,c:ink,w:1,al:1,ff:1,wd:j.wid,_ai:1};
+p.u.push(p.s);p.r=[];const set=new Set(objs);let put=false;p.s=p.s.filter(o=>{if(set.has(o)){if(!put){put=true;return true}return false}return true}).map(o=>set.has(o)?no:o);
+if(j.V.page()===p)draw(j.V);persist();log('info','AI neat writing: replaced a word')}
+window.aiQueue=aiQueue;window.aiName=aiName;window.aiKey=aiKey;
 /* ---- daily wipe: pages clear at 7:58 and 15:00 (a backup is kept for the admin panel) ---- */
 function wipeCheck(){const now=new Date(),b=new Date(now),mn=now.getHours()*60+now.getMinutes();if(mn>=900)b.setHours(15,0,0,0);else if(mn>=478)b.setHours(7,58,0,0);else{b.setDate(b.getDate()-1);b.setHours(15,0,0,0)}
 let last=0;try{last=+localStorage.getItem('wbw')||0}catch(e){}const mark=()=>{try{localStorage.setItem('wbw',String(Date.now()))}catch(e){}};
