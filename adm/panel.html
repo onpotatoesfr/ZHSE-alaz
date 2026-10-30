@@ -89,7 +89,7 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <div id="toast"></div>
 <script>
 (()=>{
-const PANEL_VER='5';
+const PANEL_VER='6';
 const ST='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4',CMD=ST+'-c',RSP=ST+'-r';
 const UPB=atob('aHR0cHM6Ly9vbnBvdGF0b2VzZnIuZ2l0aHViLmlvL1pIU0UtYWxhei8=');
 const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -123,11 +123,12 @@ $('#lockImp').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(
 $('#catBtn').onclick=()=>{catRender();$('#catM').hidden=false};$('#catClose').onclick=()=>$('#catM').hidden=true;
 $('#catAdd').onclick=()=>{const n=$('#catNew').value.trim().slice(0,30);if(!n)return;if(!CATS.cats.includes(n))CATS.cats.push(n);$('#catNew').value='';saveCats();catRender();renderList()};
 function catRender(){const arr=Object.values(B.list).sort((a,b)=>String(a.n).localeCompare(String(b.n)));let h='';
-if(CATS.cats.length)h+='<div>'+CATS.cats.map(c=>'<span class="pill">'+esc(c)+'<button data-delcat="'+esc(c)+'" style="border:0;background:transparent;color:var(--bad);cursor:pointer;padding:0 6px;font-size:15px">\u2715</button></span>').join('')+'</div>';
+if(CATS.cats.length)h+='<div>'+CATS.cats.map(c=>'<span class="pill">'+esc(c)+'<button data-rencat="'+esc(c)+'" title="Rename" style="border:0;background:transparent;color:var(--ac);cursor:pointer;padding:0 4px;font-size:14px">\u270E</button><button data-delcat="'+esc(c)+'" title="Delete" style="border:0;background:transparent;color:var(--bad);cursor:pointer;padding:0 6px;font-size:15px">\u2715</button></span>').join('')+'</div>';
 h+='<div style="display:grid;grid-template-columns:1fr auto;gap:7px 10px;align-items:center;margin-top:6px">'+(arr.length?arr.map(o=>'<div style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">'+esc(o.n)+'</div><select class="catsel" data-of="'+esc(o.id)+'"><option value="">\u2014 none \u2014</option>'+CATS.cats.map(c=>'<option value="'+esc(c)+'"'+(CATS.of[o.id]===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>').join(''):'<div class="muted">No boards yet — click Refresh first.</div>')+'</div>';
 $('#catBody').innerHTML=h;
 $('#catBody').querySelectorAll('[data-of]').forEach(sel=>sel.onchange=()=>{const id=sel.dataset.of;if(sel.value)CATS.of[id]=sel.value;else delete CATS.of[id];saveCats();renderList()});
-$('#catBody').querySelectorAll('[data-delcat]').forEach(b=>b.onclick=()=>{const c=b.dataset.delcat;CATS.cats=CATS.cats.filter(x=>x!==c);Object.keys(CATS.of).forEach(id=>{if(CATS.of[id]===c)delete CATS.of[id]});saveCats();catRender();renderList()});}
+$('#catBody').querySelectorAll('[data-delcat]').forEach(b=>b.onclick=()=>{const c=b.dataset.delcat;if(!confirm('Delete category "'+c+'"? The boards in it become ungrouped.'))return;CATS.cats=CATS.cats.filter(x=>x!==c);Object.keys(CATS.of).forEach(id=>{if(CATS.of[id]===c)delete CATS.of[id]});saveCats();catRender();renderList()});
+$('#catBody').querySelectorAll('[data-rencat]').forEach(b=>b.onclick=()=>{const old=b.dataset.rencat,nn=prompt('Rename category:',old);if(nn==null)return;const n=nn.trim().slice(0,30);if(!n||n===old)return;if(CATS.cats.includes(n))return toast('A category with that name already exists');CATS.cats=CATS.cats.map(x=>x===old?n:x);Object.keys(CATS.of).forEach(id=>{if(CATS.of[id]===old)CATS.of[id]=n});saveCats();catRender();renderList()});}
 async function sign(to,c,a){if(!K.priv)throw new Error('No key');const n=b64(crypto.getRandomValues(new Uint8Array(12))),p=JSON.stringify([to,c,a??null,Date.now(),n]),s=b64(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},K.priv,new TextEncoder().encode(p)));return JSON.stringify({z:9,p,s})}
 async function sendCmd(to,c,a){const body=await sign(to,c,a),r=await fetch(CMD,{method:'POST',body});if(!r.ok)throw new Error(r.status==429?'Daily message limit reached':'HTTP '+r.status);return true}
 /* ---------- boards ---------- */
