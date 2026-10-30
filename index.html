@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.46',BD='30/10/40';
+const VER='1.1',BUILD='2026.10.30.47',BD='30/10/41';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -794,7 +794,7 @@ function pgAnim(d){const c=WB.cv;if(!c||!WB.on)return;c.classList.remove('za-r',
 function clkUpd(){const e=$('#clk');if(!e)return;const V=WB.on?WB:PV;if(!S.clk||!V.on){e.style.display='none';return}
 let dark=false;if(V===WB){const h=String(bgFill(CP())).replace('#','');if(h.length==6){const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);dark=(r*299+g*587+b*114)/1000<140}}
 e.style.color=dark?'rgba(255,255,255,.34)':'rgba(17,24,39,.26)';e.style.top=(V.t+12)+'px';e.style.right=Math.max(8,innerWidth-(V.l+V.W)+16)+'px';e.style.display='block';
-const d=new Date(),p=n=>String(n).padStart(2,'0');$('#clkT').textContent=p(d.getHours())+':'+p(d.getMinutes());try{$('#clkD').textContent=d.toLocaleDateString(S.lang=='ckb'?'ckb-u-nu-latn':S.lang=='ar'?'ar-u-nu-latn':undefined,{weekday:'short',day:'numeric',month:'short'})}catch(x){$('#clkD').textContent=''}}
+const d=new Date(),p=n=>String(n).padStart(2,'0'),hh=d.getHours(),ap=(S.lang=='ar'?['ص','م']:S.lang=='ckb'?['پ.ن','د.ن']:['AM','PM'])[hh<12?0:1];$('#clkT').innerHTML=((hh%12)||12)+':'+p(d.getMinutes())+'<small style="font-size:.5em;margin-inline-start:4px">'+ap+'</small>';try{$('#clkD').textContent=d.toLocaleDateString(S.lang=='ckb'?'ckb-u-nu-latn':S.lang=='ar'?'ar-u-nu-latn':undefined,{weekday:'short',day:'numeric',month:'short'})}catch(x){$('#clkD').textContent=''}}
 window.clkUpd=clkUpd;setInterval(clkUpd,1000);
 /* ---- GeoGebra window: real GeoGebra online, built-in graph offline ---- */
 const GGC=['#2563EB','#DC2626','#16A34A','#D97706','#7C3AED','#0D9488'];
