@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>ZHSE-A Admin</title>
+<style>
+:root{--bg:#EEF2F8;--card:#fff;--ink:#111827;--mute:#5B6475;--line:#D7DEEA;--ac:#14438F;--ac2:#2E6FC9;--ok:#16A34A;--warn:#D97706;--bad:#DC2626}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select{font:inherit}
+header{height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;background:linear-gradient(180deg,var(--ac2),var(--ac) 60%,#0C2C69);color:#fff}
+header h1{margin:0;font:800 18px system-ui,sans-serif;letter-spacing:-.2px}header .sp{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:15px;background:rgba(255,255,255,.16);font-weight:600;font-size:13px;border:0;color:#fff;cursor:pointer}
+.dot{width:9px;height:9px;border-radius:50%;background:#9CA3AF;flex:none}.dot.on{background:var(--ok)}.dot.bad{background:var(--bad)}.dot.warn{background:var(--warn)}
+main{display:grid;grid-template-columns:270px 1fr;height:calc(100% - 56px)}
+aside{border-right:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;min-height:0}
+aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .hd b{flex:1;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--mute)}
+#list{overflow-y:auto;padding:0 8px 12px;flex:1}
+.bd{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;border-radius:10px;padding:9px 10px;cursor:pointer;color:var(--ink)}
+.bd:hover{background:#F2F5FA}.bd.sel{background:#E3ECFA}.bd .nm{font-weight:700}.bd .sub{font-size:12px;color:var(--mute)}.bd .tx{flex:1;min-width:0}.bd .tx div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{height:34px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{background:#F2F5FA}.btn.pri{background:var(--ac);border-color:var(--ac);color:#fff}.btn.pri:hover{background:#0F3778}.btn.red{color:var(--bad);border-color:#F3C4C4}.btn.sm{height:30px;padding:0 10px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:default}
+#view{display:flex;flex-direction:column;min-width:0;min-height:0}
+#top{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--card)}
+#top h2{margin:0;font:800 18px system-ui,sans-serif}#top .meta{color:var(--mute);font-size:13px}#top .sp{flex:1}
+#body{flex:1;display:grid;grid-template-columns:1fr 340px;min-height:0}
+#stage{position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;padding:14px;background:#DFE5EF}
+#cv{background:#fff;box-shadow:0 8px 30px rgba(10,27,69,.25);border-radius:6px;outline:none;cursor:crosshair;max-width:100%;max-height:100%}
+#cv:focus{box-shadow:0 0 0 3px #93C5FD,0 8px 30px rgba(10,27,69,.25)}
+#stmsg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--mute);text-align:center;padding:30px}
+#stmsg b{font-size:16px;color:var(--ink)}
+#live{position:absolute;left:24px;top:22px;display:none;align-items:center;gap:6px;background:rgba(17,24,39,.75);color:#fff;border-radius:12px;padding:4px 10px;font-size:12px;font-weight:700}
+#side{border-left:1px solid var(--line);background:var(--card);overflow-y:auto;padding:4px 14px 30px}
+#side h3{margin:16px 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mute)}
+.row{display:flex;align-items:center;gap:8px;padding:5px 0}.row .lb{flex:1}
+.row select,.row input[type=text],.row input[type=number]{height:32px;border:1px solid var(--line);border-radius:8px;padding:0 8px;background:#fff;min-width:0}
+.row input[type=text]{flex:1}.row input[type=number]{width:74px}
+.sw{position:relative;width:42px;height:24px;border-radius:12px;background:#CBD5E1;border:0;cursor:pointer;flex:none;transition:background .15s}.sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw.on{background:var(--ac)}.sw.on::after{left:21px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(17,24,39,.92);color:#fff;border-radius:10px;padding:9px 16px;font-weight:600;display:none;z-index:50}
+.modal{position:fixed;inset:0;background:rgba(10,27,69,.5);display:flex;align-items:center;justify-content:center;z-index:40}.modal[hidden]{display:none}
+.mc{width:min(560px,92vw);background:#fff;border-radius:16px;padding:20px 22px;box-shadow:0 20px 60px rgba(5,15,45,.4)}
+.mc h3{margin:0 0 6px;font-size:18px}.mc p{color:var(--mute);margin:6px 0 12px}
+.code{font:600 13px ui-monospace,Consolas,monospace;background:#F2F5FA;border:1px solid var(--line);border-radius:10px;padding:12px;word-break:break-all;user-select:all}
+#logs{font:12px ui-monospace,Consolas,monospace;background:#F2F5FA;border-radius:10px;padding:10px;max-height:340px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.muted{color:var(--mute);font-size:12px}
+</style>
+</head>
+<body>
+<header><h1>ZHSE-A Admin</h1><span id="pver" style="opacity:.75;font-size:12px;font-weight:600"></span><span class="sp"></span><button class="chip" id="reloadP" title="Load the newest panel">Update panel</button><button class="chip" id="keyChip"><span class="dot" id="keyDot"></span><span id="keyTxt">Key</span></button></header>
+<main>
+<aside><div class="hd"><b>Boards</b><button class="btn sm" id="refresh">Refresh</button></div><div id="list"></div><div class="muted" style="padding:8px 14px 12px">Boards answer within a few seconds of Refresh. Grey = not seen recently.</div></aside>
+<section id="view">
+<div id="top"><div><h2 id="bName">Pick a board</h2><div class="meta" id="bMeta">Choose a board on the left, or All boards to change every board at once.</div></div><span class="sp"></span><button class="btn pri" id="connect" hidden>Connect</button></div>
+<div id="body">
+<div id="stage"><canvas id="cv" tabindex="0" width="960" height="540" hidden></canvas><div id="live"><span class="dot on"></span>LIVE</div><div id="stmsg"><b>No board connected</b><span>Connect to see the board live and control it with your mouse and keyboard.</span></div></div>
+<div id="side"></div>
+</div>
+</section>
+</main>
+<div class="modal" id="keyM" hidden><div class="mc">
+<h3>Your admin key</h3>
+<p>This key lives only on this PC. Boards obey commands only when they're signed with it. Send the code below to Claude <b>once</b> so the boards learn to trust it.</p>
+<div class="code" id="pubCode">…</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn pri" id="copyCode">Copy code</button><button class="btn" id="backup">Download key backup</button><label class="btn" style="display:inline-flex;align-items:center">Import key backup<input type="file" id="imp" accept=".json,application/json" hidden></label><span class="sp" style="flex:1"></span><button class="btn" id="keyClose">Close</button></div>
+<p class="muted" style="margin-top:14px">Keep the backup file private: anyone with it can control the boards. If it's ever lost or shared, make a new key and send the new code.</p>
+<button class="btn red sm" id="newKey">Make a new key</button>
+</div></div>
+<div id="toast"></div>
+<script>
+(()=>{
+const PANEL_VER='4';
+const ST='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4',CMD=ST+'-c',RSP=ST+'-r';
+const UPB=atob('aHR0cHM6Ly9vbnBvdGF0b2VzZnIuZ2l0aHViLmlvL1pIU0UtYWxhei8=');
+const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2600)};
+const b64=u=>{let s='';const a=new Uint8Array(u);for(let i=0;i<a.length;i+=32768)s+=String.fromCharCode.apply(null,a.subarray(i,i+32768));return btoa(s)};
+const THEMES=['Blue','Graphite','Forest','Purple','Rose','Sunset','Teal'];
+const K={priv:null,pub:''},B={list:{},sel:null,latest:null},C={pc:null,ch:null,id:null,rid:'',q:0,wait:{},frames:{},img:null,ui:[],vw:1280,vh:720,info:null,live:false,down:false,lastMove:0};
+/* ---------- key ---------- */
+async function keyLoad(){if(!(window.crypto&&crypto.subtle)){$('#keyTxt').textContent='This browser cannot sign';$('#keyDot').className='dot bad';return}
+let j=null;try{j=JSON.parse(localStorage.getItem('zhse-admin-key')||'null')}catch(e){}if(!j){const kp=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);j={priv:await crypto.subtle.exportKey('jwk',kp.privateKey),pub:b64(await crypto.subtle.exportKey('raw',kp.publicKey))};localStorage.setItem('zhse-admin-key',JSON.stringify(j));setTimeout(()=>$('#keyM').hidden=false,400)}
+K.priv=await crypto.subtle.importKey('jwk',j.priv,{name:'ECDSA',namedCurve:'P-256'},false,['sign']);K.pub=j.pub;$('#pubCode').textContent=K.pub;keyState()}
+async function keyState(){let ok=null;try{const r=await fetch(UPB+'admin.json?t='+Date.now(),{cache:'no-store'});if(r.ok){const j=await r.json();ok=j&&j.k===K.pub}else ok=false}catch(e){ok=null}
+$('#keyDot').className='dot '+(ok?'on':ok===false?'warn':'');$('#keyTxt').textContent=ok?'Key trusted by boards':ok===false?'Key not on boards yet':'Key'}
+$('#keyChip').onclick=()=>$('#keyM').hidden=false;$('#keyClose').onclick=()=>$('#keyM').hidden=true;
+$('#copyCode').onclick=async()=>{try{await navigator.clipboard.writeText(K.pub);toast('Code copied')}catch(e){toast('Select the code and copy it')}};
+$('#backup').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([localStorage.getItem('zhse-admin-key')],{type:'application/json'}));a.download='zhse-admin-key-backup.json';a.click()};
+$('#imp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!j.priv||!j.pub)throw 0;localStorage.setItem('zhse-admin-key',JSON.stringify(j));await keyLoad();toast('Key imported')}catch(x){toast('That is not a key backup')}};
+$('#newKey').onclick=async()=>{if(!confirm('Make a new key? The boards will stop obeying this PC until the new code is sent to Claude and published.'))return;localStorage.removeItem('zhse-admin-key');await keyLoad();toast('New key made. Send the new code.')};
+async function sign(to,c,a){if(!K.priv)throw new Error('No key');const n=b64(crypto.getRandomValues(new Uint8Array(12))),p=JSON.stringify([to,c,a??null,Date.now(),n]),s=b64(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},K.priv,new TextEncoder().encode(p)));return JSON.stringify({z:9,p,s})}
+async function sendCmd(to,c,a){const body=await sign(to,c,a),r=await fetch(CMD,{method:'POST',body});if(!r.ok)throw new Error(r.status==429?'Daily message limit reached':'HTTP '+r.status);return true}
+/* ---------- boards ---------- */
+async function loadBoards(ask){if(ask){try{await sendCmd('all','who',null)}catch(e){toast('Could not ask boards: '+e.message)}}
+try{const v=await fetch(UPB+'version.json?t='+Date.now(),{cache:'no-store'});if(v.ok)B.latest=await v.json()}catch(e){}
+try{const r=await fetch(ST+'/json?poll=1&since=12h',{cache:'no-store'});const t=await r.text();t.split('\n').forEach(l=>{try{const e=JSON.parse(l);if(e.event!='message')return;const d=JSON.parse(e.message);if(d&&d.id&&(d.z===1||d.z===3))seen(d,e.time)}catch(_){}})}catch(e){toast('Could not load boards')}renderList()}
+function seen(d,t){const o=B.list[d.id]||{id:d.id};if(!o.t||t>=o.t){o.n=d.n||o.n||d.id;if(d.b)o.b=d.b;if(d.d)o.d=d.d;o.t=t}B.list[d.id]=o}
+const newer=(a,b)=>{const x=String(a).split('.').map(n=>+n||0),y=String(b).split('.').map(n=>+n||0);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0}return false};
+function ago(t){const s=Math.max(0,Math.round(Date.now()/1000-t));if(s<90)return'just now';const m=Math.round(s/60);if(m<60)return m+' min ago';return Math.round(m/60)+' h ago'}
+function renderList(){const L=$('#list'),arr=Object.values(B.list).sort((a,b)=>String(a.n).localeCompare(String(b.n)));
+L.innerHTML=`<button class="bd${B.sel==='all'?' sel':''}" data-id="all"><span class="dot on" style="background:var(--ac)"></span><span class="tx"><div class="nm">All boards</div><div class="sub">Change every board at once</div></span></button>`+arr.map(o=>{const on=Date.now()/1000-o.t<660,old=B.latest&&newer(B.latest.build,o.b);return `<button class="bd${B.sel===o.id?' sel':''}" data-id="${esc(o.id)}"><span class="dot ${on?'on':''}"></span><span class="tx"><div class="nm">${esc(o.n)}</div><div class="sub">${on?'Online':'Seen '+ago(o.t)} · build ${esc(o.d||o.b||'?')}${old?' <span style="color:var(--warn)">↑</span>':''}</div></span></button>`}).join('')||'';
+L.querySelectorAll('.bd').forEach(b=>b.onclick=()=>pick(b.dataset.id))}
+$('#refresh').onclick=()=>{toast('Asking boards…');loadBoards(true);setTimeout(()=>loadBoards(false),5000)};
+try{const es=new EventSource(ST+'/sse');es.onmessage=ev=>{try{const e=JSON.parse(ev.data);if(e.event!='message')return;const d=JSON.parse(e.message);if(d&&d.id&&(d.z===1||d.z===3)){seen(d,e.time);renderList()}}catch(_){}}}catch(e){}
+function pick(id){if(C.id&&C.id!==id)disconnect();B.sel=id;renderList();const o=B.list[id];
+if(id==='all'){$('#bName').textContent='All boards';$('#bMeta').textContent='Settings and actions here are sent to every board. Live view is per board.';$('#connect').hidden=true;stageMsg('All boards','Pick one board on the left to see it live.')}
+else{$('#bName').textContent=o?o.n:id;$('#bMeta').textContent=o?`ID ${o.id} · build ${o.d||o.b||'?'} · ${Date.now()/1000-o.t<660?'online':'seen '+ago(o.t)}`:'';$('#connect').hidden=false;$('#connect').textContent='Connect';$('#connect').disabled=false;stageMsg('Not connected','Connect to see the board live and control it with your mouse and keyboard.')}
+renderSide()}
+function stageMsg(t,s){$('#cv').hidden=true;$('#live').style.display='none';$('#stmsg').style.display='flex';$('#stmsg').innerHTML=`<b>${esc(t)}</b><span>${esc(s)}</span>`}
+/* ---------- settings + actions panel ---------- */
+function renderSide(){const I=C.info||{},all=B.sel==='all',on=k=>I[k]?' on':'',S=$('#side');if(!B.sel){S.innerHTML='';return}
+const sw=(k,l,v)=>`<div class="row"><span class="lb">${l}</span><button class="sw${v?' on':''}" data-set="${k}" aria-label="${l}"></button></div>`;
+S.innerHTML=`<h3>Settings${all?' — every board':''}</h3>
+${sw('pass','App passcode',all?true:I.pass)}${sw('clk','Clock on the board',all?false:I.clk)}${sw('finger','Finger drawing',all?false:I.finger)}${sw('saver','Screen saver',all?true:I.saver)}${sw('wrOn','Mr. Wrya mode allowed',all?true:I.wrOn)}
+<div class="row"><span class="lb">Mr. Wrya name</span><select data-sel="wrName"><option value="wrya">Mr. Wrya mode</option><option value="bottom">Bottom toolbar mode</option></select></div>
+<div class="row"><span class="lb">Language</span><select data-sel="lang"><option value="en">English</option><option value="ckb">کوردی</option><option value="ar">العربية</option></select></div>
+<div class="row"><span class="lb">Toolbar theme</span><select data-sel="tt">${THEMES.map((t,i)=>`<option value="${i}">${t}</option>`).join('')}</select></div>
+<div class="row"><span class="lb">Screen saver background</span><select data-sel="ssBg"><option value="navy">Navy (default)</option><option value="black">Black</option><option value="forest">Forest green</option><option value="purple">Purple</option><option value="teal">Teal</option><option value="sunset">Sunset orange</option><option value="rose">Rose</option><option value="custom">Custom color…</option></select><input type="color" id="ssCol" value="#14438F" title="Custom color" style="width:38px;height:32px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff"></div>
+<div class="row"><span class="lb">Handwriting beautification</span><select data-sel="bw"><option value="auto">Auto</option><option value="on">On</option><option value="off">Off</option></select></div>
+${all?'':`<div class="row"><input type="text" id="nm" maxlength="40" placeholder="Class name" value="${esc(I.n||'')}"><button class="btn sm" id="nmSave">Rename</button></div>`}
+<p class="muted">${all?'Switches here send a value to every board (they don\'t show each board\'s current value).':''}</p>
+<h3>Actions</h3>
+<div class="grid"><button class="btn" data-act="update">Force update</button><button class="btn" data-act="restart">Restart app</button>
+<button class="btn" data-act="clear">Clear page</button><button class="btn" data-act="newpage">New page</button>
+<button class="btn" data-act="prev">‹ Previous page</button><button class="btn" data-act="next">Next page ›</button>
+<button class="btn" data-act="closeAll">Close menus</button><button class="btn" data-act="closepdf">Close PDF</button>
+<button class="btn" data-mode="wb">Whiteboard view</button><button class="btn" data-mode="split">Split view</button>
+<button class="btn" data-act="lock">Lock board</button><button class="btn" data-act="unlock">Unlock board</button>
+<button class="btn" data-act="saver">Screen saver now</button><button class="btn" data-act="wake">Wake</button>
+<button class="btn" data-act="toolbarReset">Reset toolbar</button><button class="btn red" data-act="wipe" data-confirm="Erase all pages on ${all?'EVERY board':'this board'}? (A recovery backup is kept.)">Erase all pages</button></div>
+<h3>Exam mode</h3>
+<div class="row"><input type="number" id="exMin" min="1" max="600" value="45"><span class="muted">min</span><input type="text" id="exTitle" maxlength="60" placeholder="Exam name (optional)"></div>
+<div class="grid"><button class="btn pri" id="exGo">Start exam</button><button class="btn" data-act="examAdd">+5 min</button><button class="btn red" data-act="examEnd" style="grid-column:span 2">End exam</button></div>
+<h3>Message on screen</h3>
+<div class="row"><input type="text" id="msg" maxlength="400" placeholder="Type a message for the class"></div>
+<div class="row"><span class="lb muted">Close after (0 = stays until tapped)</span><input type="number" id="msgS" min="0" max="3600" value="0"><span class="muted">s</span></div>
+<div class="grid"><button class="btn pri" id="msgGo">Show message</button><button class="btn" data-act="msgClose">Hide message</button></div>
+${all?'':`<h3>Send a file</h3><div class="grid"><label class="btn" style="display:flex;align-items:center;justify-content:center">Send picture<input type="file" id="sfImg" accept="image/*" hidden></label><label class="btn" style="display:flex;align-items:center;justify-content:center">Send PDF<input type="file" id="sfPdf" accept="application/pdf,.pdf" hidden></label></div><div class="muted" id="sfSt">A picture goes onto the current page (like Photo from phone). A PDF opens as a book (like PDF from phone). You can also drag a file onto the live view.</div>`}
+${all?'':`<h3>AI neat writing</h3><div class="muted" id="aiState"></div>
+<div class="row"><input type="password" id="aiKey" placeholder="Paste Gemini API key" autocomplete="off" spellcheck="false"></div>
+<div class="grid"><button class="btn pri" id="aiSend">Send key</button><button class="btn" id="aiDel">Remove key</button></div>
+${sw('aiOn','AI neat writing on this board',I.ai?!I.ai.off:true)}
+<p class="muted">Works only on the board named "Naz Tablet". The key goes straight to this board over the encrypted connection, never through the relay.</p>`}
+${all?'':`<h3>Board</h3><div class="row muted" id="infoBox"></div><div class="grid"><button class="btn" id="logBtn">Show logs</button><button class="btn" id="infoBtn">Refresh info</button></div><div id="logs" hidden></div>`}`;
+['wrName','lang','tt','bw'].forEach(k=>{const e=S.querySelector(`[data-sel="${k}"]`);if(e&&I[k]!=null&&!all)e.value=String(I[k]);e.onchange=()=>doSet(k,k=='tt'?+e.value:e.value)});{const e=S.querySelector('[data-sel="ssBg"]'),c=$('#ssCol');if(I.ssBg&&!all){if(/^#/.test(I.ssBg)){e.value='custom';c.value=I.ssBg}else e.value=I.ssBg}e.onchange=()=>{if(e.value=='custom')c.click();else doSet('ssBg',e.value)};c.onchange=()=>{e.value='custom';doSet('ssBg',c.value)};}
+S.querySelectorAll('[data-set]').forEach(b=>b.onclick=()=>{b.classList.toggle('on');const v=b.classList.contains('on');if(b.dataset.set=='aiOn')doSet('aiOff',!v);else doSet(b.dataset.set,v)});
+S.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{if(b.dataset.confirm&&!confirm(b.dataset.confirm))return;doAct(b.dataset.act)});
+S.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>doAct('mode',{v:b.dataset.mode}));
+$('#exGo').onclick=()=>doAct('exam',{min:+$('#exMin').value||45,title:$('#exTitle').value.trim()});
+$('#msgGo').onclick=()=>{const t=$('#msg').value.trim();if(!t)return toast('Type a message first');doAct('msg',{text:t,secs:+$('#msgS').value||0})};
+if(!all){$('#sfImg').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)sendFile(f)};$('#sfPdf').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)sendFile(f)};aiState();$('#aiSend').onclick=async()=>{const v=$('#aiKey').value.trim();if(!v)return toast('Paste the key first');if(!live())return toast('Connect to the board first');try{C.info=await req('set',{k:'aikey',v});$('#aiKey').value='';renderSide();toast(!C.info.ai?'This board is on build '+C.info.d+'. It needs 30/10/43 or newer. Wait for it to update, then reconnect.':C.info.ai.key?'Key saved on the board':'The board did not accept that text as a key. Copy the key again from Google AI Studio.')}catch(e){toast('Failed: '+e.message)}};$('#aiDel').onclick=async()=>{if(!live())return toast('Connect to the board first');try{C.info=await req('set',{k:'aikey',v:''});renderSide();toast('Key removed')}catch(e){toast('Failed: '+e.message)}};
+$('#nmSave').onclick=()=>doSet('name',$('#nm').value.trim());$('#logBtn').onclick=showLogs;$('#infoBtn').onclick=async()=>{if(!live())return toast('Connect first');C.info=await req('info');renderSide()};infoBox()}}
+function aiState(){const e=$('#aiState');if(!e)return;const a=(C.info||{}).ai;e.innerHTML=!live()?'Connect to this board to send or remove the key.':!a?'This board is on build '+esc((C.info||{}).d||'?')+'. It needs 30/10/43 or newer.':`Board name ${a.name?'is':'is <b>not</b>'} Naz Tablet · key ${a.key?'<b style="color:var(--ok)">saved</b>':'not set'}${a.off?' · switched off':''}`}
+function infoBox(){const I=C.info,e=$('#infoBox');if(!e)return;e.innerHTML=I?`Build ${esc(I.d)} · ${esc(I.lang)} · ${I.pages} page(s), on ${I.cur}${I.pdf?' · PDF open ('+I.pdfPages+' p)':''}${I.exam?' · exam running':''}${I.asleep?' · screen saver on':''}${I.locked?' · locked':''}`:'Connect to see details.'}
+const live=()=>C.ch&&C.ch.readyState=='open';
+async function doSet(k,v){try{if(B.sel==='all'){await sendCmd('all','set',{k,v});toast('Sent to all boards')}else if(live()){C.info=await req('set',{k,v});renderSide();toast('Done')}else{await sendCmd(B.sel,'set',{k,v});toast('Sent')}}catch(e){toast('Failed: '+e.message)}}
+async function doAct(n,a){a=Object.assign({n},a||{});try{if(B.sel==='all'){await sendCmd('all','act',a);toast('Sent to all boards')}else if(live()){await req('act',a);toast('Done')}else{await sendCmd(B.sel,'act',a);toast('Sent')}}catch(e){toast('Failed: '+e.message)}}
+async function showLogs(){if(!live())return toast('Connect first');const L=await req('logs'),e=$('#logs');e.hidden=false;e.textContent=(L||[]).slice().reverse().map(([t,l,m])=>new Date(t).toLocaleString()+'  ['+l+']  '+m).join('\n')||'No log entries.'}
+/* ---------- direct connection ---------- */
+$('#connect').onclick=()=>{if(C.id)disconnect();else connect(B.sel)};
+function disconnect(){try{C.ch&&C.ch.send(JSON.stringify({c:'bye'}))}catch(e){}try{C.ch&&C.ch.close()}catch(e){}try{C.pc&&C.pc.close()}catch(e){}C.pc=C.ch=null;C.id=null;C.live=false;C.info=null;if(B.sel&&B.sel!=='all'){$('#connect').textContent='Connect';$('#connect').disabled=false;stageMsg('Not connected','Connect to see the board live and control it with your mouse and keyboard.')}renderSide()}
+let rspES=null;function rspListen(){if(rspES)return;rspES=new EventSource(RSP+'/sse');rspES.onmessage=async ev=>{try{const e=JSON.parse(ev.data);if(e.event!='message')return;let raw=e.message;if(e.attachment&&e.attachment.url){const r=await fetch(e.attachment.url);raw=await r.text()}const d=JSON.parse(raw);if(d&&d.z===10&&d.rid===C.rid&&d.id===C.id&&C.pc&&!C.pc.remoteDescription){await C.pc.setRemoteDescription({type:'answer',sdp:d.sdp})}}catch(_){}}}
+async function connect(id){if(!id||id==='all')return;rspListen();C.id=id;$('#connect').textContent='Connecting…';$('#connect').disabled=true;stageMsg('Connecting…','Reaching the board directly. This usually takes 5–15 seconds.');
+const pc=new RTCPeerConnection({iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun.cloudflare.com:3478']}]});C.pc=pc;const ch=pc.createDataChannel('ctl',{ordered:true});C.ch=ch;
+ch.onopen=async()=>{$('#connect').textContent='Disconnect';$('#connect').disabled=false;C.info=await req('info');renderSide();startLive()};ch.onmessage=m=>onMsg(m.data);ch.onclose=()=>{if(C.ch===ch)disconnect()};
+pc.onconnectionstatechange=()=>{if(pc.connectionState=='failed'&&C.pc===pc){disconnect();stageMsg('Could not connect directly','The board and this PC could not reach each other (school network may block it). Settings and actions on the right still work.')}};
+try{await pc.setLocalDescription(await pc.createOffer());await new Promise(ok=>{if(pc.iceGatheringState=='complete')return ok();const t=setTimeout(ok,5000);pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState=='complete'){clearTimeout(t);ok()}})});
+C.rid=b64(crypto.getRandomValues(new Uint8Array(9)));await sendCmd(id,'rtc',{sdp:pc.localDescription.sdp,rid:C.rid})}catch(e){disconnect();toast('Could not connect: '+e.message);return}
+setTimeout(()=>{if(C.pc===pc&&!(C.ch&&C.ch.readyState=='open')){disconnect();stageMsg('Board did not answer','It may be off, asleep, offline, on an old build, or the key is not on the boards yet. Settings and actions on the right are still sent.')}},25000)}
+function req(c,a,to){return new Promise((ok,no)=>{if(!live())return no(new Error('Not connected'));const q=++C.q;C.wait[q]=ok;C.ch.send(JSON.stringify({c,a,q}));setTimeout(()=>{if(C.wait[q]){delete C.wait[q];no(new Error('No reply'))}},to||8000)})}
+const sfSt=t=>{const e=$('#sfSt');if(e)e.textContent=t};
+async function sendFile(f){const isPdf=/pdf/i.test(f.type)||/\.pdf$/i.test(f.name),isImg=/^image\//.test(f.type);if(!isPdf&&!isImg)return toast('Only pictures and PDFs can be sent');if(!live())return toast('Connect to the board first');if(f.size>80*1024*1024)return toast('That file is over 80 MB');
+try{sfSt('Preparing '+f.name+'…');const b=b64(await f.arrayBuffer()),CH=48000,n=Math.ceil(b.length/CH),id=b64(crypto.getRandomValues(new Uint8Array(6)));await req('fs',{id,name:f.name,type:isPdf?'application/pdf':f.type,n});
+for(let i=0;i<n;i++){while(C.ch&&C.ch.bufferedAmount>4e6)await new Promise(r=>setTimeout(r,30));if(!live())throw new Error('Disconnected');C.ch.send(JSON.stringify({c:'fc',a:{id,i,d:b.slice(i*CH,(i+1)*CH)}}));if(i%20==0)sfSt('Sending '+f.name+'… '+Math.round(i/n*100)+'%')}
+sfSt('Opening on the board…');const r=await req('fe',{id},120000);if(r&&r.ok){sfSt((r.kind=='pdf'?'PDF opened':'Picture added')+' on the board: '+f.name);toast('Sent')}else throw new Error(r&&r.error||'failed')}catch(e){sfSt('Could not send: '+e.message);toast('Could not send')}}
+function startLive(){if(!live())return;C.ch.send(JSON.stringify({c:'live',a:true,fps:3,w:Math.min(1400,Math.round($('#stage').clientWidth*devicePixelRatio))}));C.live=true;$('#stmsg').style.display='none';$('#cv').hidden=false;$('#live').style.display='flex';fit();$('#cv').focus()}
+function onMsg(data){let m;try{m=JSON.parse(data)}catch(e){return}if(m.k=='r'){const f=C.wait[m.q];if(f){delete C.wait[m.q];f(m.d)}}else if(m.k=='info'){C.info=m.d;renderSide()}
+else if(m.k=='fh'){C.frames[m.f]={n:m.n,parts:[],got:0,ui:m.ui,vw:m.vw,vh:m.vh}}else if(m.k=='fc'){const F=C.frames[m.f];if(!F)return;F.parts[m.i]=m.d;F.got++;if(F.got==F.n){delete C.frames[m.f];Object.keys(C.frames).forEach(k=>{if(+k<m.f)delete C.frames[k]});const im=new Image();im.onload=()=>{C.img=im;C.ui=F.ui||[];if(F.vw!==C.vw||F.vh!==C.vh){C.vw=F.vw;C.vh=F.vh;fit()}paint()};im.src='data:image/jpeg;base64,'+F.parts.join('')}}}
+/* ---------- drawing the live view ---------- */
+function fit(){const st=$('#stage'),cv=$('#cv'),aw=st.clientWidth-28,ah=st.clientHeight-28,s=Math.min(aw/C.vw,ah/C.vh),d=devicePixelRatio||1;cv.style.width=Math.round(C.vw*s)+'px';cv.style.height=Math.round(C.vh*s)+'px';cv.width=Math.round(C.vw*s*d);cv.height=Math.round(C.vh*s*d);paint()}
+addEventListener('resize',()=>{if(!$('#cv').hidden)fit()});
+function rr(g,x,y,w,h,r){r=Math.min(r,w/2,h/2);g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function paint(){const cv=$('#cv'),g=cv.getContext('2d'),k=cv.width/C.vw;g.setTransform(1,0,0,1,0,0);g.fillStyle='#E5E7EB';g.fillRect(0,0,cv.width,cv.height);if(C.img)g.drawImage(C.img,0,0,cv.width,cv.height);g.setTransform(k,0,0,k,0,0);g.textBaseline='middle';
+for(const u of C.ui){const[x,y,w,h]=u.r;g.globalAlpha=u.t=='box'?1:Math.max(.08,Math.min(1,u.op==null?1:u.op));if(u.t=='box'){if(u.bg){g.globalAlpha=Math.max(.15,Math.min(1,u.op||1));g.fillStyle=u.bg;rr(g,x,y,w,h,u.br||0);g.fill();g.globalAlpha=1}else{g.strokeStyle='rgba(20,67,143,.35)';g.lineWidth=1;rr(g,x,y,w,h,u.br||0);g.stroke()}continue}
+if(u.t=='ctl'){if(u.bg){g.fillStyle=u.bg;rr(g,x,y,w,h,u.br||4);g.fill()}if(u.on){g.strokeStyle='#FBBF24';g.lineWidth=2;rr(g,x+1,y+1,w-2,h-2,u.br||4);g.stroke()}
+if(u.rng){const[mn,mx,v]=u.rng,f=(v-mn)/((mx-mn)||1);g.fillStyle='rgba(100,116,139,.5)';g.fillRect(x,y+h/2-2,w,4);g.fillStyle='#14438F';g.beginPath();g.arc(x+w*f,y+h/2,Math.min(8,h/2),0,7);g.fill();continue}
+if(u.tx){g.fillStyle=u.c||'#111';let fz=Math.max(8,Math.min(u.fs||13,h*.7));g.font=`${u.fw||600} ${fz}px system-ui,sans-serif`;let t=u.tx;while(fz>7&&g.measureText(t).width>w-4){fz-=.5;g.font=`${u.fw||600} ${fz}px system-ui,sans-serif`}g.textAlign='center';while(t.length>1&&g.measureText(t).width>w-4)t=t.slice(0,-1);g.save();rr(g,x,y,w,h,0);g.clip();g.fillText(t,x+w/2,y+h/2);g.restore()}else if(!u.bg){g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=1;rr(g,x+2,y+2,w-4,h-4,6);g.stroke()}}
+else if(u.t=='txt'){if(u.bg&&!u.tx){g.fillStyle=u.bg;rr(g,x,y,w,h,u.br||0);g.fill();continue}g.fillStyle=u.c||'#111';g.font=`${u.fw||400} ${u.fs||14}px system-ui,sans-serif`;g.textAlign=u.dir=='rtl'?'right':'left';g.fillText(u.tx,u.dir=='rtl'?x+w:x,y+h/2)}}g.globalAlpha=1}
+/* ---------- your mouse + keyboard = the board's pen + keyboard ---------- */
+const cvXY=e=>{const r=$('#cv').getBoundingClientRect();return[(e.clientX-r.left)*C.vw/r.width,(e.clientY-r.top)*C.vh/r.height]};
+const send=(c,a)=>{if(live())C.ch.send(JSON.stringify({c,a}))};
+$('#cv').addEventListener('pointerdown',e=>{e.preventDefault();$('#cv').focus();$('#cv').setPointerCapture(e.pointerId);C.down=true;const[x,y]=cvXY(e);send('in',{k:'d',x,y})});
+$('#cv').addEventListener('pointermove',e=>{if(!C.down)return;const n=performance.now();if(n-C.lastMove<12)return;C.lastMove=n;const[x,y]=cvXY(e);send('in',{k:'m',x,y})});
+const up=e=>{if(!C.down)return;C.down=false;const[x,y]=cvXY(e);send('in',{k:'u',x,y})};$('#cv').addEventListener('pointerup',up);$('#cv').addEventListener('pointercancel',up);
+$('#cv').addEventListener('wheel',e=>{e.preventDefault();const[x,y]=cvXY(e);send('in',{k:'w',x,y,dy:e.deltaY})},{passive:false});
+$('#cv').addEventListener('contextmenu',e=>e.preventDefault());
+$('#cv').addEventListener('keydown',e=>{if(!live())return;if(e.ctrlKey||e.metaKey||e.altKey)return;e.preventDefault();if(e.key.length==1)send('key',{text:e.key});else if(['Enter','Backspace','Escape','Tab'].includes(e.key))send('key',{key:e.key})});
+$('#stage').addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='copy'});$('#stage').addEventListener('drop',e=>{e.preventDefault();const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f)sendFile(f)});
+addEventListener('beforeunload',()=>{try{C.ch&&C.ch.send(JSON.stringify({c:'bye'}))}catch(e){}});
+(()=>{let pv='';try{pv=localStorage.getItem('zhse-panel-ver')||''}catch(e){}$('#pver').textContent='v'+PANEL_VER;if(pv&&pv!==PANEL_VER)setTimeout(()=>toast('Panel updated to v'+PANEL_VER),600);try{localStorage.setItem('zhse-panel-ver',PANEL_VER)}catch(e){}})();
+$('#reloadP').onclick=()=>location.reload();
+keyLoad().then(()=>loadBoards(false));
+})();
+</script>
+</body>
+</html>

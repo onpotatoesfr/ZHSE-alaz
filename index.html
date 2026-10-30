@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.56',BD='30/10/50';
+const VER='1.1',BUILD='2026.10.30.57',BD='30/10/51';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -1070,12 +1070,19 @@ pc.ondatachannel=ev=>{const ch=ev.channel;RA.ch=ch;ch.onmessage=m=>raOn(m.data);
 pc.onconnectionstatechange=()=>{if(['failed','closed'].includes(pc.connectionState)&&RA.pc===pc){RA.live=false}};
 try{await pc.setRemoteDescription({type:'offer',sdp:a.sdp});const ans=await pc.createAnswer();await pc.setLocalDescription(ans);await new Promise(ok=>{if(pc.iceGatheringState=='complete')return ok();const t=setTimeout(ok,4000);pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState=='complete'){clearTimeout(t);ok()}})});
 await fetch(RAT,{method:'POST',body:JSON.stringify({z:10,id:BS.id,rid:String(a.rid||''),sdp:pc.localDescription.sdp})})}catch(e){log('error','Remote admin connect failed: '+(e&&e.message||e));raClose()}}
+async function raFile(F){const bin=atob(F.parts.join('')),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);const isPdf=/pdf/i.test(F.type)||/\.pdf$/i.test(F.name);const blob=new Blob([u],{type:isPdf?'application/pdf':(F.type||'image/jpeg')});
+try{if(!$('#ph').hidden)phClose()}catch(e){}
+if(isPdf){await openPdf(new File([blob],F.name,{type:'application/pdf'}));toast('PDF opened');log('info','PDF received from the admin panel: '+F.name);return{ok:true,kind:'pdf'}}
+if(!/^image\//.test(blob.type))throw new Error('not a picture or PDF');await phPhoto(blob);toast('Photo added to the page');log('info','Picture received from the admin panel');return{ok:true,kind:'image'}}
 function raSend(o){const ch=RA.ch;if(!ch||ch.readyState!='open')return false;try{ch.send(JSON.stringify(o));return true}catch(e){return false}}
 function raOn(data){let m;try{m=JSON.parse(data)}catch(e){return}const q=m.q;const reply=(d)=>raSend({k:'r',q,d});
 try{if(m.c=='info')reply(raInfo());else if(m.c=='live'){RA.live=!!m.a;RA.fps=Math.max(1,Math.min(6,+m.fps||3));RA.w=Math.max(480,Math.min(1600,+m.w||1000));if(RA.live)raFrame();reply(true)}
 else if(m.c=='in')raIn(m.a);else if(m.c=='key')raKeyIn(m.a);
 else if(m.c=='logs')reply(LOG.slice(-200));
 else if(m.c=='set'){if(m.a.k=='aikey'){const v=String(m.a.v||'').replace(/^[\s"'`]+|[\s"'`]+$/g,'').replace(/\s+/g,'');try{if(v&&/^[\x21-\x7e]{16,400}$/.test(v)){localStorage.setItem('wbai',v);log('info','AI key saved');aiFont()}else{localStorage.removeItem('wbai');log('info','AI key removed')}}catch(e){}}else raSet(m.a.k,m.a.v);reply(raInfo())}else if(m.c=='act'){raAct(m.a.n,m.a);setTimeout(()=>raSend({k:'info',d:raInfo()}),400);reply(true)}
+else if(m.c=='fs'){RA.fin={id:m.a.id,name:String(m.a.name||'file').slice(0,120),type:String(m.a.type||''),n:+m.a.n||0,parts:[],got:0};reply(true)}
+else if(m.c=='fc'){const F=RA.fin;if(F&&F.id===m.a.id&&F.parts[m.a.i]==null){F.parts[m.a.i]=m.a.d;F.got++}}
+else if(m.c=='fe'){const F=RA.fin;RA.fin=null;if(!F||F.got!==F.n){reply({error:'file incomplete'});return}raFile(F).then(r=>reply(r)).catch(e=>reply({error:String(e&&e.message||e)}))}
 else if(m.c=='bye')raClose()}catch(e){reply({error:String(e&&e.message||e)})}}
 /* live view: board drawing + a map of the on-screen controls */
 function raUI(){const out=[],cs=getComputedStyle.bind(window),vis=e=>{if(!e||!e.isConnected)return null;const r=e.getBoundingClientRect();if(r.width<2||r.height<2||r.bottom<0||r.right<0||r.top>innerHeight||r.left>innerWidth)return null;const s=cs(e);if(s.visibility=='hidden'||s.display=='none'||+s.opacity<.05)return null;return[r,s]};
