@@ -47,14 +47,22 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 .code{font:600 13px ui-monospace,Consolas,monospace;background:#F2F5FA;border:1px solid var(--line);border-radius:10px;padding:12px;word-break:break-all;user-select:all}
 #logs{font:12px ui-monospace,Consolas,monospace;background:#F2F5FA;border-radius:10px;padding:10px;max-height:340px;overflow:auto;white-space:pre-wrap;word-break:break-word}
 .muted{color:var(--mute);font-size:12px}
+.cath{display:flex;align-items:center;gap:8px;padding:9px 10px 4px;font-size:12px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.5px}
+.cb{width:18px;height:18px;border:2px solid #B6C2D6;border-radius:5px;flex:none;cursor:pointer;display:grid;place-items:center;background:#fff}
+.cb.on{background:var(--ac);border-color:var(--ac)}.cb.on::after{content:'';width:8px;height:8px;border-radius:2px;background:#fff}
+.cb.part{background:var(--ac);border-color:var(--ac)}.cb.part::after{content:'';width:9px;height:2px;background:#fff}
+#tgt{align-items:center;gap:10px;padding:8px 16px;background:#EAF1FB;border-bottom:1px solid var(--line);font-size:13px;font-weight:600;color:var(--ac)}
+.catsel{height:28px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:13px;max-width:150px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#EEF2F8;border-radius:14px;padding:4px 6px 4px 12px;font-weight:600;margin:0 6px 6px 0}
 </style>
 </head>
 <body>
 <header><h1>ZHSE-A Admin</h1><span id="pver" style="opacity:.75;font-size:12px;font-weight:600"></span><span class="sp"></span><button class="chip" id="reloadP" title="Load the newest panel">Update panel</button><button class="chip" id="keyChip"><span class="dot" id="keyDot"></span><span id="keyTxt">Key</span></button></header>
 <main>
-<aside><div class="hd"><b>Boards</b><button class="btn sm" id="refresh">Refresh</button></div><div id="list"></div><div class="muted" style="padding:8px 14px 12px">Boards answer within a few seconds of Refresh. Grey = not seen recently.</div></aside>
+<aside><div class="hd"><b>Boards</b><button class="btn sm" id="catBtn">Categories</button><button class="btn sm" id="refresh">Refresh</button></div><div id="list"></div><div class="muted" style="padding:8px 14px 12px">Boards answer within a few seconds of Refresh. Grey = not seen recently.</div></aside>
 <section id="view">
 <div id="top"><div><h2 id="bName">Pick a board</h2><div class="meta" id="bMeta">Choose a board on the left, or All boards to change every board at once.</div></div><span class="sp"></span><button class="btn pri" id="connect" hidden>Connect</button></div>
+<div id="tgt"></div>
 <div id="body">
 <div id="stage"><canvas id="cv" tabindex="0" width="960" height="540" hidden></canvas><div id="live"><span class="dot on"></span>LIVE</div><div id="stmsg"><b>No board connected</b><span>Connect to see the board live and control it with your mouse and keyboard.</span></div></div>
 <div id="side"></div>
@@ -66,20 +74,39 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <p>This key lives only on this PC. Boards obey commands only when they're signed with it. Send the code below to Claude <b>once</b> so the boards learn to trust it.</p>
 <div class="code" id="pubCode">…</div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn pri" id="copyCode">Copy code</button><button class="btn" id="backup">Download key backup</button><label class="btn" style="display:inline-flex;align-items:center">Import key backup<input type="file" id="imp" accept=".json,application/json" hidden></label><span class="sp" style="flex:1"></span><button class="btn" id="keyClose">Close</button></div>
-<p class="muted" style="margin-top:14px">Keep the backup file private: anyone with it can control the boards. If it's ever lost or shared, make a new key and send the new code.</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" id="lockBk">Save password-protected backup</button><label class="btn" style="display:inline-flex;align-items:center">Unlock with password<input type="file" id="lockImp" accept=".json,application/json" hidden></label></div>
+<p class="muted" style="margin:8px 0 0">A password-protected backup is safe to keep anywhere (email it to yourself, a USB stick). Without the password it is useless, so it never exposes the boards. On a new PC: open the panel, click <b>Unlock with password</b>, pick the file and type the password.</p>
+<p class="muted" style="margin-top:14px">Keep the plain backup file private: anyone with it can control the boards. If it's ever lost or shared, make a new key and send the new code.</p>
 <button class="btn red sm" id="newKey">Make a new key</button>
+</div></div>
+<div class="modal" id="catM" hidden><div class="mc">
+<h3>Categories</h3>
+<p class="muted">Group boards (e.g. by floor or grade) so you can select a whole group at once. A board belongs to one category.</p>
+<div class="row"><input type="text" id="catNew" placeholder="New category name" maxlength="30"><button class="btn pri" id="catAdd">Create</button></div>
+<div id="catBody" style="margin-top:12px;max-height:52vh;overflow:auto"></div>
+<div style="display:flex;margin-top:14px"><span class="sp" style="flex:1"></span><button class="btn" id="catClose">Done</button></div>
 </div></div>
 <div id="toast"></div>
 <script>
 (()=>{
-const PANEL_VER='4';
+const PANEL_VER='5';
 const ST='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4',CMD=ST+'-c',RSP=ST+'-r';
 const UPB=atob('aHR0cHM6Ly9vbnBvdGF0b2VzZnIuZ2l0aHViLmlvL1pIU0UtYWxhei8=');
 const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2600)};
 const b64=u=>{let s='';const a=new Uint8Array(u);for(let i=0;i<a.length;i+=32768)s+=String.fromCharCode.apply(null,a.subarray(i,i+32768));return btoa(s)};
+const u8=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const THEMES=['Blue','Graphite','Forest','Purple','Rose','Sunset','Teal'];
-const K={priv:null,pub:''},B={list:{},sel:null,latest:null},C={pc:null,ch:null,id:null,rid:'',q:0,wait:{},frames:{},img:null,ui:[],vw:1280,vh:720,info:null,live:false,down:false,lastMove:0};
+const K={priv:null,pub:''},B={list:{},sel:null,latest:null,checked:new Set()},C={pc:null,ch:null,id:null,rid:'',q:0,wait:{},frames:{},img:null,ui:[],vw:1280,vh:720,info:null,live:false,down:false,lastMove:0};
+let CATS;try{CATS=JSON.parse(localStorage.getItem('zhse-cats')||'null')}catch(e){}if(!CATS||!Array.isArray(CATS.cats))CATS={cats:[],of:{}};
+const saveCats=()=>{try{localStorage.setItem('zhse-cats',JSON.stringify(CATS))}catch(e){}};
+function tgt(){if(B.checked.size)return [...B.checked].filter(id=>B.list[id]);if(B.sel==='all')return 'all';if(B.sel&&B.sel!=='all'&&B.list[B.sel])return B.sel;return null;}
+function tgtLabel(){const t=tgt();if(t==='all')return 'every board';if(Array.isArray(t))return t.length===1?((B.list[t[0]]||{}).n||t[0]):t.length+' boards';if(t)return (B.list[t]||{}).n||t;return null;}
+function renderTgt(){const e=$('#tgt');if(!e)return;if(B.checked.size){e.style.display='flex';e.innerHTML='Settings &amp; actions apply to <b style="margin:0 3px">'+esc(tgtLabel())+'</b><button class="btn sm" id="clrck" style="margin-left:auto">Clear selection</button>';$('#clrck').onclick=()=>{B.checked.clear();renderList();renderSide()}}else{e.style.display='none';e.innerHTML=''}}
+/* password-protected key backup */
+async function pwKey(pw,salt){const m=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function pwBackup(pw){const raw=localStorage.getItem('zhse-admin-key');if(!raw)throw new Error('no key');const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),ak=await pwKey(pw,salt),ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},ak,new TextEncoder().encode(raw));return JSON.stringify({zhse:'key-locked',v:1,salt:b64(salt),iv:b64(iv),data:b64(ct)})}
+async function pwRestore(text,pw){const j=JSON.parse(text);if(j.zhse!=='key-locked'||!j.data)throw new Error('not a locked backup');const ak=await pwKey(pw,u8(j.salt)),pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:u8(j.iv)},ak,u8(j.data)),raw=new TextDecoder().decode(pt),k=JSON.parse(raw);if(!k.priv||!k.pub)throw new Error('bad');localStorage.setItem('zhse-admin-key',raw);return true}
 /* ---------- key ---------- */
 async function keyLoad(){if(!(window.crypto&&crypto.subtle)){$('#keyTxt').textContent='This browser cannot sign';$('#keyDot').className='dot bad';return}
 let j=null;try{j=JSON.parse(localStorage.getItem('zhse-admin-key')||'null')}catch(e){}if(!j){const kp=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);j={priv:await crypto.subtle.exportKey('jwk',kp.privateKey),pub:b64(await crypto.subtle.exportKey('raw',kp.publicKey))};localStorage.setItem('zhse-admin-key',JSON.stringify(j));setTimeout(()=>$('#keyM').hidden=false,400)}
@@ -91,6 +118,16 @@ $('#copyCode').onclick=async()=>{try{await navigator.clipboard.writeText(K.pub);
 $('#backup').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([localStorage.getItem('zhse-admin-key')],{type:'application/json'}));a.download='zhse-admin-key-backup.json';a.click()};
 $('#imp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!j.priv||!j.pub)throw 0;localStorage.setItem('zhse-admin-key',JSON.stringify(j));await keyLoad();toast('Key imported')}catch(x){toast('That is not a key backup')}};
 $('#newKey').onclick=async()=>{if(!confirm('Make a new key? The boards will stop obeying this PC until the new code is sent to Claude and published.'))return;localStorage.removeItem('zhse-admin-key');await keyLoad();toast('New key made. Send the new code.')};
+$('#lockBk').onclick=async()=>{if(!localStorage.getItem('zhse-admin-key'))return toast('No key on this PC');const p=prompt('Choose a password for this backup (needed to unlock on another PC):');if(p==null)return;if(p.length<4)return toast('Use at least 4 characters');if(prompt('Type the password again:')!==p)return toast('The passwords did not match');try{const d=await pwBackup(p),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([d],{type:'application/json'}));a.download='zhse-admin-key-LOCKED.json';a.click();toast('Locked backup saved')}catch(e){toast('Could not make the backup')}};
+$('#lockImp').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const p=prompt('Password for this backup:');if(p==null)return;try{await pwRestore(await f.text(),p);await keyLoad();toast('Unlocked — this PC can now control the boards')}catch(x){toast('Wrong password or not a locked backup')}};
+$('#catBtn').onclick=()=>{catRender();$('#catM').hidden=false};$('#catClose').onclick=()=>$('#catM').hidden=true;
+$('#catAdd').onclick=()=>{const n=$('#catNew').value.trim().slice(0,30);if(!n)return;if(!CATS.cats.includes(n))CATS.cats.push(n);$('#catNew').value='';saveCats();catRender();renderList()};
+function catRender(){const arr=Object.values(B.list).sort((a,b)=>String(a.n).localeCompare(String(b.n)));let h='';
+if(CATS.cats.length)h+='<div>'+CATS.cats.map(c=>'<span class="pill">'+esc(c)+'<button data-delcat="'+esc(c)+'" style="border:0;background:transparent;color:var(--bad);cursor:pointer;padding:0 6px;font-size:15px">\u2715</button></span>').join('')+'</div>';
+h+='<div style="display:grid;grid-template-columns:1fr auto;gap:7px 10px;align-items:center;margin-top:6px">'+(arr.length?arr.map(o=>'<div style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">'+esc(o.n)+'</div><select class="catsel" data-of="'+esc(o.id)+'"><option value="">\u2014 none \u2014</option>'+CATS.cats.map(c=>'<option value="'+esc(c)+'"'+(CATS.of[o.id]===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>').join(''):'<div class="muted">No boards yet — click Refresh first.</div>')+'</div>';
+$('#catBody').innerHTML=h;
+$('#catBody').querySelectorAll('[data-of]').forEach(sel=>sel.onchange=()=>{const id=sel.dataset.of;if(sel.value)CATS.of[id]=sel.value;else delete CATS.of[id];saveCats();renderList()});
+$('#catBody').querySelectorAll('[data-delcat]').forEach(b=>b.onclick=()=>{const c=b.dataset.delcat;CATS.cats=CATS.cats.filter(x=>x!==c);Object.keys(CATS.of).forEach(id=>{if(CATS.of[id]===c)delete CATS.of[id]});saveCats();catRender();renderList()});}
 async function sign(to,c,a){if(!K.priv)throw new Error('No key');const n=b64(crypto.getRandomValues(new Uint8Array(12))),p=JSON.stringify([to,c,a??null,Date.now(),n]),s=b64(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},K.priv,new TextEncoder().encode(p)));return JSON.stringify({z:9,p,s})}
 async function sendCmd(to,c,a){const body=await sign(to,c,a),r=await fetch(CMD,{method:'POST',body});if(!r.ok)throw new Error(r.status==429?'Daily message limit reached':'HTTP '+r.status);return true}
 /* ---------- boards ---------- */
@@ -100,9 +137,20 @@ try{const r=await fetch(ST+'/json?poll=1&since=12h',{cache:'no-store'});const t=
 function seen(d,t){const o=B.list[d.id]||{id:d.id};if(!o.t||t>=o.t){o.n=d.n||o.n||d.id;if(d.b)o.b=d.b;if(d.d)o.d=d.d;o.t=t}B.list[d.id]=o}
 const newer=(a,b)=>{const x=String(a).split('.').map(n=>+n||0),y=String(b).split('.').map(n=>+n||0);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0}return false};
 function ago(t){const s=Math.max(0,Math.round(Date.now()/1000-t));if(s<90)return'just now';const m=Math.round(s/60);if(m<60)return m+' min ago';return Math.round(m/60)+' h ago'}
+function boardRow(o){const on=Date.now()/1000-o.t<660,old=B.latest&&newer(B.latest.build,o.b),ck=B.checked.has(o.id),pad=CATS.cats.length?'16px':'10px';
+return `<div class="bd${B.sel===o.id?' sel':''}" style="padding-left:${pad}"><span class="cb ${ck?'on':''}" data-ck="${esc(o.id)}" title="Select"></span><button class="tx" data-id="${esc(o.id)}" style="border:0;background:transparent;padding:0;cursor:pointer;min-width:0"><div class="nm">${esc(o.n)}</div><div class="sub">${on?'Online':'Seen '+ago(o.t)} · ${esc(o.d||o.b||'?')}${old?' <span style="color:var(--warn)">↑</span>':''}</div></button></div>`}
 function renderList(){const L=$('#list'),arr=Object.values(B.list).sort((a,b)=>String(a.n).localeCompare(String(b.n)));
-L.innerHTML=`<button class="bd${B.sel==='all'?' sel':''}" data-id="all"><span class="dot on" style="background:var(--ac)"></span><span class="tx"><div class="nm">All boards</div><div class="sub">Change every board at once</div></span></button>`+arr.map(o=>{const on=Date.now()/1000-o.t<660,old=B.latest&&newer(B.latest.build,o.b);return `<button class="bd${B.sel===o.id?' sel':''}" data-id="${esc(o.id)}"><span class="dot ${on?'on':''}"></span><span class="tx"><div class="nm">${esc(o.n)}</div><div class="sub">${on?'Online':'Seen '+ago(o.t)} · build ${esc(o.d||o.b||'?')}${old?' <span style="color:var(--warn)">↑</span>':''}</div></span></button>`}).join('')||'';
-L.querySelectorAll('.bd').forEach(b=>b.onclick=()=>pick(b.dataset.id))}
+let h=`<button class="bd${B.sel==='all'?' sel':''}" data-id="all"><span class="dot on" style="background:var(--ac)"></span><span class="tx"><div class="nm">All boards</div><div class="sub">Change every board at once</div></span></button>`;
+for(const c of CATS.cats){const items=arr.filter(o=>CATS.of[o.id]===c),ids=items.map(o=>o.id),nck=ids.filter(id=>B.checked.has(id)).length,cls=!ids.length||nck===0?'':nck===ids.length?'on':'part';
+h+=`<div class="cath"><span class="cb ${cls}" data-cat="${esc(c)}" title="Select group"></span><span style="flex:1">${esc(c)}</span><span>${items.length}</span></div>`+items.map(boardRow).join('')}
+const un=arr.filter(o=>!CATS.of[o.id]||!CATS.cats.includes(CATS.of[o.id]));
+if(CATS.cats.length&&un.length)h+=`<div class="cath"><span style="width:18px"></span><span style="flex:1">Ungrouped</span><span>${un.length}</span></div>`;
+h+=un.map(boardRow).join('');
+L.innerHTML=h;
+L.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>pick(b.dataset.id));
+L.querySelectorAll('[data-ck]').forEach(b=>b.onclick=e=>{e.stopPropagation();const id=b.dataset.ck;B.checked.has(id)?B.checked.delete(id):B.checked.add(id);renderList();renderSide()});
+L.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{const ids=arr.filter(o=>CATS.of[o.id]===b.dataset.cat).map(o=>o.id);const allck=ids.length&&ids.every(id=>B.checked.has(id));ids.forEach(id=>allck?B.checked.delete(id):B.checked.add(id));renderList();renderSide()});
+renderTgt()}
 $('#refresh').onclick=()=>{toast('Asking boards…');loadBoards(true);setTimeout(()=>loadBoards(false),5000)};
 try{const es=new EventSource(ST+'/sse');es.onmessage=ev=>{try{const e=JSON.parse(ev.data);if(e.event!='message')return;const d=JSON.parse(e.message);if(d&&d.id&&(d.z===1||d.z===3)){seen(d,e.time);renderList()}}catch(_){}}}catch(e){}
 function pick(id){if(C.id&&C.id!==id)disconnect();B.sel=id;renderList();const o=B.list[id];
@@ -111,9 +159,9 @@ else{$('#bName').textContent=o?o.n:id;$('#bMeta').textContent=o?`ID ${o.id} · b
 renderSide()}
 function stageMsg(t,s){$('#cv').hidden=true;$('#live').style.display='none';$('#stmsg').style.display='flex';$('#stmsg').innerHTML=`<b>${esc(t)}</b><span>${esc(s)}</span>`}
 /* ---------- settings + actions panel ---------- */
-function renderSide(){const I=C.info||{},all=B.sel==='all',on=k=>I[k]?' on':'',S=$('#side');if(!B.sel){S.innerHTML='';return}
+function renderSide(){const I=C.info||{},all=(B.sel==='all'||B.checked.size>0),on=k=>I[k]?' on':'',S=$('#side');if(!B.sel&&!B.checked.size){S.innerHTML='';return}
 const sw=(k,l,v)=>`<div class="row"><span class="lb">${l}</span><button class="sw${v?' on':''}" data-set="${k}" aria-label="${l}"></button></div>`;
-S.innerHTML=`<h3>Settings${all?' — every board':''}</h3>
+S.innerHTML=`<h3>Settings${B.checked.size?' — '+esc(tgtLabel()):all?' — every board':''}</h3>
 ${sw('pass','App passcode',all?true:I.pass)}${sw('clk','Clock on the board',all?false:I.clk)}${sw('finger','Finger drawing',all?false:I.finger)}${sw('saver','Screen saver',all?true:I.saver)}${sw('wrOn','Mr. Wrya mode allowed',all?true:I.wrOn)}
 <div class="row"><span class="lb">Mr. Wrya name</span><select data-sel="wrName"><option value="wrya">Mr. Wrya mode</option><option value="bottom">Bottom toolbar mode</option></select></div>
 <div class="row"><span class="lb">Language</span><select data-sel="lang"><option value="en">English</option><option value="ckb">کوردی</option><option value="ar">العربية</option></select></div>
@@ -130,7 +178,7 @@ ${all?'':`<div class="row"><input type="text" id="nm" maxlength="40" placeholder
 <button class="btn" data-mode="wb">Whiteboard view</button><button class="btn" data-mode="split">Split view</button>
 <button class="btn" data-act="lock">Lock board</button><button class="btn" data-act="unlock">Unlock board</button>
 <button class="btn" data-act="saver">Screen saver now</button><button class="btn" data-act="wake">Wake</button>
-<button class="btn" data-act="toolbarReset">Reset toolbar</button><button class="btn red" data-act="wipe" data-confirm="Erase all pages on ${all?'EVERY board':'this board'}? (A recovery backup is kept.)">Erase all pages</button></div>
+<button class="btn" data-act="toolbarReset">Reset toolbar</button><button class="btn red" data-act="wipe" data-confirm="Erase all pages on ${B.sel==='all'?'EVERY board':B.checked.size?'the selected boards':'this board'}? (A recovery backup is kept.)">Erase all pages</button></div>
 <h3>Exam mode</h3>
 <div class="row"><input type="number" id="exMin" min="1" max="600" value="45"><span class="muted">min</span><input type="text" id="exTitle" maxlength="60" placeholder="Exam name (optional)"></div>
 <div class="grid"><button class="btn pri" id="exGo">Start exam</button><button class="btn" data-act="examAdd">+5 min</button><button class="btn red" data-act="examEnd" style="grid-column:span 2">End exam</button></div>
@@ -156,8 +204,8 @@ $('#nmSave').onclick=()=>doSet('name',$('#nm').value.trim());$('#logBtn').onclic
 function aiState(){const e=$('#aiState');if(!e)return;const a=(C.info||{}).ai;e.innerHTML=!live()?'Connect to this board to send or remove the key.':!a?'This board is on build '+esc((C.info||{}).d||'?')+'. It needs 30/10/43 or newer.':`Board name ${a.name?'is':'is <b>not</b>'} Naz Tablet · key ${a.key?'<b style="color:var(--ok)">saved</b>':'not set'}${a.off?' · switched off':''}`}
 function infoBox(){const I=C.info,e=$('#infoBox');if(!e)return;e.innerHTML=I?`Build ${esc(I.d)} · ${esc(I.lang)} · ${I.pages} page(s), on ${I.cur}${I.pdf?' · PDF open ('+I.pdfPages+' p)':''}${I.exam?' · exam running':''}${I.asleep?' · screen saver on':''}${I.locked?' · locked':''}`:'Connect to see details.'}
 const live=()=>C.ch&&C.ch.readyState=='open';
-async function doSet(k,v){try{if(B.sel==='all'){await sendCmd('all','set',{k,v});toast('Sent to all boards')}else if(live()){C.info=await req('set',{k,v});renderSide();toast('Done')}else{await sendCmd(B.sel,'set',{k,v});toast('Sent')}}catch(e){toast('Failed: '+e.message)}}
-async function doAct(n,a){a=Object.assign({n},a||{});try{if(B.sel==='all'){await sendCmd('all','act',a);toast('Sent to all boards')}else if(live()){await req('act',a);toast('Done')}else{await sendCmd(B.sel,'act',a);toast('Sent')}}catch(e){toast('Failed: '+e.message)}}
+async function doSet(k,v){const t=tgt();if(!t)return toast('Pick a board first');try{if(!B.checked.size&&t===B.sel&&live()){C.info=await req('set',{k,v});renderSide();toast('Done')}else{await sendCmd(t,'set',{k,v});toast('Sent to '+tgtLabel())}}catch(e){toast('Failed: '+e.message)}}
+async function doAct(n,a){a=Object.assign({n},a||{});const t=tgt();if(!t)return toast('Pick a board first');try{if(!B.checked.size&&t===B.sel&&live()){await req('act',a);toast('Done')}else{await sendCmd(t,'act',a);toast('Sent to '+tgtLabel())}}catch(e){toast('Failed: '+e.message)}}
 async function showLogs(){if(!live())return toast('Connect first');const L=await req('logs'),e=$('#logs');e.hidden=false;e.textContent=(L||[]).slice().reverse().map(([t,l,m])=>new Date(t).toLocaleString()+'  ['+l+']  '+m).join('\n')||'No log entries.'}
 /* ---------- direct connection ---------- */
 $('#connect').onclick=()=>{if(C.id)disconnect();else connect(B.sel)};
