@@ -915,7 +915,9 @@ function exTick(){const left=Math.max(0,Math.ceil((EX.end-Date.now())/1000)),o=$
 $('#exC').textContent=fmtT(left);$('#exE').textContent=EX.done?'':tl('Ends at')+' '+p2(e.getHours())+':'+p2(e.getMinutes());
 o.classList.toggle('warn',left<=300&&left>60);o.classList.toggle('last',left<=60&&left>0);o.classList.toggle('up',left<=0);
 $('#exUp').textContent=left<=0?tl('Time is up!'):'';$('#exEnd span').textContent=tl(left<=0?'Close':'End exam');$('#exAdd span').textContent=tl('+5 min');$('#exH').textContent=tl('Hold for 2 seconds');
-if(left<=0&&!EX.done){EX.done=true;log('info','Exam time is up');beep();clearInterval(EX.rg);EX.rg=setInterval(beep,1400);clearTimeout(EX.stopRg);EX.stopRg=setTimeout(()=>clearInterval(EX.rg),12000)}}
+if(left<=0&&!EX.done){EX.done=true;log('info','Exam time is up');exAudio();beep();clearInterval(EX.rg);EX.rg=setInterval(beep,1400)}}
+function exAudio(){try{TM.ac=TM.ac||new(window.AudioContext||window.webkitAudioContext)();if(TM.ac.state=='suspended')TM.ac.resume()}catch(e){}}
+['pointerdown','keydown'].forEach(t=>document.addEventListener(t,exAudio,{capture:true,passive:true}));
 function exStop(){clearInterval(EX.iv);clearInterval(EX.rg);clearTimeout(EX.stopRg);EX.end=0;EX.done=false;try{localStorage.removeItem('wbex')}catch(e){}$('#exo').hidden=true;log('info','Exam ended')}
 function exAdd(){clearInterval(EX.rg);EX.end=Math.max(EX.end,Date.now())+300000;EX.done=false;exSave();exTick();log('info','Exam: 5 minutes added')}
 function exResume(){let d=null;try{d=JSON.parse(localStorage.getItem('wbex')||'null')}catch(e){}if(!d||!d.end)return;if(Date.now()-d.end>3600000){try{localStorage.removeItem('wbex')}catch(e){}return}EX.end=d.end;EX.title=d.title||'';EX.done=Date.now()>=d.end;exShow()}
