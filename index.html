@@ -256,6 +256,11 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 @keyframes ssDrift{0%{transform:translate(-120px,-50px)}25%{transform:translate(110px,-70px)}50%{transform:translate(130px,60px)}75%{transform:translate(-100px,70px)}100%{transform:translate(-120px,-50px)}}
 @keyframes ssBr{0%,100%{opacity:.9}50%{opacity:.6}}@keyframes ssHint{0%,100%{opacity:.35}50%{opacity:.7}}
 @media(prefers-reduced-motion:reduce){#ss .ss-d{animation-duration:240s}}
+</style><style>
+#amsg{position:fixed;inset:0;z-index:2147481000;display:flex;align-items:center;justify-content:center;background:rgba(10,27,69,.55);animation:zaFade .25s ease}
+#amsg .amsg-c{position:relative;max-width:min(760px,90vw);background:var(--fb);color:var(--ff);border-radius:20px;padding:34px 56px 34px 34px;box-shadow:0 20px 60px rgba(5,15,45,.45);animation:zaCard .3s cubic-bezier(.2,.8,.2,1)}
+#amsg .amsg-t{font:700 30px/1.35 system-ui,sans-serif;white-space:pre-wrap;word-break:break-word}
+#amsg .amsg-x{position:absolute;top:10px;right:10px;width:44px;height:44px;border:0;border-radius:12px;background:var(--fm);color:var(--ff);display:grid;place-items:center;cursor:pointer}
 </style></head><body>
 <div id="spl" aria-label="ZHSE-A is loading" role="status"><div class="spl-sl"><div class="spl-sr" aria-hidden="true"></div><div class="spl-sc"><img id="splImg" alt="Zhyar Educational Foundation logo"></div></div><div class="spl-st"><div class="spl-sn">ZHSE-A</div><div class="spl-sf">Zhyar Educational Foundation</div></div><div class="spl-sb" aria-hidden="true"><i></i></div><div class="spl-sa">made by <b>Alaz</b></div><div class="spl-sv"><span id="splB"></span><b aria-hidden="true">12F</b></div></div>
 <div id="clk" aria-hidden="true"><div id="clkT"></div><div id="clkD"></div></div>
@@ -601,22 +606,23 @@ const BSU='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4';
 const BS={id:(()=>{let i='';try{i=localStorage.getItem('wbid')||''}catch(e){}if(!i){i=Math.random().toString(36).slice(2,8).toUpperCase();try{localStorage.setItem('wbid',i)}catch(e){}}return i})(),list:null,latest:null,msg:'',busy:false};
 const bsName=()=>{let n='';try{n=localStorage.getItem('wbn')||''}catch(e){}return n||('Board '+BS.id)};
 const bsEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-async function bsBeat(){if(!navigator.onLine)return;try{await fetch(BSU,{method:'POST',body:JSON.stringify({z:1,id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER})})}catch(e){}}
-setTimeout(bsBeat,20000);setInterval(bsBeat,300000);addEventListener('online',()=>setTimeout(bsBeat,5000));
+async function bsBeat(force){if(!navigator.onLine)return;let lb=0;try{lb=+localStorage.getItem('wbhb')||0}catch(e){}if(!force&&Date.now()-lb<30*60000)return;try{localStorage.setItem('wbhb',String(Date.now()))}catch(e){}try{await fetch(BSU,{method:'POST',body:JSON.stringify({z:1,id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER})})}catch(e){}}
+setTimeout(()=>bsBeat(),20000);addEventListener('online',()=>setTimeout(()=>bsBeat(),5000));
 async function bsLoad(){if(BS.busy)return;BS.busy=true;BS.msg='Loading boards...';adRender();
 try{const v=await fetch(upBase()+'version.json?t='+Date.now(),{cache:'no-store'});if(v.ok){const j=await v.json();if(j&&j.build)BS.latest=j}}catch(e){}
+if(navigator.onLine&&Date.now()-(BS.lp||0)>120000){BS.lp=Date.now();try{await fetch(BSC,{method:'POST',body:JSON.stringify({z:4,t:Date.now()})});await new Promise(r=>setTimeout(r,4000))}catch(e){}}
 try{const r=await fetch(BSU+'/json?poll=1&since=12h',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const t=await r.text(),m={};
 const lg={};t.split('\n').forEach(l=>{try{const e=JSON.parse(l);if(e.event!='message')return;const d=JSON.parse(e.message);if(d&&d.z===3&&d.id&&Array.isArray(d.e)){(lg[d.id]=lg[d.id]||[]).push(...d.e.map(x=>[+x[0]||e.time*1000,String(x[1]||'')]));if(!m[d.id])m[d.id]={id:String(d.id),n:String(d.n||d.id),b:String(d.b||''),d:String(d.d||''),t:e.time};return}if(!d||d.z!==1||!d.id)return;const o=m[d.id];if(!o||e.time>o.t)m[d.id]={id:String(d.id),n:String(d.n||d.id),b:String(d.b||''),d:String(d.d||''),t:e.time}}catch(_){}});
 BS.list=Object.values(m).sort((a,b)=>a.n.localeCompare(b.n));BS.logs={};Object.keys(lg).forEach(k=>{BS.logs[k]=lg[k].sort((a,b)=>b[0]-a[0]).slice(0,60)});BS.msg=''}catch(e){BS.msg='Could not load board status: '+noUrl(e.message||e)}BS.busy=false;adRender()}
 const BSC=BSU+'-c';
 async function fuRemote(){if(FU.busy||UPS.busy)return;try{const r=await fetch(upBase()+'version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=await r.json();if(!v||!v.build||!bnew(v.build,BUILD)){log('info','Admin update request: already up to date');return}UPS.avail=v;FU.snooze=0;fuWait()}catch(e){}}
 function bsCmd(m){try{const d=JSON.parse(m);if(!d||d.z!==2||d.cmd!=='up')return;if(!(d.to==='all'||(Array.isArray(d.to)&&d.to.includes(BS.id))))return;log('info','Admin update request received');fuRemote()}catch(e){}}
-let bsES=null;function bsListen(){try{if(!window.EventSource)return;if(bsES)bsES.close();bsES=new EventSource(BSC+'/sse');bsES.onmessage=ev=>{try{const e=JSON.parse(ev.data);if(e.event==='message')bsCmd(e.message)}catch(_){}}}catch(e){}}
+let bsES=null;function bsListen(){try{if(!window.EventSource)return;if(bsES)bsES.close();bsES=new EventSource(BSC+'/sse');bsES.onmessage=ev=>{try{const e=JSON.parse(ev.data);if(e.event==='message'){bsCmd(e.message);raMsg(e)}}catch(_){}}}catch(e){}}
 setTimeout(bsListen,8000);setInterval(()=>{if(navigator.onLine&&(!bsES||bsES.readyState===2))bsListen()},60000);
 async function bsSend(to){ADv.msg='Sending...';adRender();try{const r=await fetch(BSC,{method:'POST',body:JSON.stringify({z:2,cmd:'up',to,t:Date.now()})});ADv.msg=r.ok?(to==='all'?'Update sent to all boards. Each shows a 5-second notice, then installs.':'Update sent to '+((BS.list||[]).find(o=>o.id==to[0])||{n:to[0]}).n+'.'):'Could not send (HTTP '+r.status+').';log('info','Admin update sent to '+(to==='all'?'all':to.join(',')))}catch(e){ADv.msg='Could not send. Check the internet connection.'}adRender()}
 const BSE={q:[],t:0,open:{}};
-function bsErr(m){BSE.q.push([Date.now(),m.slice(0,250)]);if(BSE.q.length>30)BSE.q.splice(0,BSE.q.length-30);if(!BSE.t)BSE.t=setTimeout(bsFlush,20000)}
-async function bsFlush(){BSE.t=0;if(!BSE.q.length)return;if(!navigator.onLine){BSE.t=setTimeout(bsFlush,60000);return}const e=BSE.q.slice(0,10);try{const r=await fetch(BSU,{method:'POST',body:JSON.stringify({z:3,id:BS.id,n:bsName(),b:BUILD,d:BD,e})});if(r.ok)BSE.q.splice(0,e.length)}catch(x){}if(BSE.q.length)BSE.t=setTimeout(bsFlush,60000)}
+function bsErr(m){BSE.q.push([Date.now(),m.slice(0,250)]);if(BSE.q.length>30)BSE.q.splice(0,BSE.q.length-30);if(!BSE.t)BSE.t=setTimeout(bsFlush,Math.max(20000,(BSE.lf||0)+1800000-Date.now()))}
+async function bsFlush(){BSE.t=0;if(!BSE.q.length)return;if(!navigator.onLine){BSE.t=setTimeout(bsFlush,60000);return}const e=BSE.q.slice(0,10);try{const r=await fetch(BSU,{method:'POST',body:JSON.stringify({z:3,id:BS.id,n:bsName(),b:BUILD,d:BD,e})});if(r.ok){BSE.q.splice(0,e.length);BSE.lf=Date.now()}}catch(x){}if(BSE.q.length)BSE.t=setTimeout(bsFlush,1800000)}
 window.bsErr=bsErr;
 function bsAgo(t){const s=Math.max(0,Math.round(Date.now()/1000-t));if(s<90)return'just now';const m=Math.round(s/60);if(m<60)return m+' min ago';const h=Math.round(m/60);return h+' h ago'}
 function bsHTML(){const L=BS.latest,rows=(BS.list||[]).map(o=>{const on=Date.now()/1000-o.t<660,cur=!L||!bnew(L.build,o.b);return `<div class="ar"><span class="al"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:${on?'#16A34A':'#9CA3AF'}"></span>${bsEsc(o.n)}${o.id==BS.id?' (this board)':''}</span><span style="min-width:120px">${on?'Online':'Last seen '+bsAgo(o.t)}</span><span style="min-width:150px;font-weight:700;color:${cur?'#16A34A':'#D97706'}">Build ${bsEsc(o.d||o.b)} ${cur?'&#10003; up to date':'&#8593; needs update'}</span><button class="ab" data-a="ad_bsu:${bsEsc(o.id)}"${cur?' disabled':''}>Update</button><button class="ab${BSE.open[o.id]?' on':''}" data-a="ad_bsg:${bsEsc(o.id)}">Log (${((BS.logs||{})[o.id]||[]).length})</button></div>${BSE.open[o.id]?`<div class="adlog">${((BS.logs||{})[o.id]||[]).length?BS.logs[o.id].map(x=>new Date(x[0]).toLocaleString()+'  '+bsEsc(x[1])).join('\n'):'No errors reported in the last 12 hours.'}</div>`:''}`}).join('');
@@ -713,7 +719,7 @@ if(k=='ad_bsl'){bsLoad();return}
 if(k=='ad_bsa'){bsSend('all');return}
 if(k=='ad_bsg'){BSE.open[v]=!BSE.open[v];adRender();return}
 if(k=='ad_bsu'){bsSend([v]);return}
-if(k=='ad_bsn'){const i=$('#bsn'),v=(i&&i.value||'').trim().slice(0,40);try{if(v)localStorage.setItem('wbn',v);else localStorage.removeItem('wbn')}catch(e){}log('info','Class name set: '+bsName());ADv.msg='Class name saved.';adRender();bsBeat().then(()=>setTimeout(bsLoad,1500));return}
+if(k=='ad_bsn'){const i=$('#bsn'),v=(i&&i.value||'').trim().slice(0,40);try{if(v)localStorage.setItem('wbn',v);else localStorage.removeItem('wbn')}catch(e){}log('info','Class name set: '+bsName());ADv.msg='Class name saved.';adRender();bsBeat(true).then(()=>setTimeout(bsLoad,1500));return}
 if(k=='ad_upc'){upCheck(true,true);return}
 if(k=='ad_upi'){upInstall();return}
 if(k=='ad_upr'){if(conf('upr'))upRemove();else adRender();return}
@@ -948,10 +954,10 @@ function ssShow(){if(SS.on)return;SS.on=true;const e=$('#ss');try{const l=$('#lg
 function ssWake(){SS.last=Date.now();if(!SS.on)return;SS.on=false;clearInterval(SS.iv);const e=$('#ss');e.classList.add('out');setTimeout(()=>{if(!SS.on){e.hidden=true;e.classList.remove('out')}},350)}
 ['pointerdown','pointermove','keydown','wheel'].forEach(t=>document.addEventListener(t,()=>{SS.last=Date.now()},{capture:true,passive:true}));
 $('#ss').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();ssWake()});
-setInterval(()=>{if(SS.on){if(ssBusy())ssWake();return}if(Date.now()-SS.last>=SS.idle&&!ssBusy()&&!document.hidden)ssShow()},SS.idle<5000?250:5000);
+setInterval(()=>{if(SS.on){if(ssBusy()||AD.ssOff)ssWake();return}if(!AD.ssOff&&Date.now()-SS.last>=SS.idle&&!ssBusy()&&!document.hidden)ssShow()},SS.idle<5000?250:5000);
 /* ---- handwriting beautification: only on the board named "Naz Tablet" ---- */
 const BW_ALL=true;
-function bwOn(){if(BW_ALL)return true;try{const n=bsName().toLowerCase().replace(/['\u2018\u2019`\u00b4]/g,'').replace(/\s+/g,' ').trim();return n=='naz tablet'||n=='nazs tablet'}catch(e){return false}}
+function bwOn(){if(AD.bw=='on')return true;if(AD.bw=='off')return false;if(BW_ALL)return true;try{const n=bsName().toLowerCase().replace(/['\u2018\u2019`\u00b4]/g,'').replace(/\s+/g,' ').trim();return n=='naz tablet'||n=='nazs tablet'}catch(e){return false}}
 function bwStart(o,q,k){o.f=[.45];o._r=[q.slice()];o.p=[q.slice()];o._t=performance.now();o._k=k}
 const bwD=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
 function bwCorner(o,i){const r=o._r,R=10/o._k;if(i<=0||i>=r.length-1)return false;let a=i,b=i,da=0,db=0;while(a>0&&da<R){da+=bwD(r[a],r[a-1]);a--}while(b<r.length-1&&db<R){db+=bwD(r[b],r[b+1]);b++}if(da<R*.8||db<R*.8)return false;
@@ -994,6 +1000,100 @@ if(Math.abs(M[0]-1)+Math.abs(M[1])+Math.abs(M[2])+Math.abs(M[3]-1)<.01&&Math.abs
 p.u.push(p.s);p.r=[];const nw=new Map();objs.forEach(o=>nw.set(o,{...o,m:(o.m||I3).slice()}));p.s=p.s.map(o=>nw.get(o)||o);
 const pairs=objs.map(o=>[nw.get(o),o.m||I3]),V=w.V,t0=performance.now();cancelAnimationFrame(BWW.anim);
 const step=()=>{const t=Math.min(1,(performance.now()-t0)/220),e=1-Math.pow(1-t,3),Mt=I3.map((v,i)=>v+(M[i]-v)*e);pairs.forEach(([n,m0])=>{n.m=mm(Mt,m0)});draw(V);if(t<1)BWW.anim=requestAnimationFrame(step);else{BWW.anim=0;persist()}};BWW.anim=requestAnimationFrame(step);log('info','Word neatened')}
+/* ---- remote admin (PC panel): signed commands + direct encrypted live view/control ---- */
+const RA={key:null,seen:new Map(),pc:null,ch:null,live:false,lt:0,fid:0,sending:false,ptr:null,lastWho:0,lastPing:0};
+const RAT=BSU+'-r';
+const b64u8=b=>Uint8Array.from(atob(b),c=>c.charCodeAt(0));
+async function raKey(){if(!(window.crypto&&crypto.subtle))return null;let k='';try{const r=await fetch(upBase()+'admin.json?t='+Date.now(),{cache:'no-store'});if(r.ok){const j=await r.json();if(j&&j.k){k=String(j.k);try{localStorage.setItem('wbak',k)}catch(e){}}}}catch(e){}
+if(!k){try{k=localStorage.getItem('wbak')||''}catch(e){}}if(!k)return null;try{RA.key=await crypto.subtle.importKey('raw',b64u8(k),{name:'ECDSA',namedCurve:'P-256'},false,['verify'])}catch(e){RA.key=null;log('warn','Remote admin key could not be loaded')}return RA.key}
+setTimeout(raKey,3000);setInterval(raKey,30*60000);
+async function raVerify(p,s){if(!RA.key||typeof p!='string'||typeof s!='string')return null;try{const ok=await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},RA.key,b64u8(s),new TextEncoder().encode(p));if(!ok)return null;const d=JSON.parse(p);if(!Array.isArray(d)||d.length!=5)return null;const[to,c,a,t,n]=d;
+if(Math.abs(Date.now()-t)>5*60000)return null;if(RA.seen.has(n))return null;RA.seen.set(n,t);if(RA.seen.size>500){for(const k of RA.seen.keys()){RA.seen.delete(k);if(RA.seen.size<=300)break}}
+if(!(to==='all'||to===BS.id||(Array.isArray(to)&&to.includes(BS.id))))return null;return{c,a}}catch(e){return null}}
+async function raMsg(e){let raw=e.message;if(e.attachment&&e.attachment.url){try{const r=await fetch(e.attachment.url);if(r.ok)raw=await r.text()}catch(x){return}}let d;try{d=JSON.parse(raw)}catch(x){return}if(!d)return;
+if(d.z===4){if(Date.now()-RA.lastPing>10*60000){RA.lastPing=Date.now();bsBeat(true)}return}
+if(d.z!==9)return;const v=await raVerify(d.p,d.s);if(!v)return;
+if(v.c=='who'){if(Date.now()-RA.lastWho>30000){RA.lastWho=Date.now();bsBeat(true)}return}
+if(v.c=='rtc'){raRtc(v.a);return}
+try{raExec(v.c,v.a)}catch(x){log('error','Remote command failed: '+(x&&x.message||x))}}
+/* settings + actions shared by signed commands and the live connection */
+function raInfo(){return{id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER,lang:S.lang||'en',pass:!AD.nopw,clk:!!S.clk,finger:!!S.finger,wrOn:!AD.nowr,wrName:AD.wrb?'bottom':'wrya',wr:!!S.wr,tt:S.tt,bw:AD.bw||'auto',saver:!AD.ssOff,mode:S.mode,pages:P.length,cur:S.cur+1,pdf:!!doc,pdfPages:pdfN,exam:!!(window.exActive&&exActive()),asleep:!!SS.on,locked:$('#lk').style.display=='flex',vw:innerWidth,vh:innerHeight,online:navigator.onLine,crypto:!!(window.crypto&&crypto.subtle)}}
+function raSet(k,v){if(k=='pass'){AD.nopw=!v;try{localStorage.setItem('wbu',String(Date.now()))}catch(e){}saveAD();lockCheck()}
+else if(k=='clk'){S.clk=!!v;saveS();clkUpd()}
+else if(k=='lang'){S.lang=['en','ckb','ar'].includes(v)?v:'en';applyLang();panel();saveS()}
+else if(k=='finger'){S.finger=!!v;saveS()}
+else if(k=='wrOn'){AD.nowr=!v;if(!v&&S.wr)setWr(false);saveAD()}
+else if(k=='wrName'){AD.wrb=v=='bottom';saveAD()}
+else if(k=='tt'){const i=+v;if(T[i]){S.tt=i;applyTheme();saveS()}}
+else if(k=='bw'){AD.bw=['on','off'].includes(v)?v:'auto';saveAD()}
+else if(k=='saver'){AD.ssOff=!v;saveAD();if(!v)ssWake()}
+else if(k=='name'){const n=String(v||'').trim().slice(0,40);try{if(n)localStorage.setItem('wbn',n);else localStorage.removeItem('wbn')}catch(e){}bsBeat(true)}
+if(S.fly)fly(S.fly);mark();log('info','Remote setting: '+k)}
+function raAct(n,a){a=a||{};if(n=='update'){fuRemote()}
+else if(n=='clear'){A=WB;mut(x=>{x.length=0})}
+else if(n=='newpage'){P.splice(S.cur+1,0,mk());S.cur++;A=WB;save();drawAll();pgAnim('n')}
+else if(n=='prev'||n=='next'){const c0=S.cur;S.cur=cl(S.cur+(n=='next'?1:-1),0,P.length-1);if(S.cur!=c0){A=WB;drawAll();pgAnim(S.cur>c0?'r':'l')}}
+else if(n=='closepdf'){if(doc){mTok++;doc=null;pdfN=0;Q=[];pdfKey='';bm={};sizes=[];offY=[];W0=612;A=WB;if(S.mode=='pdf')S.mode='wb';layout()}}
+else if(n=='mode'){if(['wb','pdf','split'].includes(a.v)){S.mode=a.v;layout();saveS()}}
+else if(n=='exam'){const m=Math.max(1,Math.min(600,+a.min||60));EX.title=String(a.title||'').slice(0,60);EX.end=Date.now()+m*60000;EX.done=false;exSave();$('#exs').hidden=true;fly(null);closePops();exShow()}
+else if(n=='examEnd'){if(EX.end)exStop()}
+else if(n=='examAdd'){if(EX.end)exAdd()}
+else if(n=='lock'){$('#lk').style.display='flex';try{localStorage.setItem('wbu','0')}catch(e){}$('#lki').value='';$('#lke').textContent=''}
+else if(n=='unlock'){try{localStorage.setItem('wbu',String(Date.now()))}catch(e){}$('#lk').style.display='none'}
+else if(n=='msg'){raBanner(String(a.text||'').slice(0,400),+a.secs||0)}
+else if(n=='msgClose'){const b=$('#amsg');if(b)b.remove()}
+else if(n=='saver'){ssShow()}else if(n=='wake'){ssWake()}
+else if(n=='wipe'){try{const o=localStorage.getItem('wb1');if(o)localStorage.setItem('wb1b',o)}catch(e){}live=null;D=null;P=[mk()];S.cur=0;S.sel=null;A=WB;doSave();if(S.fly)fly(S.fly);drawAll()}
+else if(n=='closeAll'){fly(null);closePops();try{$('#cal').hidden=true;ggClose();phClose()}catch(e){}}
+else if(n=='restart'){try{save(true);saveS();saveAD()}catch(e){}setTimeout(()=>location.reload(),300)}
+else if(n=='toolbarReset'){AD.tbo=TBD.slice();AD.tbh=[];AD.tbs={};AD.qa=[];S.hid=false;S.tx=10;S.ty=10;saveAD();saveS();panel();posPanel()}
+log('info','Remote action: '+n)}
+function raExec(c,a){if(c=='set'&&a)raSet(a.k,a.v);else if(c=='act'&&a)raAct(a.n,a)}
+function raBanner(t,secs){let b=$('#amsg');if(b)b.remove();if(!t)return;b=document.createElement('div');b.id='amsg';b.setAttribute('role','alert');b.innerHTML='<div class="amsg-c"><div class="amsg-t"></div><button class="amsg-x" aria-label="Close">'+ic(I.x,20)+'</button></div>';b.querySelector('.amsg-t').textContent=t;b.querySelector('.amsg-x').onclick=()=>b.remove();document.body.append(b);if(secs>0)setTimeout(()=>{if(b.isConnected)b.remove()},secs*1000)}
+/* direct connection (WebRTC) */
+function raClose(){RA.live=false;try{RA.ch&&RA.ch.close()}catch(e){}try{RA.pc&&RA.pc.close()}catch(e){}RA.ch=null;RA.pc=null}
+async function raRtc(a){if(!a||typeof a.sdp!='string'||!window.RTCPeerConnection)return;raClose();const pc=new RTCPeerConnection({iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun.cloudflare.com:3478']}]});RA.pc=pc;
+pc.ondatachannel=ev=>{const ch=ev.channel;RA.ch=ch;ch.onmessage=m=>raOn(m.data);ch.onclose=()=>{if(RA.ch===ch){RA.live=false;RA.ch=null}};ch.onopen=()=>{raSend({k:'info',d:raInfo()});log('info','Remote admin connected')}};
+pc.onconnectionstatechange=()=>{if(['failed','closed'].includes(pc.connectionState)&&RA.pc===pc){RA.live=false}};
+try{await pc.setRemoteDescription({type:'offer',sdp:a.sdp});const ans=await pc.createAnswer();await pc.setLocalDescription(ans);await new Promise(ok=>{if(pc.iceGatheringState=='complete')return ok();const t=setTimeout(ok,4000);pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState=='complete'){clearTimeout(t);ok()}})});
+await fetch(RAT,{method:'POST',body:JSON.stringify({z:10,id:BS.id,rid:String(a.rid||''),sdp:pc.localDescription.sdp})})}catch(e){log('error','Remote admin connect failed: '+(e&&e.message||e));raClose()}}
+function raSend(o){const ch=RA.ch;if(!ch||ch.readyState!='open')return false;try{ch.send(JSON.stringify(o));return true}catch(e){return false}}
+function raOn(data){let m;try{m=JSON.parse(data)}catch(e){return}const q=m.q;const reply=(d)=>raSend({k:'r',q,d});
+try{if(m.c=='info')reply(raInfo());else if(m.c=='live'){RA.live=!!m.a;RA.fps=Math.max(1,Math.min(6,+m.fps||3));RA.w=Math.max(480,Math.min(1600,+m.w||1000));if(RA.live)raFrame();reply(true)}
+else if(m.c=='in')raIn(m.a);else if(m.c=='key')raKeyIn(m.a);
+else if(m.c=='logs')reply(LOG.slice(-200));
+else if(m.c=='set'){raSet(m.a.k,m.a.v);reply(raInfo())}else if(m.c=='act'){raAct(m.a.n,m.a);setTimeout(()=>raSend({k:'info',d:raInfo()}),400);reply(true)}
+else if(m.c=='bye')raClose()}catch(e){reply({error:String(e&&e.message||e)})}}
+/* live view: board drawing + a map of the on-screen controls */
+function raUI(){const out=[],cs=getComputedStyle.bind(window),vis=e=>{if(!e||!e.isConnected)return null;const r=e.getBoundingClientRect();if(r.width<2||r.height<2||r.bottom<0||r.right<0||r.top>innerHeight||r.left>innerWidth)return null;const s=cs(e);if(s.visibility=='hidden'||s.display=='none'||+s.opacity<.05)return null;return[r,s]};
+const bg=s=>{const c=s.backgroundColor;if(c&&c!='rgba(0, 0, 0, 0)'&&c!='transparent')return c;const m=/(rgba?\([^)]*\)|#[0-9a-fA-F]{3,8})/.exec(s.backgroundImage||'');return m?m[1]:''};
+const R=r=>[Math.round(r.left),Math.round(r.top),Math.round(r.width),Math.round(r.height)];
+const roots=['#w #pn','#tabL','#tabR','#fl','#fp','#ab','#zm','#pb','#jp','#tc','#dv','.pvs.show','#tm','#sp','#cal','#ph','#exs','#exo','#gg','#ad','#ap','#lk','#rz','#rc','#tt','#ss','#wn','#fu','#toast','#amsg','#clk','#spl'];
+for(const sel of roots)document.querySelectorAll(sel).forEach(el=>{const v=vis(el);if(!v)return;const[r,s]=v;out.push({t:'box',r:R(r),bg:bg(s),br:parseFloat(s.borderTopLeftRadius)||0,op:+s.opacity});
+el.querySelectorAll('button,input,select,textarea,label.li,label.sw,.li,.m,.sw,.tw,.gi,.pt,.ab,b,h2,h3,p,span,i.dt,div').forEach(c=>{if(out.length>700)return;const v2=vis(c);if(!v2)return;const[r2,s2]=v2,tag=c.tagName;
+const isCtl=/^(BUTTON|INPUT|SELECT|TEXTAREA)$/.test(tag)||c.matches('label.li,label.sw,.li,.m,.sw,.tw,.gi,.pt,.ab');
+let txt='';if(isCtl){txt=(c.getAttribute('aria-label')||'').trim();const own=[...c.childNodes].filter(n=>n.nodeType==3).map(n=>n.textContent).join('').trim()||(c.innerText||'').trim();if(own)txt=own;if(tag=='INPUT'&&c.type!='range'&&c.type!='color'&&c.type!='file')txt=c.type=='password'?'•'.repeat(c.value.length):(c.value||c.placeholder||'')}
+else{txt=[...c.childNodes].filter(n=>n.nodeType==3).map(n=>n.textContent).join('').trim();if(!txt&&!bg(s2))return}
+if(!isCtl&&!txt&&!bg(s2))return;out.push({t:isCtl?'ctl':'txt',r:R(r2),bg:bg(s2),c:s2.color,fs:parseFloat(s2.fontSize)||14,fw:s2.fontWeight,tx:txt.slice(0,60),on:c.classList.contains('on'),br:parseFloat(s2.borderTopLeftRadius)||0,op:+s2.opacity,rng:tag=='INPUT'&&c.type=='range'?[+c.min,+c.max,+c.value]:null,dir:s2.direction})})});
+return out}
+async function raFrame(){if(!RA.live||!RA.ch||RA.ch.readyState!='open'){RA.live=false;return}const t0=performance.now();
+if(!RA.sending&&RA.ch.bufferedAmount<1.5e6){RA.sending=true;try{const W=innerWidth,H=innerHeight,k=Math.min(1,RA.w/W),c=document.createElement('canvas');c.width=Math.round(W*k);c.height=Math.round(H*k);const g=c.getContext('2d');g.fillStyle='#E5E7EB';g.fillRect(0,0,c.width,c.height);g.scale(k,k);
+for(const V of[WB,PV]){if(!V.on||V.cv.style.display=='none')continue;try{g.drawImage(V.cv,V.l,V.t,V.W,V.H)}catch(e){}}
+const blob=await new Promise(ok=>c.toBlob(ok,'image/jpeg',.62)),buf=new Uint8Array(await blob.arrayBuffer());let bin='';for(let i=0;i<buf.length;i+=32768)bin+=String.fromCharCode.apply(null,buf.subarray(i,i+32768));const b64=btoa(bin),id=++RA.fid,CH=60000,n=Math.ceil(b64.length/CH);
+raSend({k:'fh',f:id,n,vw:W,vh:H,ui:raUI()});for(let i=0;i<n;i++)raSend({k:'fc',f:id,i,d:b64.slice(i*CH,(i+1)*CH)})}catch(e){}RA.sending=false}
+setTimeout(raFrame,Math.max(60,1000/RA.fps-(performance.now()-t0)))}
+/* remote touch + typing */
+['setPointerCapture','releasePointerCapture'].forEach(f=>{const o=Element.prototype[f];Element.prototype[f]=function(){try{return o.apply(this,arguments)}catch(e){}}});
+function raPE(type,tg,x,y,b){tg.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,composed:true,clientX:x,clientY:y,pointerId:7777,pointerType:'pen',isPrimary:true,width:1,height:1,pressure:b?.5:0,buttons:b,button:type=='pointermove'?-1:0}))}
+function raIn(a){if(!a)return;const x=+a.x,y=+a.y;
+if(a.k=='d'){const tg=document.elementFromPoint(x,y);if(!tg)return;RA.ptr={tg,x,y,mv:0};if(tg.focus&&/^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName))tg.focus();raPE('pointerdown',tg,x,y,1)}
+else if(a.k=='m'){const p=RA.ptr;if(!p)return;p.mv=Math.max(p.mv,Math.hypot(x-p.x,y-p.y));raPE('pointermove',p.tg,x,y,1)}
+else if(a.k=='u'){const p=RA.ptr;RA.ptr=null;if(!p)return;raPE('pointerup',p.tg,x,y,0);if(p.mv<10){const t2=document.elementFromPoint(x,y)||p.tg;const tg=p.tg.contains(t2)||t2.contains(p.tg)?t2:p.tg;
+if(tg.tagName=='INPUT'&&tg.type=='range'){const r=tg.getBoundingClientRect(),f=cl((x-r.left)/r.width,0,1),mn=+tg.min||0,mx=+tg.max||100;tg.value=String(Math.round(mn+(mx-mn)*f));tg.dispatchEvent(new Event('input',{bubbles:true}));tg.dispatchEvent(new Event('change',{bubbles:true}));return}
+tg.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,clientX:x,clientY:y}))}}
+else if(a.k=='w'){const tg=document.elementFromPoint(x,y);if(tg)tg.dispatchEvent(new WheelEvent('wheel',{bubbles:true,cancelable:true,clientX:x,clientY:y,deltaY:+a.dy||0}))}}
+function raKeyIn(a){const el=document.activeElement;if(!a)return;if(a.key){const k=a.key;if(el&&/^(INPUT|TEXTAREA)$/.test(el.tagName)&&k=='Backspace'){el.value=el.value.slice(0,-1);el.dispatchEvent(new Event('input',{bubbles:true}));return}(el||document).dispatchEvent(new KeyboardEvent('keydown',{key:k,bubbles:true}));(el||document).dispatchEvent(new KeyboardEvent('keyup',{key:k,bubbles:true}));return}
+if(typeof a.text=='string'&&el&&/^(INPUT|TEXTAREA)$/.test(el.tagName)){el.value+=a.text;el.dispatchEvent(new Event('input',{bubbles:true}))}}
 /* ---- daily wipe: pages clear at 7:58 and 15:00 (a backup is kept for the admin panel) ---- */
 function wipeCheck(){const now=new Date(),b=new Date(now),mn=now.getHours()*60+now.getMinutes();if(mn>=900)b.setHours(15,0,0,0);else if(mn>=478)b.setHours(7,58,0,0);else{b.setDate(b.getDate()-1);b.setHours(15,0,0,0)}
 let last=0;try{last=+localStorage.getItem('wbw')||0}catch(e){}const mark=()=>{try{localStorage.setItem('wbw',String(Date.now()))}catch(e){}};
