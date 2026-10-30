@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.30.34","disp":"30/10/28","force":true,"notes":"PDF slider and remembered page","items":["PDF books reopen at the page you were on","A small slider on the side of the PDF lets you move through the whole book, with the page number next to it"]}
+{"version":"1.1","build":"2026.10.30.35","disp":"30/10/29","force":true,"notes":"Slimmer PDF slider","items":["The PDF slider is smaller, sits right at the edge, and only appears while scrolling or touching it"]}

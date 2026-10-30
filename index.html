@@ -214,7 +214,7 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 html.rtl #fl,html.rtl #fp,html.rtl #sp,html.rtl #rz .lkb,html.rtl #lk .lkb,html.rtl #toast,html.rtl #fu,html.rtl #wn .wn-card,html.rtl #ggList,html.rtl #ggMsg,html.rtl #tm .fh,html.rtl #cal .fh{direction:rtl}
 html.rtl .li,html.rtl .gi,html.rtl .m{text-align:right}
 </style><style>
-.pvs{position:fixed;z-index:3;width:22px;display:none;touch-action:none;cursor:pointer;animation:zaFade .25s ease}
+.pvs{position:fixed;z-index:3;width:22px;display:none;touch-action:none;cursor:pointer;opacity:0;transition:opacity .3s ease}.pvs.show,.pvs.drag{opacity:1;transition:opacity .12s ease}
 .pvs-t{position:absolute;left:15px;top:0;bottom:0;width:3px;border-radius:2px;background:rgba(17,24,39,.18)}
 .pvs-h{position:absolute;left:12px;width:9px;height:34px;border-radius:5px;background:var(--ac);opacity:.85;box-shadow:0 1px 4px rgba(0,0,0,.3);transition:opacity .15s ease}
 .pvs-n{position:absolute;top:50%;transform:translateY(-50%);background:rgba(17,24,39,.85);color:#fff;font:700 11px system-ui,sans-serif;padding:2px 6px;border-radius:9px;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums;transition:font-size .15s ease,padding .15s ease}
@@ -250,7 +250,7 @@ html.rtl .li,html.rtl .gi,html.rtl .m{text-align:right}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.34',BD='30/10/28';
+const VER='1.1',BUILD='2026.10.30.35',BD='30/10/29';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -838,13 +838,14 @@ if(Math.hypot(vx,vy)<.02){pvIn=0;schedRender();return}pvRend();pvIn=requestAnima
 /* ---- PDF slider (small, on the PDF's outer edge) + remember the page per book ---- */
 let pvTarget=null;
 function pvsGeo(){if(!doc||!PV.on||!pdfN)return null;const k=PVV.z*PV.b(),tot=(offY[pdfN-1]+sz(pdfN-1)[1])*k;if(tot<=PV.H+2)return null;const top=PV.t+70,h=Math.max(120,PV.H-170);return{k,tot,top,h,th:34}}
-function pvsUpd(){const g=pvsGeo(),sides=!g?[]:S.mode=='pdf'?['L','R']:S.mode=='split'?[S.sw?'L':'R']:[];
+function pvsUpd(){const g=pvsGeo();if(g&&pvsOy!=null&&Math.abs(PVV.oy-pvsOy)>.5)pvsShow();pvsOy=g?PVV.oy:null;const sides=!g?[]:S.mode=='pdf'?['L','R']:S.mode=='split'?[S.sw?'L':'R']:[];
 ['L','R'].forEach(sd=>{const el=$('#pvs'+sd);if(!el)return;if(!sides.includes(sd)){el.style.display='none';return}const f=cl(-PVV.oy/(g.tot-PV.H),0,1);
 el.style.display='block';el.style.top=g.top+'px';el.style.height=g.h+'px';el.style.left=(sd=='R'?PV.l+PV.W-22:PV.l)+'px';el.querySelector('.pvs-h').style.top=(f*(g.h-g.th))+'px';el.querySelector('.pvs-n').textContent=String(pageAt((PV.H*.4-PVV.oy)/g.k)+1)})}
+let pvsT=0,pvsOy=null;function pvsShow(){['L','R'].forEach(sd=>{const el=$('#pvs'+sd);if(el)el.classList.add('show')});clearTimeout(pvsT);pvsT=setTimeout(()=>{['L','R'].forEach(sd=>{const el=$('#pvs'+sd);if(el&&!el.classList.contains('drag'))el.classList.remove('show')})},1200)}
 window.pvsUpd=pvsUpd;
 ['L','R'].forEach(sd=>{const el=$('#pvs'+sd);let on=false;const mv=e=>{const g=pvsGeo();if(!g)return;const f=cl((e.clientY-g.top-g.th/2)/(g.h-g.th),0,1);PVV.oy=-f*(g.tot-PV.H);draw(PV);pvRend()};
-el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();el.setPointerCapture(e.pointerId);on=true;pvStop();pvTarget=null;el.classList.add('drag');A=PV;mv(e)});
-el.addEventListener('pointermove',e=>{if(on)mv(e)});const up=()=>{if(!on)return;on=false;el.classList.remove('drag');schedRender()};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)});
+el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();el.setPointerCapture(e.pointerId);on=true;pvStop();pvTarget=null;el.classList.add('drag','show');A=PV;mv(e)});
+el.addEventListener('pointermove',e=>{if(on)mv(e)});const up=()=>{if(!on)return;on=false;el.classList.remove('drag');pvsShow();schedRender()};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)});
 /* ---- daily wipe: pages clear at 7:58 and 15:00 (a backup is kept for the admin panel) ---- */
 function wipeCheck(){const now=new Date(),b=new Date(now),mn=now.getHours()*60+now.getMinutes();if(mn>=900)b.setHours(15,0,0,0);else if(mn>=478)b.setHours(7,58,0,0);else{b.setDate(b.getDate()-1);b.setHours(15,0,0,0)}
 let last=0;try{last=+localStorage.getItem('wbw')||0}catch(e){}const mark=()=>{try{localStorage.setItem('wbw',String(Date.now()))}catch(e){}};
