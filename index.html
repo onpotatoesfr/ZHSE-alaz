@@ -289,7 +289,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.41',BD='30/10/35';
+const VER='1.1',BUILD='2026.10.30.42',BD='30/10/36';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -941,14 +941,14 @@ b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.po
 ['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,reset))})})();
 setInterval(()=>{if(exActive()){const d=new Date();$('#exClk').textContent=p2(d.getHours())+':'+p2(d.getMinutes())}},1000);
 /* ---- screen saver: after 10 minutes untouched ---- */
-const SS={last:Date.now(),on:false,iv:0};
+const SS={last:Date.now(),on:false,iv:0,idle:1000};
 function ssBusy(){try{if(window.exActive&&exActive())return true}catch(e){}if(TM.st=='run'||TM.st=='ring')return true;if(doc&&PV.on)return true;if($('#fu'))return true;if($('#ad').style.display=='flex'||$('#tt').style.display=='block')return true;return false}
 function ssClock(){const d=new Date(),p=n=>String(n).padStart(2,'0'),loc=S.lang=='ckb'?'ckb-u-nu-latn':S.lang=='ar'?'ar-u-nu-latn':undefined;$('#ssT').textContent=p(d.getHours())+':'+p(d.getMinutes());try{$('#ssD').textContent=d.toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long'})}catch(e){$('#ssD').textContent=d.toDateString()}}
 function ssShow(){if(SS.on)return;SS.on=true;const e=$('#ss');try{const l=$('#lgo');if(l&&!$('#ssI').src)$('#ssI').src=l.src}catch(x){}$('#ssH').textContent=tl('Touch anywhere to wake');e.classList.remove('out');e.hidden=false;ssClock();clearInterval(SS.iv);SS.iv=setInterval(ssClock,1000);fly(null);log('info','Screen saver on')}
 function ssWake(){SS.last=Date.now();if(!SS.on)return;SS.on=false;clearInterval(SS.iv);const e=$('#ss');e.classList.add('out');setTimeout(()=>{if(!SS.on){e.hidden=true;e.classList.remove('out')}},350)}
-['pointerdown','keydown','wheel'].forEach(t=>document.addEventListener(t,()=>{SS.last=Date.now()},{capture:true,passive:true}));
+['pointerdown','pointermove','keydown','wheel'].forEach(t=>document.addEventListener(t,()=>{SS.last=Date.now()},{capture:true,passive:true}));
 $('#ss').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();ssWake()});
-setInterval(()=>{if(SS.on){if(ssBusy())ssWake();return}if(Date.now()-SS.last>=600000&&!ssBusy()&&!document.hidden)ssShow()},5000);
+setInterval(()=>{if(SS.on){if(ssBusy())ssWake();return}if(Date.now()-SS.last>=SS.idle&&!ssBusy()&&!document.hidden)ssShow()},SS.idle<5000?250:5000);
 /* ---- daily wipe: pages clear at 7:58 and 15:00 (a backup is kept for the admin panel) ---- */
 function wipeCheck(){const now=new Date(),b=new Date(now),mn=now.getHours()*60+now.getMinutes();if(mn>=900)b.setHours(15,0,0,0);else if(mn>=478)b.setHours(7,58,0,0);else{b.setDate(b.getDate()-1);b.setHours(15,0,0,0)}
 let last=0;try{last=+localStorage.getItem('wbw')||0}catch(e){}const mark=()=>{try{localStorage.setItem('wbw',String(Date.now()))}catch(e){}};
