@@ -248,7 +248,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 #ss .ss-d{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;animation:ssDrift 60s ease-in-out infinite}
 #ss .ss-l{width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 0 60px rgba(46,111,201,.35);animation:ssBr 6s ease-in-out infinite}#ss .ss-l img{height:92px;width:auto}
 #ssT{font:800 112px system-ui,sans-serif;letter-spacing:-3px;line-height:1;font-variant-numeric:tabular-nums;opacity:.92}
-#ssD{font:600 24px system-ui,sans-serif;opacity:.7}
+#ssD{font:600 24px system-ui,sans-serif;opacity:.7}#ssT .ss-ap{font:700 34px system-ui,sans-serif;letter-spacing:0;margin-inline-start:12px;opacity:.75}
 #ss .ss-m{font:700 18px system-ui,sans-serif;letter-spacing:3px;text-transform:uppercase;opacity:.45;margin-top:6px}
 #ssH{position:absolute;left:0;right:0;bottom:34px;font:600 16px system-ui,sans-serif;animation:ssHint 3s ease-in-out infinite}
 #ss .ss-z{position:absolute;left:30px;bottom:26px;font:500 14px system-ui,sans-serif;opacity:.4}#ss .ss-w{position:absolute;right:30px;bottom:22px;font:800 22px system-ui,sans-serif;opacity:.12}
@@ -289,7 +289,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.42',BD='30/10/36';
+const VER='1.1',BUILD='2026.10.30.43',BD='30/10/37';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -941,9 +941,9 @@ b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.po
 ['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,reset))})})();
 setInterval(()=>{if(exActive()){const d=new Date();$('#exClk').textContent=p2(d.getHours())+':'+p2(d.getMinutes())}},1000);
 /* ---- screen saver: after 10 minutes untouched ---- */
-const SS={last:Date.now(),on:false,iv:0,idle:1000};
+const SS={last:Date.now(),on:false,iv:0,idle:600000};
 function ssBusy(){try{if(window.exActive&&exActive())return true}catch(e){}if(TM.st=='run'||TM.st=='ring')return true;if(doc&&PV.on)return true;if($('#fu'))return true;if($('#ad').style.display=='flex'||$('#tt').style.display=='block')return true;return false}
-function ssClock(){const d=new Date(),p=n=>String(n).padStart(2,'0'),loc=S.lang=='ckb'?'ckb-u-nu-latn':S.lang=='ar'?'ar-u-nu-latn':undefined;$('#ssT').textContent=p(d.getHours())+':'+p(d.getMinutes());try{$('#ssD').textContent=d.toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long'})}catch(e){$('#ssD').textContent=d.toDateString()}}
+function ssClock(){const d=new Date(),p=n=>String(n).padStart(2,'0'),loc=S.lang=='ckb'?'ckb-u-nu-latn':S.lang=='ar'?'ar-u-nu-latn':undefined;const h=d.getHours(),ap=(S.lang=='ar'?['ص','م']:S.lang=='ckb'?['پ.ن','د.ن']:['AM','PM'])[h<12?0:1];$('#ssT').innerHTML=((h%12)||12)+':'+p(d.getMinutes())+'<small class="ss-ap">'+ap+'</small>';try{$('#ssD').textContent=d.toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long'})}catch(e){$('#ssD').textContent=d.toDateString()}}
 function ssShow(){if(SS.on)return;SS.on=true;const e=$('#ss');try{const l=$('#lgo');if(l&&!$('#ssI').src)$('#ssI').src=l.src}catch(x){}$('#ssH').textContent=tl('Touch anywhere to wake');e.classList.remove('out');e.hidden=false;ssClock();clearInterval(SS.iv);SS.iv=setInterval(ssClock,1000);fly(null);log('info','Screen saver on')}
 function ssWake(){SS.last=Date.now();if(!SS.on)return;SS.on=false;clearInterval(SS.iv);const e=$('#ss');e.classList.add('out');setTimeout(()=>{if(!SS.on){e.hidden=true;e.classList.remove('out')}},350)}
 ['pointerdown','pointermove','keydown','wheel'].forEach(t=>document.addEventListener(t,()=>{SS.last=Date.now()},{capture:true,passive:true}));
