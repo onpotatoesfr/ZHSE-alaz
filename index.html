@@ -402,7 +402,7 @@ SH.r=SH.rect;SH.e=SH.ell;SH.brect=['Blank rectangle',1,0,SH.rect[3]];
 function sp(k,a,b){const s=SH[k]||SH.rect;let x0=Math.min(a[0],b[0]),y0=Math.min(a[1],b[1]),w=Math.abs(b[0]-a[0]),h=Math.abs(b[1]-a[1]);if(s[2]){const m=Math.max(w,h);x0=b[0]<a[0]?a[0]-m:a[0];y0=b[1]<a[1]?a[1]-m:a[1];w=h=m}return s[3](a,b,v=>+(x0+v*w).toFixed(1),v=>+(y0+v*h).toFixed(1),w,h)}
 /* drawing objects */
 function R(o){x.save();if(o.m)x.transform(o.m[0],o.m[1],o.m[2],o.m[3],o.m[4],o.m[5]);x.globalCompositeOperation=o.er?'destination-out':'source-over';x.globalAlpha=o.al;x.strokeStyle=x.fillStyle=o.c;x.lineWidth=o.w;x.lineCap=x.lineJoin='round';x.setLineDash(o.d?[o.w*2,o.w*2]:[]);
-if(o.k=='p'){const q=o.p;x.beginPath();x.moveTo(q[0][0],q[0][1]);if(q.length==1)x.lineTo(q[0][0]+.1,q[0][1]);for(let i=1;i<q.length-1;i++)x.quadraticCurveTo(q[i][0],q[i][1],(q[i][0]+q[i+1][0])/2,(q[i][1]+q[i+1][1])/2);if(q.length>1)x.lineTo(q[q.length-1][0],q[q.length-1][1]);x.stroke()}
+if(o.k=='p'&&o.f&&o.f.length==o.p.length&&o.p.length>2){bwDraw(o)}else if(o.k=='p'){const q=o.p;x.beginPath();x.moveTo(q[0][0],q[0][1]);if(q.length==1)x.lineTo(q[0][0]+.1,q[0][1]);for(let i=1;i<q.length-1;i++)x.quadraticCurveTo(q[i][0],q[i][1],(q[i][0]+q[i+1][0])/2,(q[i][1]+q[i+1][1])/2);if(q.length>1)x.lineTo(q[q.length-1][0],q[q.length-1][1]);x.stroke()}
 else if(o.k=='s'){const Q2=new Path2D(sp(o.s,o.a,o.b));if(o.fc&&(SH[o.s]||SH.rect)[1]){x.fillStyle=o.fc;x.fill(Q2);x.fillStyle=o.c}x.stroke(Q2)}
 else if(o.k=='i'){if(o.img&&o.img.complete)x.drawImage(o.img,o.x,o.y,o.w,o.h)}
 else{x.font=o.z+'px '+FF;x.textBaseline='top';x.fillText(o.s,o.x,o.y)}x.restore()}
@@ -498,16 +498,16 @@ if(S.tool=='select'){selDown(p,k,q);return}
 if(S.tool=='text'){e.preventDefault();addText(e.clientX,e.clientY,q);return}
 if(S.tool=='laser'){lzCur={V,p:[[sx,sy,performance.now()]]};LZ.push(lzCur);lzGo();return}
 const bk=S.tool=='pen2'||(eb&&S.wr),m=S.type=='marker',sz0=bk&&S.wr?((S.useRec&&S.recB)||AD.dBack||S.size):((S.useRec&&(S.wr?S.recWT:S.recT))||(S.wr&&AD.dTip)||S.size),base={c:bk?S.color2:S.color,w:(m?sz0*3:sz0)/V.b(),al:S.al*(m?.4:1),d:S.dash||S.type=='dotted'};
-live=S.tool=='shape'?{...base,k:'s',s:S.shape,a:q,b:q,f:S.fill}:{...base,k:'p',p:[q]};if(live.k=='p'&&S.tool!='laser'){const ed=insSnap(V,sx,sy);if(ed){const pp=insProj(ed,sx,sy);live.rs=ed;live.p=[[(pp[0]-p.ox)/k-og[0],(pp[1]-p.oy)/k-og[1]]]}}drag='d'});
+live=S.tool=='shape'?{...base,k:'s',s:S.shape,a:q,b:q,f:S.fill}:{...base,k:'p',p:[q]};if(live.k=='p'&&S.tool!='laser'){const ed=insSnap(V,sx,sy);if(ed){const pp=insProj(ed,sx,sy);live.rs=ed;live.p=[[(pp[0]-p.ox)/k-og[0],(pp[1]-p.oy)/k-og[1]]]}}if(live.k=='p'&&!live.rs&&!live.er&&!live.d&&live.al>=.99&&S.type=='pen'&&(S.tool=='pen'||S.tool=='pen2')&&bwOn())bwStart(live,live.p[0],k);drag='d'});
 cv.addEventListener('pointermove',e=>{if(A!==V)return;const p=pg(),k=K(),[sx,sy]=loc(e),og=V.og(),q=[(sx-p.ox)/k-og[0],(sy-p.oy)/k-og[1]];
 if(V===PV&&tp.has(e.pointerId)){tp.set(e.pointerId,[e.clientX,e.clientY]);if(gz){const a=[...tp.values()];if(a.length>=2){const r=cv.getBoundingClientRect(),d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1,cx=(a[0][0]+a[1][0])/2-r.left,cy=(a[0][1]+a[1][1])/2-r.top,nz=cl(gz.z*d/gz.d,1,6);PVP.z=nz;PVP.ox=cx-(gz.cx-r.left-gz.ox)*nz/gz.z;PVP.oy=cy-(gz.cy-r.top-gz.oy)*nz/gz.z;draw(V);schedRender()}return}if(pvPan&&pvPan.id==e.pointerId){pvMove(e);return}}
 if(lzCur&&lid==e.pointerId){lzCur.p.push([sx,sy,performance.now()]);return}
 if(ig&&lid==e.pointerId){insMove(V,sx,sy,p,k,og);return}
 if(D&&lid==e.pointerId){selMove(p,q);draw(V);return}
-if(live&&lid==e.pointerId){if(live.k=='s')live.b=q;else if(live.rs){const pp=insProj(live.rs,sx,sy);live.p=[live.p[0],[(pp[0]-p.ox)/k-og[0],(pp[1]-p.oy)/k-og[1]]]}else live.p.push(q);draw(V);return}
+if(live&&lid==e.pointerId){if(live.k=='s')live.b=q;else if(live.rs){const pp=insProj(live.rs,sx,sy);live.p=[live.p[0],[(pp[0]-p.ox)/k-og[0],(pp[1]-p.oy)/k-og[1]]]}else if(live.f)bwAdd(live,q);else live.p.push(q);draw(V);return}
 if(S.tool=='hand'){const o=ptr.get(e.pointerId);if(!o)return;ptr.set(e.pointerId,[e.clientX,e.clientY]);if(ptr.size==2&&pz){const a=[...ptr.values()],d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]),r=cv.getBoundingClientRect();zoomAt((a[0][0]+a[1][0])/2-r.left,(a[0][1]+a[1][1])/2-r.top,cl(pz.z*d/pz.d,V===PV?1:.25,6))}else if(ptr.size==1){p.ox+=e.clientX-o[0];p.oy+=e.clientY-o[1]}draw(V);if(V===PV)schedRender();return}
 if(drag=='e'){er(q,k);draw(V)}});
-const up=e=>{if(A!==V)return;const wasPv=V===PV&&tp.has(e.pointerId);tp.delete(e.pointerId);if(tp.size<2)gz=null;if(pvPan&&pvPan.id==e.pointerId){pvRelease();return}if(wasPv&&!S.finger){if(tp.size==1&&!gz){const [id,q]=[...tp.entries()][0];pvPan={id,x:q[0],y:q[1],t:performance.now(),vx:0,vy:0}}return}if(lzCur&&e.pointerId==lid)lzCur=null;if(ig&&e.pointerId==lid)ig=null;ptr.delete(e.pointerId);if(ptr.size<2)pz=null;if(D&&e.pointerId==lid){const dn=D.done;D=null;if(dn)persist();draw(V);return}if(live&&e.pointerId!=lid)return;if(live){const o=live;live=null;delete o.rs;mut(a=>a.push(o));if(o.k=='s'&&(S.fill||o.s=='brect')&&(SH[o.s]||SH.rect)[1])askFill(o)}else if(drag||pan){persist();draw(V)}if(!ptr.size)pan=0;drag=null};
+const up=e=>{if(A!==V)return;const wasPv=V===PV&&tp.has(e.pointerId);tp.delete(e.pointerId);if(tp.size<2)gz=null;if(pvPan&&pvPan.id==e.pointerId){pvRelease();return}if(wasPv&&!S.finger){if(tp.size==1&&!gz){const [id,q]=[...tp.entries()][0];pvPan={id,x:q[0],y:q[1],t:performance.now(),vx:0,vy:0}}return}if(lzCur&&e.pointerId==lid)lzCur=null;if(ig&&e.pointerId==lid)ig=null;ptr.delete(e.pointerId);if(ptr.size<2)pz=null;if(D&&e.pointerId==lid){const dn=D.done;D=null;if(dn)persist();draw(V);return}if(live&&e.pointerId!=lid)return;if(live){const o=live;live=null;delete o.rs;if(o.f)bwEnd(o);mut(a=>a.push(o));if(o.k=='s'&&(S.fill||o.s=='brect')&&(SH[o.s]||SH.rect)[1])askFill(o)}else if(drag||pan){persist();draw(V)}if(!ptr.size)pan=0;drag=null};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 cv.addEventListener('wheel',e=>{if(V===PV&&S.tool!='hand'&&doc){e.preventDefault();A=V;const k=PVV.z*PV.b(),tot=(offY[pdfN-1]+sz(pdfN-1)[1])*k;PVV.oy=PVV.oy-e.deltaY;draw(V);schedRender();return}if(S.tool!='hand')return;e.preventDefault();A=V;const p=pg(),[sx,sy]=loc(e);zoomAt(sx,sy,cl(p.z*(e.deltaY<0?1.1:.9),.25,6));draw(V);if(V===PV)schedRender();persist()},{passive:false})}
 /* flyouts */
@@ -949,6 +949,21 @@ function ssWake(){SS.last=Date.now();if(!SS.on)return;SS.on=false;clearInterval(
 ['pointerdown','pointermove','keydown','wheel'].forEach(t=>document.addEventListener(t,()=>{SS.last=Date.now()},{capture:true,passive:true}));
 $('#ss').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();ssWake()});
 setInterval(()=>{if(SS.on){if(ssBusy())ssWake();return}if(Date.now()-SS.last>=SS.idle&&!ssBusy()&&!document.hidden)ssShow()},SS.idle<5000?250:5000);
+/* ---- handwriting beautification: only on the board named "Naz's tablet" ---- */
+function bwOn(){try{return bsName().toLowerCase().replace(/[‘’`´]/g,"'").replace(/\s+/g,' ').trim()=="naz's tablet"}catch(e){return false}}
+function bwStart(o,q,k){o.f=[.45];o._r=[q.slice()];o.p=[q.slice()];o._t=performance.now();o._k=k}
+const bwD=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+function bwCorner(o,i){const r=o._r,R=10/o._k;if(i<=0||i>=r.length-1)return false;let a=i,b=i,da=0,db=0;while(a>0&&da<R){da+=bwD(r[a],r[a-1]);a--}while(b<r.length-1&&db<R){db+=bwD(r[b],r[b+1]);b++}if(da<R*.8||db<R*.8)return false;
+const u=[r[i][0]-r[a][0],r[i][1]-r[a][1]],v=[r[b][0]-r[i][0],r[b][1]-r[i][1]],lu=Math.hypot(u[0],u[1]),lv=Math.hypot(v[0],v[1]);if(lu<1e-6||lv<1e-6)return false;
+if((u[0]*v[0]+u[1]*v[1])/(lu*lv)>=.5)return false;for(const j of[i-1,i+1]){if(j<=0||j>=r.length-1)continue;if(bwTurn(o,j)>bwTurn(o,i)+1e-9)return false}return true}
+function bwTurn(o,i){const r=o._r,R=10/o._k;let a=i,b=i,da=0,db=0;while(a>0&&da<R){da+=bwD(r[a],r[a-1]);a--}while(b<r.length-1&&db<R){db+=bwD(r[b],r[b+1]);b++}const u=[r[i][0]-r[a][0],r[i][1]-r[a][1]],v=[r[b][0]-r[i][0],r[b][1]-r[i][1]],lu=Math.hypot(u[0],u[1])||1,lv=Math.hypot(v[0],v[1])||1;return 1-(u[0]*v[0]+u[1]*v[1])/(lu*lv)}
+function bwSmooth(o,a,b){const r=o._r,R=15/o._k;for(let i=Math.max(1,a);i<=Math.min(b,r.length-2);i++){if(bwCorner(o,i)){o.p[i]=r[i].slice();continue}let sx=r[i][0],sy=r[i][1],sw=1;
+for(const dir of[-1,1]){let d=0;for(let j=i+dir;j>=0&&j<r.length;j+=dir){d+=bwD(r[j],r[j-dir]);if(d>R)break;const w=1-d/(R+1e-6);sx+=r[j][0]*w;sy+=r[j][1]*w;sw+=w;if(bwCorner(o,j))break}}o.p[i]=[+(sx/sw).toFixed(2),+(sy/sw).toFixed(2)]}}
+function bwAdd(o,q){const now=performance.now(),l=o._r[o._r.length-1],d=Math.hypot(q[0]-l[0],q[1]-l[1])*o._k;if(d<.35)return;const dt=Math.max(1,now-o._t),sp=d/dt,tg=Math.max(.5,Math.min(1.4,1.45-sp*.5)),pf=o.f[o.f.length-1],n=o._r.length;let f=pf+(tg-pf)*.25;f=Math.min(f,.45+n*.14);
+o._r.push(q.slice());o.p.push(q.slice());o.f.push(+f.toFixed(3));o._t=now;bwSmooth(o,n-24,n-1)}
+function bwEnd(o){const n0=o._r.length;bwSmooth(o,1,n0-2);const n=o.f.length;if(n<3){o.f=o.p.map(()=>1)}else{[.42,.62,.82].forEach((m,i)=>{const j=n-1-i;if(j>0)o.f[j]=+(o.f[j]*m).toFixed(3)})}delete o._r;delete o._t;delete o._k}
+function bwDraw(o){const q=o.p,f=o.f,n=q.length,mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];x.lineCap=x.lineJoin='round';
+for(let i=1;i<n-1;i++){const s0=i==1?q[0]:mid(q[i-1],q[i]),e0=i==n-2?q[n-1]:mid(q[i],q[i+1]);x.lineWidth=o.w*(f[i-1]+2*f[i]+f[i+1])/4;x.beginPath();x.moveTo(s0[0],s0[1]);x.quadraticCurveTo(q[i][0],q[i][1],e0[0],e0[1]);x.stroke()}}
 /* ---- daily wipe: pages clear at 7:58 and 15:00 (a backup is kept for the admin panel) ---- */
 function wipeCheck(){const now=new Date(),b=new Date(now),mn=now.getHours()*60+now.getMinutes();if(mn>=900)b.setHours(15,0,0,0);else if(mn>=478)b.setHours(7,58,0,0);else{b.setDate(b.getDate()-1);b.setHours(15,0,0,0)}
 let last=0;try{last=+localStorage.getItem('wbw')||0}catch(e){}const mark=()=>{try{localStorage.setItem('wbw',String(Date.now()))}catch(e){}};
