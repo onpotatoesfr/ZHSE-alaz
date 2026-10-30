@@ -13,7 +13,8 @@ header{height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;backg
 header h1{margin:0;font:800 18px system-ui,sans-serif;letter-spacing:-.2px}header .sp{flex:1}
 .chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:15px;background:rgba(255,255,255,.16);font-weight:600;font-size:13px;border:0;color:#fff;cursor:pointer}
 .dot{width:9px;height:9px;border-radius:50%;background:#9CA3AF;flex:none}.dot.on{background:var(--ok)}.dot.bad{background:var(--bad)}.dot.warn{background:var(--warn)}
-main{display:grid;grid-template-columns:270px 1fr;height:calc(100% - 56px)}
+main{position:relative;display:grid;grid-template-columns:270px 1fr;height:calc(100% - 56px)}
+#gate{position:absolute;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:40px}#gate[hidden]{display:none}#gate h2{margin:0;font:800 22px system-ui,sans-serif}#gateMsg{font-size:15px;color:var(--mute);max-width:480px;line-height:1.55}
 aside{border-right:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;min-height:0}
 aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .hd b{flex:1;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--mute)}
 #list{overflow-y:auto;padding:0 8px 12px;flex:1}
@@ -68,6 +69,7 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <div id="side"></div>
 </div>
 </section>
+<div id="gate" hidden><h2>Waiting for the boards to trust this PC</h2><div id="gateMsg"></div><div style="display:flex;gap:8px"><button class="btn pri" id="gateCode">Show my code</button><button class="btn" id="gateChk">Check again</button></div></div>
 </main>
 <div class="modal" id="keyM" hidden><div class="mc">
 <h3>Your admin key</h3>
@@ -89,7 +91,7 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <div id="toast"></div>
 <script>
 (()=>{
-const PANEL_VER='6';
+const PANEL_VER='7';
 const ST='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4',CMD=ST+'-c',RSP=ST+'-r';
 const UPB=atob('aHR0cHM6Ly9vbnBvdGF0b2VzZnIuZ2l0aHViLmlvL1pIU0UtYWxhei8=');
 const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -112,7 +114,9 @@ async function keyLoad(){if(!(window.crypto&&crypto.subtle)){$('#keyTxt').textCo
 let j=null;try{j=JSON.parse(localStorage.getItem('zhse-admin-key')||'null')}catch(e){}if(!j){const kp=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);j={priv:await crypto.subtle.exportKey('jwk',kp.privateKey),pub:b64(await crypto.subtle.exportKey('raw',kp.publicKey))};localStorage.setItem('zhse-admin-key',JSON.stringify(j));setTimeout(()=>$('#keyM').hidden=false,400)}
 K.priv=await crypto.subtle.importKey('jwk',j.priv,{name:'ECDSA',namedCurve:'P-256'},false,['sign']);K.pub=j.pub;$('#pubCode').textContent=K.pub;keyState()}
 async function keyState(){let ok=null;try{const r=await fetch(UPB+'admin.json?t='+Date.now(),{cache:'no-store'});if(r.ok){const j=await r.json();ok=j&&j.k===K.pub}else ok=false}catch(e){ok=null}
-$('#keyDot').className='dot '+(ok?'on':ok===false?'warn':'');$('#keyTxt').textContent=ok?'Key trusted by boards':ok===false?'Key not on boards yet':'Key'}
+$('#keyDot').className='dot '+(ok?'on':ok===false?'warn':'');$('#keyTxt').textContent=ok?'Key trusted by boards':ok===false?'Key not on boards yet':'Key';applyGate(ok)}
+let gateOk=null;function applyGate(ok){gateOk=ok;const g=$('#gate');if(!g)return;if(ok){g.hidden=true;if(!B._loaded){B._loaded=true;loadBoards(false)}}else{g.hidden=false;$('#gateMsg').innerHTML=ok===false?'Your admin key isn\'t on the boards yet. Open <b>Key</b> (top-right), send the code to Claude, publish it, then click <b>Check again</b>. The boards and controls stay hidden until then.':'Couldn\'t check with GitHub — are you online? The boards stay hidden until the key is confirmed.'}}
+$('#gateCode').onclick=()=>$('#keyM').hidden=false;$('#gateChk').onclick=()=>{toast('Checking\u2026');keyState()};setInterval(()=>{if(gateOk!==true)keyState()},20000);
 $('#keyChip').onclick=()=>$('#keyM').hidden=false;$('#keyClose').onclick=()=>$('#keyM').hidden=true;
 $('#copyCode').onclick=async()=>{try{await navigator.clipboard.writeText(K.pub);toast('Code copied')}catch(e){toast('Select the code and copy it')}};
 $('#backup').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([localStorage.getItem('zhse-admin-key')],{type:'application/json'}));a.download='zhse-admin-key-backup.json';a.click()};
@@ -251,7 +255,7 @@ $('#stage').addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dr
 addEventListener('beforeunload',()=>{try{C.ch&&C.ch.send(JSON.stringify({c:'bye'}))}catch(e){}});
 (()=>{let pv='';try{pv=localStorage.getItem('zhse-panel-ver')||''}catch(e){}$('#pver').textContent='v'+PANEL_VER;if(pv&&pv!==PANEL_VER)setTimeout(()=>toast('Panel updated to v'+PANEL_VER),600);try{localStorage.setItem('zhse-panel-ver',PANEL_VER)}catch(e){}})();
 $('#reloadP').onclick=()=>location.reload();
-keyLoad().then(()=>loadBoards(false));
+keyLoad();
 })();
 </script>
 </body>
