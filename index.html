@@ -289,7 +289,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.30.44',BD='30/10/38';
+const VER='1.1',BUILD='2026.10.30.45',BD='30/10/39';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -950,7 +950,8 @@ function ssWake(){SS.last=Date.now();if(!SS.on)return;SS.on=false;clearInterval(
 $('#ss').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();ssWake()});
 setInterval(()=>{if(SS.on){if(ssBusy())ssWake();return}if(Date.now()-SS.last>=SS.idle&&!ssBusy()&&!document.hidden)ssShow()},SS.idle<5000?250:5000);
 /* ---- handwriting beautification: only on the board named "Naz Tablet" ---- */
-function bwOn(){try{const n=bsName().toLowerCase().replace(/['\u2018\u2019`\u00b4]/g,'').replace(/\s+/g,' ').trim();return n=='naz tablet'||n=='nazs tablet'}catch(e){return false}}
+const BW_ALL=true;
+function bwOn(){if(BW_ALL)return true;try{const n=bsName().toLowerCase().replace(/['\u2018\u2019`\u00b4]/g,'').replace(/\s+/g,' ').trim();return n=='naz tablet'||n=='nazs tablet'}catch(e){return false}}
 function bwStart(o,q,k){o.f=[.45];o._r=[q.slice()];o.p=[q.slice()];o._t=performance.now();o._k=k}
 const bwD=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
 function bwCorner(o,i){const r=o._r,R=10/o._k;if(i<=0||i>=r.length-1)return false;let a=i,b=i,da=0,db=0;while(a>0&&da<R){da+=bwD(r[a],r[a-1]);a--}while(b<r.length-1&&db<R){db+=bwD(r[b],r[b+1]);b++}if(da<R*.8||db<R*.8)return false;
