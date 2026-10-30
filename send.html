@@ -46,12 +46,12 @@ const $=s=>document.getElementById(s),st=(t,c)=>{$('st').textContent=t||'';$('st
 document.documentElement.lang=lang;if(lang!='en')document.documentElement.dir='rtl';
 $('sub').textContent=mode=='p'?T.subP:T.subF;$('bSend').textContent=T.send;
 if(mode=='p'){$('bTake').textContent=T.take;$('bPick').textContent=T.pick;$('fPick').accept='image/*'}else{$('bTake').style.display='none';$('bPick').textContent=T.pickF;$('bPick').className='btn pri';$('fPick').accept='application/pdf,.pdf'}
-if(!/^zhse-a-px-[a-f0-9]{16}$/.test(topic)){st(T.bad,'err');$('bTake').style.display=$('bPick').style.display='none';return}
+if(!/^(zhse-a-px-[a-f0-9]{16}|[a-z0-9]{8})$/.test(topic)){st(T.bad,'err');$('bTake').style.display=$('bPick').style.display='none';return}
 let file=null,name='';
 async function shrink(f){const u=URL.createObjectURL(f);try{const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=u});const k=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);return await new Promise(ok=>c.toBlob(ok,'image/jpeg',.82))}finally{URL.revokeObjectURL(u)}}
 async function chosen(f){if(!f)return;st('');$('bar').style.display='none';
 if(mode=='p'){if(!/^image\//.test(f.type)){st(T.notImg,'err');return}try{file=await shrink(f)}catch(e){st(T.notImg,'err');return}name='photo.jpg';$('pv').src=URL.createObjectURL(file);$('pv').style.display='block'}
-else{if(!(f.type=='application/pdf'||/\.pdf$/i.test(f.name))){st(T.notPdf,'err');return}if(f.size>15*1024*1024){st(T.big,'err');return}file=f;name=(f.name||'book.pdf').replace(/[^\w.\- ]+/g,'_').slice(0,80);if(!/\.pdf$/i.test(name))name+='.pdf';$('fn').textContent=f.name;$('fn').style.display='block'}
+else{if(!(f.type=='application/pdf'||/\.pdf$/i.test(f.name))){st(T.notPdf,'err');return}if(f.size>2*1024*1024){st(T.big,'err');return}file=f;name=(f.name||'book.pdf').replace(/[^\w.\- ]+/g,'_').slice(0,80);if(!/\.pdf$/i.test(name))name+='.pdf';$('fn').textContent=f.name;$('fn').style.display='block'}
 $('bSend').disabled=false}
 $('fTake').onchange=e=>chosen(e.target.files[0]);$('fPick').onchange=e=>chosen(e.target.files[0]);
 $('bSend').onclick=()=>{if(!file)return;$('bSend').disabled=true;st(T.sending);$('bar').style.display='block';$('bar').firstChild.style.width='0';
