@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.67',BD='31/10/61';
+const VER='1.1',BUILD='2026.10.31.68',BD='31/10/62';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -1446,7 +1446,7 @@ function close(){RQ.open=false;RQ.cand=null;if(el)el.classList.remove('on');}
 
 function setOption(k){
  if(RQ.cur===k)return;RQ.cur=k;RQ.sub=null;
- el.querySelectorAll('.opt').forEach(function(o){o.classList.toggle('hot',o.dataset.rqopt===k);});
+ el.querySelectorAll('.opt').forEach(function(o){var on=o.dataset.rqopt===k;o.classList.toggle('hot',on);o.style.display=(!k||on)?'':'none';});
  el.querySelectorAll('.pop').forEach(function(p){p.classList.toggle('on',p.dataset.pop===k);});
  el.querySelectorAll('.sub,.cring .sw').forEach(function(s){s.classList.remove('hot');});
 }
@@ -1499,7 +1499,7 @@ function onMove(e){
  var optEl=n&&n.closest&&n.closest('[data-rqopt]');
  var subEl=n&&n.closest&&n.closest('[data-rqsub]');
  var track=n&&n.closest&&n.closest('[data-rqsize]');
- if(optEl)setOption(optEl.dataset.rqopt);
+ if(optEl)setOption(optEl.dataset.rqopt);else if(Math.hypot(e.clientX-RQ.cx,e.clientY-RQ.cy)<52)setOption(null);
  if(RQ.cur==='size'&&(track||subEl===null)){
   var tr=el.querySelector('[data-rqsize]');
   if(tr){var r=tr.getBoundingClientRect();var f=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));var v=Math.round(1+f*23);RQ.sub='size:'+v;var kn=tr.querySelector('.knob');if(kn)kn.style.left=(f*100)+'%';var vl=tr.parentNode.querySelector('.val');if(vl)vl.textContent='Size '+v;}
