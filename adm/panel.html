@@ -61,6 +61,27 @@ aside,#side{box-shadow:var(--sh)}
 #list::-webkit-scrollbar,#side::-webkit-scrollbar,#devList::-webkit-scrollbar,#logs::-webkit-scrollbar,#histList::-webkit-scrollbar,#catBody::-webkit-scrollbar{width:10px;height:10px}
 #list::-webkit-scrollbar-thumb,#side::-webkit-scrollbar-thumb,#devList::-webkit-scrollbar-thumb,#logs::-webkit-scrollbar-thumb,#histList::-webkit-scrollbar-thumb,#catBody::-webkit-scrollbar-thumb{background:#C3CEDE;border-radius:8px;border:2px solid transparent;background-clip:content-box}
 #list::-webkit-scrollbar-thumb:hover,#side::-webkit-scrollbar-thumb:hover,#devList::-webkit-scrollbar-thumb:hover{background:#A9B7CC;background-clip:content-box}
+/* --- refinement pass (visual only) --- */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+header h1{text-shadow:0 1px 1px rgba(0,0,0,.12)}
+.chip{box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+aside .hd{padding:14px 12px 10px}aside .hd b{font-weight:800}
+.bd{margin:1px 0}
+.bd.sel{box-shadow:inset 0 0 0 1px #CBD9F2}
+.btn{box-shadow:0 1px 1px rgba(10,27,69,.04)}
+.btn.pri{box-shadow:0 2px 10px rgba(20,67,143,.28)}
+.btn.sm{border-radius:8px}
+.sw{box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
+.sw::after{box-shadow:0 1px 2px rgba(0,0,0,.25),0 0 0 .5px rgba(0,0,0,.05)}
+#top{box-shadow:0 1px 0 rgba(10,27,69,.04)}#top h2{letter-spacing:-.2px}
+#side h3{font-weight:800}
+.row select,.row input[type=text],.row input[type=number]{transition:border-color .15s,box-shadow .15s;box-shadow:inset 0 1px 1px rgba(10,27,69,.03)}
+.mc{border:1px solid rgba(215,222,234,.8)}.mc h3{letter-spacing:-.2px}
+.code{line-height:1.5}
+#gate h2{letter-spacing:-.3px}
+.cath{padding-top:12px}
+#toast{box-shadow:0 10px 30px rgba(10,27,69,.35)}
+.pill{box-shadow:inset 0 0 0 1px rgba(10,27,69,.05)}
 </style>
 </head>
 <body>
@@ -123,7 +144,7 @@ aside,#side{box-shadow:var(--sh)}
 <div id="toast"></div>
 <script>
 (()=>{
-const PANEL_VER='16';
+const PANEL_VER='17';
 const ST='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4',CMD=ST+'-c',RSP=ST+'-r';
 const UPB=atob('aHR0cHM6Ly9vbnBvdGF0b2VzZnIuZ2l0aHViLmlvL1pIU0UtYWxhei8=');
 const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
