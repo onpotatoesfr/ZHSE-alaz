@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.84',BD='31/10/78';
+const VER='1.1',BUILD='2026.10.31.85',BD='31/10/79';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -1346,7 +1346,7 @@ else if(k=='swp'){S.sw=!S.sw;dv.classList.remove('op');layout()}
 else if(k=='md'){S.mode=v;if(v=='pdf')A=PV;else if(v=='wb')A=WB;layout()}
 else if(k=='pdfx'){mTok++;doc=null;pdfN=0;Q=[];pdfKey='';bm={};sizes=[];offY=[];W0=612;A=WB;$('#jp').hidden=true;$('#pm').textContent=tl('Open a PDF book to read it here and draw on it.');layout()}
 else if(k=='fg')S.finger=!S.finger;
-else if(k=='fs'){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}
+else if(k=='fs'){if(window.goFullscreen)window.goFullscreen();else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}
 else if(k=='th'){const r=document.documentElement,d=r.dataset.theme=='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark'}
 if(S.tool!='select'||(S.sel&&!pg().s.includes(S.sel)))S.sel=null;if(S.fly)fly(S.fly);mark();drawAll();save();saveS();if(k=='np'||k=='dup'||(['pv','nx','pg','dp'].includes(k)&&S.cur!==_c0))pgAnim((k=='np'||k=='dup')?'n':S.cur>_c0?'r':'l');clkUpd()});
 $('#fi').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const m=new Image();m.onload=()=>{const k=Math.min(1,800/Math.max(m.width,m.height)),c=document.createElement('canvas');c.width=m.width*k;c.height=m.height*k;c.getContext('2d').drawImage(m,0,0,c.width,c.height);const s=c.toDataURL('image/jpeg',.85),i=new Image();i.onload=()=>{const q=Math.min(1,500/Math.max(c.width,c.height)),p=WB.page(),w=c.width*q,h=c.height*q;A=WB;mut(a=>a.push({k:'i',img:i,src:s,x:(WB.W/2-p.ox)/p.z-w/2,y:(WB.H/2-p.oy)/p.z-h/2,w,h,c:'#000',al:1}))};i.src=s};m.src=r.result};r.readAsDataURL(f);e.target.value=''};
@@ -1404,7 +1404,15 @@ document.body.append(w);var ok=w.querySelector('.wn-ok');ok.onclick=function(){t
 .adpanel>h3:first-child{margin-top:8px}
 @media(max-width:720px){.adwrap{flex-direction:column}.adnav{flex:0 0 auto;flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--fl)}.adtab{white-space:nowrap}}
 </style>
-<script>(function(){function fs(){try{var el=document.documentElement,r=el.requestFullscreen||el.webkitRequestFullscreen;if(r&&!document.fullscreenElement&&!document.webkitFullscreenElement)r.call(el)&&0}catch(e){}window.removeEventListener('pointerdown',fs,true);window.removeEventListener('keydown',fs,true)}try{window.addEventListener('pointerdown',fs,true);window.addEventListener('keydown',fs,true)}catch(e){}})();</script>
+<script>(function(){var el=document.documentElement;
+function isFs(){return document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement||document.msFullscreenElement;}
+function go(){if(isFs())return;try{var r=el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen;if(!r)return;var p;try{p=r.call(el,{navigationUI:'hide'});}catch(e){p=r.call(el);}if(p&&p.catch)p.catch(function(){try{r.call(el);}catch(_){}});}catch(e){}}
+window.goFullscreen=go;
+/* auto-enter on launch; re-enter on the next interaction if we ever leave (handles all Android versions / exe / browser; APK still needs immersive mode for the system bars) */
+['pointerdown','touchstart','mousedown','keydown','click'].forEach(function(t){try{window.addEventListener(t,go,{capture:true,passive:true});}catch(e){}});
+try{go();}catch(e){}
+window.addEventListener('load',function(){try{go();}catch(e){}});
+})();</script>
 <style id="rqCSS">
 #rqm{position:fixed;inset:0;z-index:95;display:none;touch-action:none}
 #rqm.on{display:block}
