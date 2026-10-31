@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.65',BD='31/10/59';
+const VER='1.1',BUILD='2026.10.31.66',BD='31/10/60';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -1362,8 +1362,8 @@ document.body.append(w);var ok=w.querySelector('.wn-ok');ok.onclick=function(){t
 #rqm .moon .sub svg{width:20px;height:20px;pointer-events:none}
 #rqm .pop.anch{transform:none;background:none;border:0;box-shadow:none;padding:0;width:0;height:0}
 #rqm .moon2{position:relative}
-#rqm .moon2 .sub{position:absolute;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid #d7deea;color:#14438f;display:grid;place-items:center;box-shadow:0 4px 14px rgba(10,27,69,.25)}
-#rqm .moon2 .sub.hot{background:#14438f;color:#fff;border-color:#14438f}
+#rqm .moon2 .sub{position:absolute;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:linear-gradient(180deg,#2e6fc9,#14438f 55%,#0c2c69);border:0;color:#fff;display:grid;place-items:center;box-shadow:0 4px 14px rgba(10,27,69,.35)}
+#rqm .moon2 .sub.hot{box-shadow:0 0 0 3px #fff,0 6px 18px rgba(10,27,69,.45)}
 #rqm .moon2 .sub svg{width:20px;height:20px;pointer-events:none}
 #rqm .hubdot{position:absolute;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#14438f;box-shadow:0 0 0 6px rgba(20,67,143,.18)}
 </style>
@@ -1433,7 +1433,7 @@ function layout(){
    html+='<div class="pop" data-pop="color" style="left:'+ox+'px;top:'+(oy-18)+'px"><div class="cring">'+ring+'</div></div>';
   }else if(o.k==='bar'){
    var items=realToolbar(),leftSide=ox<cx,n=items.length,moon='';
-   items.forEach(function(tt,i){var t=n>1?i/(n-1):0.5,ang=(-74+t*148)*Math.PI/180,r=98,dx=(leftSide?-1:1)*r*Math.cos(ang),dy=r*Math.sin(ang);moon+='<div class="sub" data-rqsub="bar:'+tt[0]+'" style="left:'+dx+'px;top:'+dy+'px">'+ic(tt[1])+'</div>';});
+   items.forEach(function(tt,i){var t=n>1?i/(n-1):0.5,ang=(-80+t*160)*Math.PI/180,r=112,dx=(leftSide?-1:1)*r*Math.cos(ang),dy=r*Math.sin(ang);moon+='<div class="sub" data-rqsub="bar:'+tt[0]+'" style="left:'+dx+'px;top:'+dy+'px">'+ic(tt[1])+'</div>';});
    html+='<div class="pop anch" data-pop="bar" style="left:'+ox+'px;top:'+oy+'px"><div class="moon2">'+moon+'</div></div>';
   }
  });
@@ -1490,7 +1490,7 @@ function fire(){
 }
 function onMove(e){
  if(RQ.cand&&e.pointerId===RQ.cand.id){
-  if(Math.hypot(e.clientX-RQ.cand.x,e.clientY-RQ.cand.y)>10){RQ.cand=null;clearTimeout(RQ.tmr);}
+  if(Math.hypot(e.clientX-RQ.cand.x,e.clientY-RQ.cand.y)>24){RQ.cand=null;clearTimeout(RQ.tmr);}
   return;
  }
  if(!RQ.open||e.pointerId!==RQ.id)return;
