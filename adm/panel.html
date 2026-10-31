@@ -58,7 +58,7 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 </style>
 </head>
 <body>
-<header><h1>ZHSE-A Admin</h1><span id="pver" style="opacity:.75;font-size:12px;font-weight:600"></span><span class="sp"></span><button class="chip" id="reloadP" title="Load the newest panel">Update panel</button><button class="chip" id="keyChip"><span class="dot" id="keyDot"></span><span id="keyTxt">Key</span></button></header>
+<header><h1>ZHSE-A Admin</h1><span id="pver" style="opacity:.75;font-size:12px;font-weight:600"></span><span class="sp"></span><button class="chip" id="reloadP" title="Load the newest panel">Update panel</button><button class="chip" id="wgChip" title="Welcome & goodbye screens">Welcome screens</button><button class="chip" id="keyChip"><span class="dot" id="keyDot"></span><span id="keyTxt">Key</span></button></header>
 <main>
 <aside><div class="hd"><b>Boards</b><button class="btn sm" id="catBtn">Categories</button><button class="btn sm" id="refresh">Refresh</button></div><div id="list"></div><div class="muted" style="padding:8px 14px 12px">Boards answer within a few seconds of Refresh. Grey = not seen recently.</div></aside>
 <section id="view">
@@ -79,6 +79,15 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <p class="muted" style="margin:8px 0 0"><b>Download key backup</b> saves the key to a file so you can move it to another PC: there, open the panel and click <b>Import key backup</b>. Keep that file private — anyone who has it can control the boards. If it's ever lost or shared, make a new key and send the new code.</p>
 <button class="btn red sm" id="newKey">Make a new key</button>
 </div></div>
+<div class="modal" id="wgM" hidden><div class="mc">
+<h3>Welcome &amp; goodbye screens</h3>
+<p class="muted">One schedule for every board. Put <b>{board.ID}</b> in the message and each board fills in its own name.</p>
+<label class="row" style="gap:8px;align-items:center"><input type="checkbox" id="wgOn"> Enable on all boards</label>
+<div style="margin-top:10px"><b>Welcome</b><div class="row"><input type="text" id="wgHiMsg" placeholder="Welcome back, {board.ID}!" maxlength="120"></div><div class="row" style="gap:6px;align-items:center">Show at <select id="wgHiH"></select>:<select id="wgHiMn"></select> <select id="wgHiAP"><option>AM</option><option>PM</option></select></div></div>
+<div style="margin-top:10px"><b>Goodbye</b><div class="row"><input type="text" id="wgByeMsg" placeholder="See you tomorrow, {board.ID}" maxlength="120"></div><div class="row" style="gap:6px;align-items:center">Show at <select id="wgByeH"></select>:<select id="wgByeMn"></select> <select id="wgByeAP"><option>AM</option><option>PM</option></select></div></div>
+<div style="display:flex;gap:8px;margin-top:14px"><button class="btn pri" id="wgSend">Send to all boards</button><span class="sp" style="flex:1"></span><button class="btn" id="wgClose">Close</button></div>
+<p class="muted" id="wgMsg" style="margin-top:8px"></p>
+</div></div>
 <div class="modal" id="catM" hidden><div class="mc">
 <h3>Categories</h3>
 <p class="muted">Group boards (e.g. by floor or grade) so you can select a whole group at once. A board belongs to one category.</p>
@@ -89,7 +98,7 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <div id="toast"></div>
 <script>
 (()=>{
-const PANEL_VER='9';
+const PANEL_VER='10';
 const ST='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4',CMD=ST+'-c',RSP=ST+'-r';
 const UPB=atob('aHR0cHM6Ly9vbnBvdGF0b2VzZnIuZ2l0aHViLmlvL1pIU0UtYWxhei8=');
 const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -112,6 +121,12 @@ $('#keyDot').className='dot '+(ok?'on':ok===false?'warn':'');$('#keyTxt').textCo
 let gateOk=null;function applyGate(ok){gateOk=ok;const g=$('#gate');if(!g)return;if(ok){g.hidden=true;if(!B._loaded){B._loaded=true;loadBoards(false)}}else{g.hidden=false;$('#gateMsg').innerHTML=ok===false?'Your admin key isn\'t on the boards yet. Open <b>Key</b> (top-right), send the code to Claude, publish it, then click <b>Check again</b>. The boards and controls stay hidden until then.':'Couldn\'t check with GitHub — are you online? The boards stay hidden until the key is confirmed.'}}
 $('#gateCode').onclick=()=>$('#keyM').hidden=false;$('#gateChk').onclick=()=>{toast('Checking\u2026');keyState()};setInterval(()=>{if(gateOk!==true)keyState()},20000);
 $('#keyChip').onclick=()=>$('#keyM').hidden=false;$('#keyClose').onclick=()=>$('#keyM').hidden=true;
+function wgFill(){var H='';for(var i=1;i<=12;i++)H+='<option>'+i+'</option>';var Mn=['00','15','30','45'].map(m=>'<option>'+m+'</option>').join('');['wgHiH','wgByeH'].forEach(id=>{var e=$('#'+id);if(e)e.innerHTML=H;});['wgHiMn','wgByeMn'].forEach(id=>{var e=$('#'+id);if(e)e.innerHTML=Mn;});}
+function wgSetT(pfx,t){var m=/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(t||'');if(!m)m=[0,'8','00','AM'];$('#'+pfx+'H').value=String(+m[1]||8);$('#'+pfx+'Mn').value=m[2]||'00';$('#'+pfx+'AP').value=(m[3]||'AM').toUpperCase();}
+function wgGetT(pfx){return $('#'+pfx+'H').value+':'+$('#'+pfx+'Mn').value+' '+$('#'+pfx+'AP').value;}
+$('#wgChip').onclick=()=>{wgFill();var c={};try{c=JSON.parse(localStorage.getItem('zhse-wg')||'{}')}catch(e){}$('#wgOn').checked=!!c.on;$('#wgHiMsg').value=c.hiMsg||'';$('#wgByeMsg').value=c.byeMsg||'';wgSetT('wgHi',c.hiT||'8:00 AM');wgSetT('wgBye',c.byeT||'3:00 PM');$('#wgMsg').textContent='';$('#wgM').hidden=false;};
+$('#wgClose').onclick=()=>$('#wgM').hidden=true;
+$('#wgSend').onclick=async()=>{var cfg={on:$('#wgOn').checked,hiMsg:$('#wgHiMsg').value.slice(0,120),hiT:wgGetT('wgHi'),byeMsg:$('#wgByeMsg').value.slice(0,120),byeT:wgGetT('wgBye')};try{localStorage.setItem('zhse-wg',JSON.stringify(cfg))}catch(e){}try{await sendCmd('all','act',Object.assign({n:'wg'},cfg));$('#wgMsg').textContent='Sent to all boards.';toast('Welcome/goodbye sent to all boards')}catch(e){$('#wgMsg').textContent='Could not send: '+e.message;}};
 $('#copyCode').onclick=async()=>{try{await navigator.clipboard.writeText(K.pub);toast('Code copied')}catch(e){toast('Select the code and copy it')}};
 $('#backup').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([localStorage.getItem('zhse-admin-key')],{type:'application/json'}));a.download='zhse-admin-key-backup.json';a.click()};
 $('#imp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!j.priv||!j.pub)throw 0;localStorage.setItem('zhse-admin-key',JSON.stringify(j));await keyLoad();toast('Key imported')}catch(x){toast('That is not a key backup')}};

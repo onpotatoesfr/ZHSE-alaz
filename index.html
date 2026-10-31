@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.70',BD='31/10/64';
+const VER='1.1',BUILD='2026.10.31.71',BD='31/10/65';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -610,6 +610,17 @@ const bsName=()=>{let n='';try{n=localStorage.getItem('wbn')||''}catch(e){}retur
 const bsEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 async function bsBeat(force){if(!navigator.onLine)return;let lb=0;try{lb=+localStorage.getItem('wbhb')||0}catch(e){}if(!force&&Date.now()-lb<30*60000)return;try{localStorage.setItem('wbhb',String(Date.now()))}catch(e){}try{await fetch(BSU,{method:'POST',body:JSON.stringify({z:1,id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER})})}catch(e){}}
 setTimeout(()=>bsBeat(),20000);addEventListener('online',()=>setTimeout(()=>bsBeat(),5000));
+/* ---- scheduled welcome / goodbye screens (one setting for all boards, from the admin panel) ---- */
+var WG={on:false,hiMsg:'',hiT:'',byeMsg:'',byeT:''};
+function wgLoad(){try{WG=Object.assign(WG,JSON.parse(localStorage.getItem('wbWG')||'{}'))}catch(e){}}
+function wgSet(a){WG={on:!!a.on,hiMsg:String(a.hiMsg||''),hiT:String(a.hiT||''),byeMsg:String(a.byeMsg||''),byeT:String(a.byeT||'')};try{localStorage.setItem('wbWG',JSON.stringify(WG))}catch(e){}log('info','Welcome/goodbye schedule '+(WG.on?'set':'off'))}
+function wgParse(t){var m=/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(String(t||'').trim());if(!m)return -1;var h=(+m[1])%12;if(/pm/i.test(m[3]))h+=12;return h*60+(+m[2]);}
+function wgShown(k){try{return localStorage.getItem('wbWGd')===new Date().toDateString()+'|'+k}catch(e){return false}}
+function wgMark(k){try{localStorage.setItem('wbWGd',new Date().toDateString()+'|'+k)}catch(e){}}
+function wgTick(){if(!WG.on)return;var d=new Date(),now=d.getHours()*60+d.getMinutes();[['hi',WG.hiT,WG.hiMsg],['bye',WG.byeT,WG.byeMsg]].forEach(function(x){var mins=wgParse(x[1]);if(mins<0)return;if(now===mins&&!wgShown(x[0])){wgMark(x[0]);wgShow(x[0],x[2]);}});}
+function wgShow(kind,msg){var e=document.getElementById('wg');if(!e){e=document.createElement('div');e.id='wg';e.onclick=function(){e.classList.remove('on');};document.body.appendChild(e);}var name=bsName();var text=String(msg||'').replace(/\{board\.ID\}/g,name).trim()||name;e.className='wg '+(kind==='bye'?'bye':'hi')+' on';e.innerHTML='<div class="wg-rail"></div><div class="wg-mid"><div class="wg-kick"></div><div class="wg-msg"></div></div>';e.querySelector('.wg-kick').textContent=(kind==='bye'?'End of the day':'Welcome');e.querySelector('.wg-msg').textContent=text;clearTimeout(e._t);e._t=setTimeout(function(){e.classList.remove('on');},9000);log('info','Welcome/goodbye screen shown: '+kind);}
+wgLoad();setTimeout(wgTick,3000);setInterval(wgTick,20000);
+
 async function bsLoad(){if(BS.busy)return;BS.busy=true;BS.msg='Loading boards...';adRender();
 try{const v=await fetch(upBase()+'version.json?t='+Date.now(),{cache:'no-store'});if(v.ok){const j=await v.json();if(j&&j.build)BS.latest=j}}catch(e){}
 if(navigator.onLine&&Date.now()-(BS.lp||0)>120000){BS.lp=Date.now();try{await fetch(BSC,{method:'POST',body:JSON.stringify({z:4,t:Date.now()})});await new Promise(r=>setTimeout(r,4000))}catch(e){}}
@@ -1064,6 +1075,7 @@ else if(n=='wipe'){try{const o=localStorage.getItem('wb1');if(o)localStorage.set
 else if(n=='closeAll'){fly(null);closePops();try{$('#cal').hidden=true;ggClose();phClose()}catch(e){}}
 else if(n=='restart'){try{save(true);saveS();saveAD()}catch(e){}setTimeout(()=>location.reload(),300)}
 else if(n=='toolbarReset'){AD.tbo=TBD.slice();AD.tbh=[];AD.tbs={};AD.qa=[];S.hid=false;S.tx=10;S.ty=10;saveAD();saveS();panel();posPanel()}
+else if(n=='wg'){wgSet(a)}
 log('info','Remote action: '+n)}
 function raExec(c,a){if(c=='set'&&a)raSet(a.k,a.v);else if(c=='act'&&a)raAct(a.n,a)}
 function raBanner(t,secs){let b=$('#amsg');if(b)b.remove();if(!t)return;b=document.createElement('div');b.id='amsg';b.setAttribute('role','alert');b.innerHTML='<div class="amsg-c"><div class="amsg-t"></div><button class="amsg-x" aria-label="Close">'+ic(I.x,20)+'</button></div>';b.querySelector('.amsg-t').textContent=t;b.querySelector('.amsg-x').onclick=()=>b.remove();document.body.append(b);if(secs>0)setTimeout(()=>{if(b.isConnected)b.remove()},secs*1000)}
@@ -1323,6 +1335,16 @@ setTimeout(function(){var w=document.createElement('div');w.id='wn';w.innerHTML=
 document.body.append(w);var ok=w.querySelector('.wn-ok');ok.onclick=function(){try{localStorage.setItem('wbSeen',BUILD)}catch(e){}w.style.transition='opacity .25s';w.style.opacity='0';setTimeout(function(){w.remove()},260);log('info','What\'s new seen '+BUILD)};},3200)})();
 </script>
 <style>
+#wg{position:fixed;inset:0;z-index:108;display:none;background:linear-gradient(135deg,#ffffff,#f3f7fd);color:#0c2c69;font-family:system-ui,sans-serif;align-items:center;justify-content:center}
+#wg.on{display:flex;animation:wgfade .4s ease}
+#wg.bye{background:linear-gradient(135deg,#0c2c69,#14438f 60%,#2e6fc9);color:#fff}
+#wg .wg-rail{position:absolute;left:3%;top:8%;bottom:8%;width:7%;border-radius:40px;background:linear-gradient(180deg,#2e6fc9,#14438f 55%,#0c2c69)}
+#wg.bye .wg-rail{background:rgba(255,255,255,.15)}
+#wg .wg-mid{padding-left:7%;max-width:82%}
+#wg .wg-kick{font:700 clamp(14px,3vw,22px)/1 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#2e6fc9;margin-bottom:14px}
+#wg.bye .wg-kick{color:#bcd4f5}
+#wg .wg-msg{font:800 clamp(34px,8vw,82px)/1.08 system-ui,sans-serif}
+@keyframes wgfade{from{opacity:0}to{opacity:1}}
 #adc{width:min(960px,97vw);height:min(88vh,640px);max-height:88vh;padding:0;overflow:hidden;display:flex;flex-direction:column}
 #adc .ahd{position:static;top:auto;margin:0;padding:14px 18px;border-bottom:1px solid var(--fl)}
 .adwrap{display:flex;flex:1;min-height:0}
