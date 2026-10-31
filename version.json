@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.31.73","disp":"31/10/67","force":true,"notes":"Improvements","items":["PowerPoint from phone now works: the QR page accepts .pptx and the board shows the right \"Waiting for a PowerPoint\" message"]}
+{"version":"1.1","build":"2026.10.31.74","disp":"31/10/68","force":true,"notes":"Improvements","items":["Presentation mode now opens PowerPoint files correctly (fixed the PowerPoint reader)"]}

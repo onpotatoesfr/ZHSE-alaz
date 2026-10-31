@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.73',BD='31/10/67';
+const VER='1.1',BUILD='2026.10.31.74',BD='31/10/68';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -1598,14 +1598,26 @@ if(window.presOpen)return;
 var INK={strokes:[],cur:null};
 function svg(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
 function loadScript(src){return new Promise(function(ok,no){var s=document.createElement('script');s.src=src;s.onload=function(){ok()};s.onerror=function(){no(new Error('load'))};document.head.appendChild(s);setTimeout(function(){no(new Error('timeout'))},15000);});}
+async function loadOpt(src){try{await loadScript(src)}catch(e){}}
+async function loadOptFirst(list){for(var i=0;i<list.length;i++){try{await loadScript(list[i]);return true}catch(e){}}return false}
 async function ensurePptx(){
  if(window.$&&window.$.fn&&window.$.fn.pptxToHtml)return;
- if(!window.JSZip)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
- if(!window.JSZipUtils)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js');
+ // try a tag then the default branch, in case one ref is unavailable
+ var BASES=['https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@v1.21.1/','https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@master/','https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@main/'];
  if(!window.jQuery)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js');
- if(!document.getElementById('pptxcss')){var l=document.createElement('link');l.id='pptxcss';l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@v1.21.1/css/pptxjs.min.css';document.head.appendChild(l);}
- await loadScript('https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@v1.21.1/js/pptxjs.min.js');
- await loadScript('https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@v1.21.1/js/divs2slides.min.js');
+ // load the PPTXjs plugin; the base+filename that works becomes the base for the rest (handles missing tag or non-min filenames)
+ var B=null;
+ for(var i=0;i<BASES.length&&!B;i++){for(var v=0;v<2&&!B;v++){try{await loadScript(BASES[i]+(v?'js/pptxjs.js':'js/pptxjs.min.js'));if(window.$&&window.$.fn&&window.$.fn.pptxToHtml)B=BASES[i]}catch(e){}}}
+ if(!B)throw new Error('renderer');
+ // PPTXjs needs JSZip v2 (NOT v3) — use the v2 build shipped with PPTXjs
+ await loadOptFirst([B+'js/jszip.min.js',B+'js/jszip.js']);
+ if(!window.JSZipUtils)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js');
+ await loadOptFirst([B+'js/filereader.js']);
+ await loadOptFirst([B+'js/divs2slides.min.js',B+'js/divs2slides.js']);
+ if(!document.getElementById('pptxcss')){var l=document.createElement('link');l.id='pptxcss';l.rel='stylesheet';l.href=B+'css/pptxjs.min.css';l.onerror=function(){l.href=B+'css/pptxjs.css'};document.head.appendChild(l);}
+ // optional: chart support (never block if these fail)
+ await loadOpt('https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js');
+ await loadOpt('https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.6/nv.d3.min.js');
  if(!(window.$&&window.$.fn&&window.$.fn.pptxToHtml))throw new Error('renderer');
 }
 function build(){
@@ -1646,11 +1658,16 @@ async function presStart(file){
   await ensurePptx();
   window.$('#presSlides').empty();
   window.$('#presSlides').pptxToHtml({pptxFileUrl:url,slideMode:false,keyBoardShortCut:false,mediaProcess:true});
-  var m=document.getElementById('presMsg');
-  setTimeout(function(){m.style.display='none';},1200);
+  var m=document.getElementById('presMsg'),t0=Date.now();
+  var iv=setInterval(function(){
+   var host=document.getElementById('presSlides');
+   if(host&&host.childElementCount>0){clearInterval(iv);m.style.display='none';}
+   else if(Date.now()-t0>10000){clearInterval(iv);m.style.display='block';m.textContent=navigator.onLine?'Couldn’t show this presentation. Try a smaller .pptx, or open it from this device.':'Presentation rendering needs the internet the first time. Connect once, then it works.';}
+  },400);
  }catch(e){
   var m=document.getElementById('presMsg');m.style.display='block';
   m.textContent=navigator.onLine?'Couldn’t open this presentation. Make sure it’s a .pptx file.':'Presentation rendering needs the internet the first time. Connect once, then it works.';
+  try{log('warn','Presentation render failed: '+((e&&e.message)||e))}catch(_){}
  }
 }
 window.presOpen=function(){build();document.getElementById('presCh').classList.add('on');};
