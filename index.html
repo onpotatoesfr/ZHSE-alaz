@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.68',BD='31/10/62';
+const VER='1.1',BUILD='2026.10.31.69',BD='31/10/63';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -1174,7 +1174,7 @@ function wipeCheck(){const now=new Date(),b=new Date(now),mn=now.getHours()*60+n
 let last=0;try{last=+localStorage.getItem('wbw')||0}catch(e){}const mark=()=>{try{localStorage.setItem('wbw',String(Date.now()))}catch(e){}};
 if(!last){mark();return}if(last>=b.getTime())return;mark();if(P.length<2&&!P.some(q=>q.s.length))return;
 try{const o=localStorage.getItem('wb1');if(o)localStorage.setItem('wb1b',o)}catch(e){}
-live=null;D=null;P=[mk()];S.cur=0;S.sel=null;A=WB;doSave();$('#rz').style.display='none';if(S.fly)fly(S.fly);drawAll();clkUpd();log('info','Daily wipe ('+p2(b.getHours())+':'+p2(b.getMinutes())+')');toast('Board cleared for the next class')}
+live=null;D=null;P=[mk()];S.cur=0;S.sel=null;A=WB;doSave();$('#rz').style.display='none';if(S.fly)fly(S.fly);drawAll();clkUpd();log('info','Daily wipe ('+p2(b.getHours())+':'+p2(b.getMinutes())+')');toast('Cleared pages')}
 setInterval(wipeCheck,30000);
 /* ---- timer, picker, files, resume ---- */
 const closePops=()=>{$('#fp').hidden=true;$('#jp').hidden=true;$('#tm').hidden=true;$('#sp').hidden=true};
@@ -1410,10 +1410,9 @@ function layout(){
  RQ.cx=cx;RQ.cy=cy;
  var opts=[
   {k:'color',a:-90,ic:SVG.color,t:'Colour'},
-  {k:'size',a:-18,ic:SVG.size,t:'Size'},
-  {k:'bar',a:126,ic:SVG.bar,t:'Toolbar',side:true},
-  {k:'clear',a:54,ic:SVG.clear,t:'Clear',danger:true,action:true},
-  {k:'type',a:198,ic:SVG.type,t:'Pen'}
+  {k:'size',a:0,ic:SVG.size,t:'Size'},
+  {k:'clear',a:90,ic:SVG.clear,t:'Clear',danger:true,action:true},
+  {k:'type',a:180,ic:SVG.type,t:'Pen'}
  ];
  var html='<div class="hubdot" style="left:'+cx+'px;top:'+cy+'px"></div>';
  opts.forEach(function(o){
