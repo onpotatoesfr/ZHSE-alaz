@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.85',BD='31/10/79';
+const VER='1.1',BUILD='2026.10.31.86',BD='31/10/80';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -562,11 +562,11 @@ document.addEventListener('input',e=>{const a=e.target.dataset.a,v=e.target.valu
 document.addEventListener('change',e=>{const a=e.target.dataset&&e.target.dataset.a;if(a=='pci'){const v=e.target.value;if(S.tool=='select'&&S.sel&&pg().s.includes(S.sel)){const o=S.sel,n={...o,c:v};mut(a2=>{a2[a2.indexOf(o)]=n});S.sel=n}}else if(a=='fci')setFill(e.target.value)});
 /* ---- background quick picker (small, bottom-left) ---- */
 function pbSet(mode,color){try{const q=CP();if(!q)return;if(mode=='u'){q.bg='u';q.bgc=color}else{q.bg=mode}drawAll();save();pbMark()}catch(e){}}
-function pbMark(){try{const q=CP();if(!q)return;const m=PB(q),c=(PBC(q)||'').toLowerCase();document.querySelectorAll('#bgpk [data-bg]').forEach(function(b){const k=b.dataset.bg;let on=false;if(k=='w')on=m=='w';else if(k=='g')on=m=='g';else if(k=='dark')on=m=='u'&&c=='#0e1622';else if(k=='wheel')on=m=='u'&&c!='#0e1622';b.classList.toggle('on',on)})}catch(e){}}
+function pbMark(){try{const q=CP();if(!q)return;const m=PB(q),c=(PBC(q)||'').toLowerCase();document.querySelectorAll('#bgpk [data-bg]').forEach(function(b){const k=b.dataset.bg;let on=false;if(k=='w')on=m=='w';else if(k=='g')on=m=='g';else if(k=='dark')on=m=='u'&&c=='#000000';else if(k=='wheel')on=m=='u'&&c!='#000000';b.classList.toggle('on',on)})}catch(e){}}
 function pbInit(){if(document.getElementById('bgpk'))return;if(!document.body){setTimeout(pbInit,30);return}
- var st=document.createElement('style');st.textContent='#bgpk{position:fixed;left:12px;bottom:12px;z-index:6;display:flex;gap:7px;align-items:center;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:6px;border-radius:999px;box-shadow:0 6px 20px rgba(10,27,69,.25)}#bgpk .pbsw{width:26px;height:26px;border-radius:50%;border:2px solid rgba(17,24,39,.14);cursor:pointer;padding:0;position:relative;background:none;transition:box-shadow .15s}#bgpk .pbsw.on{box-shadow:0 0 0 3px var(--t1,#14438F);border-color:#fff}#bgpk .pb-w{background:#fff}#bgpk .pb-d{background:#0E1622}#bgpk .pb-g{background:#fff;background-image:linear-gradient(#c6d2e6 1px,transparent 1px),linear-gradient(90deg,#c6d2e6 1px,transparent 1px);background-size:7px 7px}#bgpk .pb-wh{background:conic-gradient(from 0deg,#ff4d4d,#ffb84d,#ffee4d,#6fe36f,#4dd2ff,#6a7bff,#c86bff,#ff4da6,#ff4d4d)}#bgpk .pb-wh::after{content:"";position:absolute;inset:7px;border-radius:50%;background:rgba(255,255,255,.9)}#bgpk .pb-wh b{position:absolute;inset:0;display:grid;place-items:center;font:800 13px system-ui;color:#14438F}';document.head.appendChild(st);
+ var st=document.createElement('style');st.textContent='#bgpk{position:fixed;left:12px;bottom:12px;z-index:6;display:flex;gap:6px;align-items:center;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:5px;border-radius:999px;box-shadow:0 6px 20px rgba(10,27,69,.25)}#bgpk .pbsw{width:22px;height:22px;border-radius:50%;border:2px solid rgba(17,24,39,.14);cursor:pointer;padding:0;position:relative;background:none;transition:box-shadow .15s}#bgpk .pbsw.on{box-shadow:0 0 0 3px var(--t1,#14438F);border-color:#fff}#bgpk .pb-w{background:#fff}#bgpk .pb-d{background:#000}#bgpk .pb-g{background:#fff;background-image:linear-gradient(#c6d2e6 1px,transparent 1px),linear-gradient(90deg,#c6d2e6 1px,transparent 1px);background-size:6px 6px}#bgpk .pb-wh{background:conic-gradient(from 0deg,#ff4d4d,#ffb84d,#ffee4d,#6fe36f,#4dd2ff,#6a7bff,#c86bff,#ff4da6,#ff4d4d)}#bgpk .pb-wh::after{content:"";position:absolute;inset:6px;border-radius:50%;background:rgba(255,255,255,.9)}#bgpk .pb-wh b{position:absolute;inset:0;display:grid;place-items:center;font:800 12px system-ui;color:#14438F}';document.head.appendChild(st);
  var d=document.createElement('div');d.id='bgpk';d.innerHTML='<button class="pbsw pb-w" data-bg="w" title="White" aria-label="White background"></button><button class="pbsw pb-d" data-bg="dark" title="Dark" aria-label="Dark background"></button><button class="pbsw pb-g" data-bg="g" title="Grid" aria-label="Grid background"></button><button class="pbsw pb-wh" data-bg="wheel" title="Pick a colour" aria-label="Pick a custom colour"><b>+</b></button><input type="color" id="bgpkC" value="#14438F" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none">';document.body.appendChild(d);
- d.addEventListener('click',function(e){var b=e.target.closest('[data-bg]');if(!b)return;var k=b.dataset.bg;if(k=='wheel'){document.getElementById('bgpkC').click();return}if(k=='dark')pbSet('u','#0E1622');else pbSet(k)});
+ d.addEventListener('click',function(e){var b=e.target.closest('[data-bg]');if(!b)return;var k=b.dataset.bg;if(k=='wheel'){document.getElementById('bgpkC').click();return}if(k=='dark')pbSet('u','#000000');else pbSet(k)});
  document.getElementById('bgpkC').addEventListener('input',function(){pbSet('u',this.value)});
  pbMark();}
 try{pbInit()}catch(e){}
@@ -1494,9 +1494,9 @@ function layout(){
  RQ.cx=cx;RQ.cy=cy;
  var opts=[
   {k:'color',a:-90,ic:SVG.color,t:'Colour'},
-  {k:'size',a:0,ic:SVG.size,t:'Size'},
+  {k:'size',a:180,ic:SVG.size,t:'Size'},
   {k:'clear',a:90,ic:SVG.clear,t:'Clear',danger:true,action:true},
-  {k:'type',a:180,ic:SVG.type,t:'Pen'}
+  {k:'type',a:0,ic:SVG.type,t:'Pen'}
  ];
  var html='<div class="hubdot" style="left:'+cx+'px;top:'+cy+'px"></div>';
  opts.forEach(function(o){
