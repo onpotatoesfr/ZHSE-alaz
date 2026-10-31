@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.31.80","disp":"31/10/74","force":true,"notes":"Improvements","items":["Offline update packages are now a compressed .zhse file instead of a readable .html"]}
+{"version":"1.1","build":"2026.10.31.81","disp":"31/10/75","force":true,"notes":"Improvements","items":["Boards are locked until you approve them in the admin panel"]}

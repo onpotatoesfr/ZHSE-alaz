@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.80',BD='31/10/74';
+const VER='1.1',BUILD='2026.10.31.81',BD='31/10/75';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -623,9 +623,18 @@ function wgTick(){if(!WG.on)return;var d=new Date(),now=d.getHours()*60+d.getMin
 function wgShow(kind,msg){var e=document.getElementById('wg');if(!e){e=document.createElement('div');e.id='wg';e.onclick=function(){e.classList.remove('on');};document.body.appendChild(e);}var name=bsName();var text=String(msg||'').replace(/\{board\.ID\}/g,name).trim()||name;e.className='wg '+(kind==='bye'?'bye':'hi')+' on';e.innerHTML='<div class="wg-rail"></div><div class="wg-mid"><div class="wg-kick"></div><div class="wg-msg"></div></div>';e.querySelector('.wg-kick').textContent=(kind==='bye'?'End of the day':'Welcome');e.querySelector('.wg-msg').textContent=text;clearTimeout(e._t);e._t=setTimeout(function(){e.classList.remove('on');},9000);log('info','Welcome/goodbye screen shown: '+kind);}
 wgLoad();setTimeout(wgTick,3000);setInterval(wgTick,20000);
 function zState(){var a=false,w=false,m=false;try{a=localStorage.getItem('wbAppr')=='1'}catch(e){}try{w=localStorage.getItem('wbWL')=='1'}catch(e){}try{m=localStorage.getItem('wbMaint')=='1'}catch(e){}return{a:a,w:w,m:m}}
-function zShow(kind){var e=document.getElementById('zblock');if(!e){e=document.createElement('div');e.id='zblock';document.body.appendChild(e)}var id='';try{id=BS.id||''}catch(x){}var lg='';try{var L=document.getElementById('lgo');if(L&&L.src)lg='<img src="'+L.src+'" alt="">'}catch(x){}var nm='';try{nm=bsName()}catch(x){}e.innerHTML='<div class="zb-c">'+lg+'<div class="zb-t">'+(kind=='maint'?'Under maintenance':'Waiting for approval')+'</div>'+(kind=='maint'?'<div class="zb-s">This board is temporarily unavailable.</div>':'<div class="zb-id">Board ID: '+id+(nm?' \u00b7 '+nm:'')+'</div><div class="zb-s">Ask the admin to approve this board.</div>')+'</div>';e.style.display='flex'}
+function zShow(kind){var e=document.getElementById('zblock');if(!e){e=document.createElement('div');e.id='zblock';document.body.appendChild(e)}
+ if(e.style.display=='flex'&&e.dataset.kind==kind)return; // already showing this lock; don't rebuild (keeps the password box)
+ var id='';try{id=BS.id||''}catch(x){}var lg='';try{var L=document.getElementById('lgo');if(L&&L.src)lg='<img src="'+L.src+'" alt="">'}catch(x){}var nm='';try{nm=bsName()}catch(x){}
+ e.innerHTML='<div class="zb-c">'+lg+'<div class="zb-t">'+(kind=='maint'?'Under maintenance':'Waiting for approval')+'</div>'+(kind=='maint'?'<div class="zb-s">This board is temporarily unavailable.</div>':'<div class="zb-id">Board ID: '+id+(nm?' \u00b7 '+nm:'')+'</div><div class="zb-s">Give this ID to the admin to approve this board.</div>')+'</div>';
+ e.style.display='flex';e.dataset.kind=kind;
+ if(kind=='wl'){try{if(!zShow._beat){zShow._beat=1;if(window.bsBeat)bsBeat(true)}}catch(x){}
+  var lgEl=e.querySelector('img')||e.querySelector('.zb-c'),ht=null;var dn=function(){clearTimeout(ht);ht=setTimeout(zAskPw,4000)},cx=function(){clearTimeout(ht)};
+  if(lgEl){lgEl.addEventListener('pointerdown',dn);['pointerup','pointercancel','pointerleave'].forEach(function(ev){lgEl.addEventListener(ev,cx)})}
+ }}
+function zAskPw(){var e=document.getElementById('zblock');if(!e||e.style.display=='none'||e.querySelector('#zpw'))return;var c=e.querySelector('.zb-c');if(!c)return;var w=document.createElement('div');w.id='zpw';w.style.cssText='margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap';w.innerHTML='<input type="password" id="zpwi" placeholder="Admin password" style="height:42px;border:1px solid #cbd5e1;border-radius:8px;padding:0 12px;font:600 15px system-ui"><button id="zpwb" style="height:42px;border:0;border-radius:8px;padding:0 16px;background:#14438f;color:#fff;font:700 14px system-ui;cursor:pointer">Unlock</button>';c.appendChild(w);var go=async function(){var i=document.getElementById('zpwi'),v=i?i.value:'';var ok=false;try{ok=crypto.subtle?(await sha(v))==AH:fnv(v)==AF}catch(x){try{ok=fnv(v)==AF}catch(_){}}if(ok){try{localStorage.setItem('wbAppr','1')}catch(_){}try{log('info','Board approved locally by owner')}catch(_){}zlock()}else if(i){i.value='';i.placeholder='Wrong password'}};document.getElementById('zpwb').onclick=go;var ii=document.getElementById('zpwi');if(ii){ii.addEventListener('keydown',function(ev){if(ev.key=='Enter')go()});try{ii.focus()}catch(_){}}}
 function zHide(){var e=document.getElementById('zblock');if(e)e.style.display='none'}
-function zlock(){var s=zState();if(s.m){zShow('maint');return}if(s.w&&!s.a){zShow('wl');return}zHide()}
+function zlock(){var s=zState();if(s.m){zShow('maint');return}if(!s.a){zShow('wl');return}zHide()}
 zlock();setInterval(zlock,15000);
 
 async function bsLoad(){if(BS.busy)return;BS.busy=true;BS.msg='Loading boards...';adRender();
