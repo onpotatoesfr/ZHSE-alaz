@@ -192,3 +192,18 @@ Note: items 5, 6, 8 above are already implemented and are listed only because th
 3. **Device whitelist (STRICT) + "Approved Devices" notifications**, then **Maintenance mode** — build last, with the lock screen showing the board ID and a panel "approve all boards seen recently" button. **Warn the user once before deploying**, because it locks the whole fleet until approved.
 
 Always: build → test → commit locally → wait for `force update`/`push` → bump build (+version.json) → push.
+
+---
+
+## 14. Update — built after the handoff (now IMPLEMENTED)
+
+All four previously-pending features are now built and shipped (board build `31/10/66`, panel `v12`). They are designed **deploy-safe** (shipping the build locks nothing; the admin triggers the locks):
+
+- **Presentation mode** (Tools → Presentation): opens a **.pptx** (from this device, or from phone via QR — phone uses `phOpen('ppt')`). Full-screen viewer, **black pen only**, no toolbar, faint ✕ to exit. Renders via PPTXjs loaded from CDN (jszip, jszip-utils, jQuery, pptxjs + divs2slides) with a graceful fallback message if offline/unsupported. Radial quick menu is disabled while presenting (`window.__pres`). Module is appended near the end of index.html; `window.presOpen/presStart/presExit`.
+- **Device whitelist (STRICT) + approval:** board stores `wbWL` (enforce) + `wbAppr` (approved). `raAct` cases `wlEnforce`, `approve`, `revoke`. When enforce is on and the board isn't approved → full-screen lock (`#zblock`) showing the Zhyar logo + the board's **ID** + name. **Enforcement is OFF until the admin turns it on** from the panel (that is the moment unapproved boards lock). Panel: **Devices** button → modal with the enforce toggle, **"Approve all boards seen recently"**, per-board Approve/Revoke, and approval state saved in `zhse-appr`. Approve/revoke/enforce are logged to the activity history and toasted (the "Approved Devices" notifications).
+- **Maintenance mode:** `raAct('maint',{v})` → board stores `wbMaint` and shows the `#zblock` logo-only lock ("Under maintenance"). Only active when the admin sends it (per board from the Devices list, or all boards from the Devices modal). Nothing happens on deploy.
+- **Offline update packages:** admin menu (Backup & updates tab) → **Import package** (`#upPkg`, `.html`). `adImportPkg` validates it's a real app file, then stores it via the ZHSE bridge or the service-worker `zhse-update` cache and reloads. On the user's WebView (no worker/bridge) it shows a clear "can't apply" message — same constraint as online updates.
+
+Lock overlay `#zblock` (z-index 2147483000) is shared by whitelist + maintenance; the board's command listener keeps running under it so an approve/unlock command still lands.
+
+**Nothing is left pending from the original requests.** Everything CeZo asked for is implemented and deployed.

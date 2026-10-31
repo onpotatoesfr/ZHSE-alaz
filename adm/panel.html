@@ -58,7 +58,7 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 </style>
 </head>
 <body>
-<header><h1>ZHSE-A Admin</h1><span id="pver" style="opacity:.75;font-size:12px;font-weight:600"></span><span class="sp"></span><button class="chip" id="reloadP" title="Load the newest panel">Update panel</button><button class="chip" id="histChip" title="Activity history">History</button><button class="chip" id="wgChip" title="Welcome & goodbye screens">Welcome screens</button><button class="chip" id="keyChip"><span class="dot" id="keyDot"></span><span id="keyTxt">Key</span></button></header>
+<header><h1>ZHSE-A Admin</h1><span id="pver" style="opacity:.75;font-size:12px;font-weight:600"></span><span class="sp"></span><button class="chip" id="reloadP" title="Load the newest panel">Update panel</button><button class="chip" id="devChip" title="Devices & approval">Devices</button><button class="chip" id="histChip" title="Activity history">History</button><button class="chip" id="wgChip" title="Welcome & goodbye screens">Welcome screens</button><button class="chip" id="keyChip"><span class="dot" id="keyDot"></span><span id="keyTxt">Key</span></button></header>
 <main>
 <aside><div class="hd"><b>Boards</b><button class="btn sm" id="catBtn">Categories</button><button class="btn sm" id="refresh">Refresh</button></div><div id="list"></div><div class="muted" style="padding:8px 14px 12px">Boards answer within a few seconds of Refresh. Grey = not seen recently.</div></aside>
 <section id="view">
@@ -78,6 +78,18 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn pri" id="copyCode">Copy code</button><button class="btn" id="backup">Download key backup</button><label class="btn" style="display:inline-flex;align-items:center">Import key backup<input type="file" id="imp" accept=".json,application/json" hidden></label><span class="sp" style="flex:1"></span><button class="btn" id="keyClose">Close</button></div>
 <p class="muted" style="margin:8px 0 0"><b>Download key backup</b> saves the key to a file so you can move it to another PC: there, open the panel and click <b>Import key backup</b>. Keep that file private — anyone who has it can control the boards. If it's ever lost or shared, make a new key and send the new code.</p>
 <button class="btn red sm" id="newKey">Make a new key</button>
+</div></div>
+<div class="modal" id="devM" hidden><div class="mc">
+<h3>Devices &amp; approval</h3>
+<p class="muted">Strict whitelist: when enforced, a board shows only the Zhyar logo until you approve it. Approving sends permission over the encrypted relay. <b>Turning enforcement on locks every unapproved board.</b></p>
+<label class="row" style="gap:8px;align-items:center"><input type="checkbox" id="wlOn"> Enforce whitelist on all boards</label>
+<div class="row" style="margin-top:6px"><button class="btn pri" id="apprAll">Approve all boards seen recently</button></div>
+<h3 style="margin-top:10px">Boards</h3>
+<div id="devList" style="max-height:34vh;overflow:auto"></div>
+<h3 style="margin-top:10px">Maintenance (all boards)</h3>
+<div class="row"><button class="btn red" id="maintAll">Maintenance ON (all)</button><button class="btn" id="maintOff">OFF (all)</button></div>
+<div style="display:flex;gap:8px;margin-top:12px"><span class="sp" style="flex:1"></span><button class="btn" id="devClose">Close</button></div>
+<p class="muted" id="devMsg" style="margin-top:8px"></p>
 </div></div>
 <div class="modal" id="histM" hidden><div class="mc">
 <h3>Activity history</h3>
@@ -104,7 +116,7 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <div id="toast"></div>
 <script>
 (()=>{
-const PANEL_VER='11';
+const PANEL_VER='12';
 const ST='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4',CMD=ST+'-c',RSP=ST+'-r';
 const UPB=atob('aHR0cHM6Ly9vbnBvdGF0b2VzZnIuZ2l0aHViLmlvL1pIU0UtYWxhei8=');
 const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -112,6 +124,8 @@ const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clea
 let ALOG=[];try{ALOG=JSON.parse(localStorage.getItem('zhse-alog')||'[]')}catch(e){}
 function alog(x){ALOG.unshift({t:Date.now(),x:String(x)});if(ALOG.length>200)ALOG.length=200;try{localStorage.setItem('zhse-alog',JSON.stringify(ALOG))}catch(e){}}
 let NOTES={};try{NOTES=JSON.parse(localStorage.getItem('zhse-notes')||'{}')}catch(e){}
+let APPR={};try{APPR=JSON.parse(localStorage.getItem('zhse-appr')||'{}')}catch(e){}
+function saveAppr(){try{localStorage.setItem('zhse-appr',JSON.stringify(APPR))}catch(e){}}
 const b64=u=>{let s='';const a=new Uint8Array(u);for(let i=0;i<a.length;i+=32768)s+=String.fromCharCode.apply(null,a.subarray(i,i+32768));return btoa(s)};
 const u8=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const THEMES=['Blue','Graphite','Forest','Purple','Rose','Sunset','Teal'];
@@ -138,6 +152,16 @@ $('#wgClose').onclick=()=>$('#wgM').hidden=true;
 $('#wgSend').onclick=async()=>{var cfg={on:$('#wgOn').checked,hiMsg:$('#wgHiMsg').value.slice(0,120),hiT:wgGetT('wgHi'),byeMsg:$('#wgByeMsg').value.slice(0,120),byeT:wgGetT('wgBye')};try{localStorage.setItem('zhse-wg',JSON.stringify(cfg))}catch(e){}try{await sendCmd('all','act',Object.assign({n:'wg'},cfg));$('#wgMsg').textContent='Sent to all boards.';alog('Welcome/goodbye schedule sent to all boards');toast('Welcome/goodbye sent to all boards')}catch(e){$('#wgMsg').textContent='Could not send: '+e.message;}};
 function histRender(){var L=$('#histList');L.innerHTML=ALOG.length?ALOG.map(function(e){return '<div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:8px 2px"><span>'+esc(e.x)+'</span><span class="muted" style="white-space:nowrap">'+new Date(e.t).toLocaleString()+'</span></div>';}).join(''):'<div class="muted">Nothing yet.</div>';}
 $('#histChip').onclick=()=>{histRender();$('#histM').hidden=false;};$('#histClose').onclick=()=>$('#histM').hidden=true;$('#histClear').onclick=()=>{if(!confirm('Clear the activity history?'))return;ALOG=[];try{localStorage.setItem('zhse-alog','[]')}catch(e){}histRender();};
+function devRender(){var arr=Object.values(B.list||{}).sort(function(a,b){return String(a.n).localeCompare(String(b.n))});var L=$('#devList');L.innerHTML=arr.length?arr.map(function(o){var ok=!!APPR[o.id];return '<div style="display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:8px 2px"><span style="flex:1;min-width:0"><div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(o.n)+'</div><div class="muted" style="font-size:12px">'+esc(o.id)+' · '+(ok?'<span style="color:var(--ok)">approved</span>':'not approved')+'</div></span><button class="btn sm" data-ap="'+esc(o.id)+'">'+(ok?'Re-approve':'Approve')+'</button><button class="btn sm red" data-rv="'+esc(o.id)+'">Revoke</button><button class="btn sm" data-mo="'+esc(o.id)+'">Maint</button></div>';}).join(''):'<div class="muted">No boards seen yet — Refresh first.</div>';
+L.querySelectorAll('[data-ap]').forEach(function(b){b.onclick=async function(){var id=b.dataset.ap,nm=(B.list[id]||{}).n||id;try{await sendCmd(id,'act',{n:'approve'});APPR[id]=true;saveAppr();alog('Approved device: '+nm);toast('Approved '+nm);devRender();}catch(e){toast('Failed: '+e.message)}};});
+L.querySelectorAll('[data-rv]').forEach(function(b){b.onclick=async function(){var id=b.dataset.rv,nm=(B.list[id]||{}).n||id;try{await sendCmd(id,'act',{n:'revoke'});APPR[id]=false;saveAppr();alog('Revoked device: '+nm);toast('Revoked '+nm);devRender();}catch(e){toast('Failed: '+e.message)}};});
+L.querySelectorAll('[data-mo]').forEach(function(b){b.onclick=async function(){var id=b.dataset.mo,nm=(B.list[id]||{}).n||id;try{await sendCmd(id,'act',{n:'maint',v:true});alog('Maintenance ON: '+nm);toast('Maintenance on '+nm);}catch(e){toast('Failed: '+e.message)}};});}
+$('#devChip').onclick=()=>{try{$('#wlOn').checked=localStorage.getItem('zhse-wlon')=='1'}catch(e){}devRender();$('#devMsg').textContent='';$('#devM').hidden=false;};
+$('#devClose').onclick=()=>$('#devM').hidden=true;
+$('#wlOn').onchange=async()=>{var on=$('#wlOn').checked;try{localStorage.setItem('zhse-wlon',on?'1':'0')}catch(e){}try{await sendCmd('all','act',{n:'wlEnforce',v:on});alog('Whitelist enforcement '+(on?'ON':'OFF')+' (all boards)');$('#devMsg').textContent=on?'Enforcement on. Unapproved boards are now locked until approved.':'Enforcement off.';toast('Enforcement '+(on?'on':'off'))}catch(e){$('#devMsg').textContent='Could not send: '+e.message}};
+$('#apprAll').onclick=async()=>{try{await sendCmd('all','act',{n:'approve'});Object.keys(B.list||{}).forEach(function(id){APPR[id]=true});saveAppr();alog('Approved all boards');$('#devMsg').textContent='Approved all boards that are online now.';toast('Approved all');devRender()}catch(e){$('#devMsg').textContent='Could not send: '+e.message}};
+$('#maintAll').onclick=async()=>{if(!confirm('Put ALL boards into maintenance (logo only, nothing works)?'))return;try{await sendCmd('all','act',{n:'maint',v:true});alog('Maintenance ON (all boards)');toast('Maintenance on (all)')}catch(e){toast('Failed: '+e.message)}};
+$('#maintOff').onclick=async()=>{try{await sendCmd('all','act',{n:'maint',v:false});alog('Maintenance OFF (all boards)');toast('Maintenance off (all)')}catch(e){toast('Failed: '+e.message)}};
 $('#copyCode').onclick=async()=>{try{await navigator.clipboard.writeText(K.pub);toast('Code copied')}catch(e){toast('Select the code and copy it')}};
 $('#backup').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([localStorage.getItem('zhse-admin-key')],{type:'application/json'}));a.download='zhse-admin-key-backup.json';a.click()};
 $('#imp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!j.priv||!j.pub)throw 0;localStorage.setItem('zhse-admin-key',JSON.stringify(j));await keyLoad();toast('Key imported')}catch(x){toast('That is not a key backup')}};

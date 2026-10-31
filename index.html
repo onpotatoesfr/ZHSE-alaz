@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.71',BD='31/10/65';
+const VER='1.1',BUILD='2026.10.31.72',BD='31/10/66';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -517,7 +517,7 @@ const up=e=>{if(A!==V)return;const wasPv=V===PV&&tp.has(e.pointerId);tp.delete(e
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 cv.addEventListener('wheel',e=>{if(V===PV&&S.tool!='hand'&&doc){e.preventDefault();A=V;const k=PVV.z*PV.b(),tot=(offY[pdfN-1]+sz(pdfN-1)[1])*k;PVV.oy=PVV.oy-e.deltaY;draw(V);schedRender();return}if(S.tool!='hand')return;e.preventDefault();A=V;const p=pg(),[sx,sy]=loc(e);zoomAt(sx,sy,cl(p.z*(e.deltaY<0?1.1:.9),.25,6));draw(V);if(V===PV)schedRender();persist()},{passive:false})}
 /* flyouts */
-const LI={aiw:'<path d="M12 3l1.8 4.6L18 9.4l-4.2 1.8L12 16l-1.8-4.8L6 9.4l4.2-1.8z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>',exam:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h4"/>',phph:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',phpdf:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',calc:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/>',ggb:'<path d="M3 20h18M4 20V4"/><path d="M5 17c3-9 6-9 8-4s4 5 7-6"/>',clk:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',upq:'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>','ins:r':'<path d="M3 15l12-12 6 6L9 21z"/><path d="M7 11l2 2M10 8l2 2M13 5l2 2"/>','ins:p':'<path d="M3 19a9 9 0 0118 0z"/><path d="M12 19v-3M6.5 16l1-1.5M17.5 16l-1-1.5"/>','ins:c':'<path d="M12 3v5M12 8L6 21M12 8l6 13M8.5 16h7"/>',ses:'<path d="M6 2h8l5 5v15H6zM14 2v5h5M9 13h6M9 17h6"/>',rc:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',rcc:'<path d="M5 5l14 14M19 5L5 19"/>',tm:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>',stu:'<circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M17 5a3.5 3.5 0 010 7M19 15c2 1 3 3 3 6"/>',sv1:'<path d="M5 3h12l3 3v15H5zM8 3v6h8V3M8 21v-7h8v7"/>',sv2:'<path d="M5 3h12l3 3v15H5zM8 3v6h8V3M8 21v-7h8v7"/>',imp:'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',jpg:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M3 17l6-5 5 5 3-3 4 4"/>','t:select':'<path d="M5 3l14 8-6 2 4 7-3 1-4-7-4 4z"/>',clr:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',rs:'<path d="M4 12a8 8 0 112.5 5.8M4 12V6M4 12h6"/>',wr:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',tx:'<path d="M5 6V4h14v2M12 4v16M9 20h6"/>',np:'<path d="M6 2h8l5 5v15H6zM12 11v6M9 14h6"/>',dup:'<path d="M8 8h9v12H8z"/><path d="M5 4h8v3M5 4v11h3"/>',dp:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',img:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M3 17l6-5 5 5 3-3 4 4"/>',pdf:'<path d="M6 2h8l5 5v15H6zM14 2v5h5M9 14h6M9 17h4"/>',pdfx:'<path d="M5 5l14 14M19 5L5 19"/>',fg:'<path d="M8 13V6a1.5 1.5 0 013 0v5V4a1.5 1.5 0 013 0v7V6a1.5 1.5 0 013 0v9c0 5-3 7-6 7s-5-2-7-5l-2-4a1.5 1.5 0 012.5-1.5z"/>','bg:w':'<rect x="4" y="4" width="16" height="16" rx="2"/>','bg:g':'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 12h16M12 4v16M4 8h16M4 16h16M8 4v16M16 4v16"/>','bg:r':'<rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor" opacity=".5"/>'};
+const LI={aiw:'<path d="M12 3l1.8 4.6L18 9.4l-4.2 1.8L12 16l-1.8-4.8L6 9.4l4.2-1.8z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>',exam:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h4"/>',phph:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',phpdf:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',calc:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/>',ggb:'<path d="M3 20h18M4 20V4"/><path d="M5 17c3-9 6-9 8-4s4 5 7-6"/>',clk:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',upq:'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>','ins:r':'<path d="M3 15l12-12 6 6L9 21z"/><path d="M7 11l2 2M10 8l2 2M13 5l2 2"/>','ins:p':'<path d="M3 19a9 9 0 0118 0z"/><path d="M12 19v-3M6.5 16l1-1.5M17.5 16l-1-1.5"/>','ins:c':'<path d="M12 3v5M12 8L6 21M12 8l6 13M8.5 16h7"/>',ses:'<path d="M6 2h8l5 5v15H6zM14 2v5h5M9 13h6M9 17h6"/>',rc:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',rcc:'<path d="M5 5l14 14M19 5L5 19"/>',tm:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>',stu:'<circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M17 5a3.5 3.5 0 010 7M19 15c2 1 3 3 3 6"/>',sv1:'<path d="M5 3h12l3 3v15H5zM8 3v6h8V3M8 21v-7h8v7"/>',sv2:'<path d="M5 3h12l3 3v15H5zM8 3v6h8V3M8 21v-7h8v7"/>',imp:'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',jpg:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M3 17l6-5 5 5 3-3 4 4"/>','t:select':'<path d="M5 3l14 8-6 2 4 7-3 1-4-7-4 4z"/>',present:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',clr:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',rs:'<path d="M4 12a8 8 0 112.5 5.8M4 12V6M4 12h6"/>',wr:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',tx:'<path d="M5 6V4h14v2M12 4v16M9 20h6"/>',np:'<path d="M6 2h8l5 5v15H6zM12 11v6M9 14h6"/>',dup:'<path d="M8 8h9v12H8z"/><path d="M5 4h8v3M5 4v11h3"/>',dp:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',img:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M3 17l6-5 5 5 3-3 4 4"/>',pdf:'<path d="M6 2h8l5 5v15H6zM14 2v5h5M9 14h6M9 17h4"/>',pdfx:'<path d="M5 5l14 14M19 5L5 19"/>',fg:'<path d="M8 13V6a1.5 1.5 0 013 0v5V4a1.5 1.5 0 013 0v7V6a1.5 1.5 0 013 0v9c0 5-3 7-6 7s-5-2-7-5l-2-4a1.5 1.5 0 012.5-1.5z"/>','bg:w':'<rect x="4" y="4" width="16" height="16" rx="2"/>','bg:g':'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 12h16M12 4v16M4 8h16M4 16h16M8 4v16M16 4v16"/>','bg:r':'<rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor" opacity=".5"/>'};
 const L=(a,t,on)=>{const q=a.startsWith('wr:')?'wr':a,i=LI[q]||LI[q.split(':')[0]];return `<button class="li${on?' on':''}" data-a="${a}">${i?ic(i,22):''}<span>${tl(t)}</span></button>`};
 const H=(t,dg)=>`<div class="fh${dg?' dg':''}"><b class="nc">${tl(t)}</b>${dg?'<span class="gp" aria-hidden="true">'+ic('<circle cx="6" cy="9" r="1.2"/><circle cx="12" cy="9" r="1.2"/><circle cx="18" cy="9" r="1.2"/><circle cx="6" cy="15" r="1.2"/><circle cx="12" cy="15" r="1.2"/><circle cx="18" cy="15" r="1.2"/>',18)+'</span>':''}<button class="b" data-a="x" aria-label="${tl('Close menu')}">${ic(I.x,18)}</button></div>`;
 const szv=()=>S.wr&&S.ct=='b'?S.size2:S.size;
@@ -528,7 +528,7 @@ function flyHTML(n){let h='';
 if(n=='pen')h=H(S.wr?'Pencil colors':'Pen color',1)+`<div class="ch nc">${['pen','marker','dotted','laser'].filter(vt).map(t=>`<button class="${(t=='laser'?S.tool=='laser':S.tool!='laser'&&S.type==t)?'on':''}" data-a="ty:${t}" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px">${ic(TYI[t],20)}<span>${tl(t[0].toUpperCase()+t.slice(1))}</span></button>`).join('')}</div>${S.tool=='laser'?laserHTML():(S.wr?wrChips():'')+`<div class="cg">${penGrid()}</div><div class="sl"><span id="sv">${tl('Size')} ${S.size}</span><input type="range" min="1" max="24" value="${S.size}" data-a="rg" aria-label="Pen size"><span class="szpv" id="szPv" style="width:${Math.min(S.size*1.2,24)}px;height:${Math.min(S.size*1.2,24)}px;background:${curCol()}"></span></div>`}${S.tool=='laser'?'':`<div class="sl" style="margin-top:10px"><span id="ov">${tl('Opacity')} ${Math.round(S.al*100)}%</span><input type="range" min="10" max="100" step="5" value="${Math.round(S.al*100)}" data-a="rg4" aria-label="Pen opacity"></div>`}`;
 else if(n=='graphic'){const t=k=>`<button class="gi${S.tool=='shape'&&S.shape==k?' on':''}" data-a="sh:${k}">${ic('<path d="'+sp(k,[3,21],[21,3])+'"/>',30)}<span>${tl(SH[k][0])}</span></button>`;h=H('Graphic')+`<div class="ch"><button class="${S.fill?'':'on'}" data-a="fv:0">${tl('Outline only')}</button><button class="${S.fill?'on':''}" data-a="fv:1">${tl('Ask fill color')}</button></div><div class="gh">${tl('Shapes')}</div><div class="gg">${['l','a','da','rect','brect','sqr','rr','ell','circ','tri','rtri','dia','para','trap','pent','hex','oct','star','heart','plus','bub'].map(t).join('')}</div><div class="gh">${tl('Graphics')}</div><div class="gg">${['axes','nl','grid','cube','cyl','check','xm'].map(t).join('')}</div>`+`<div class="gh">${tl('Instruments')}</div>`+L('ins:r','Ruler',insOn('r'))+L('ins:p','Protractor',insOn('p'))+L('ins:c','Compass',insOn('c'))+(vt('text')?L('tx','Text',S.tool=='text'):'')}
 else if(n=='eraser')h=H('Eraser')+`<div class="ch"><button class="${S.em=='n'?'on':''}" data-a="em:n">${tl('Normal')}</button>${vt('whole')?`<button class="${S.em=='s'?'on':''}" data-a="em:s">${tl('Whole stroke')}</button>`:''}</div><div class="sl"><span id="sv">${tl('Size')} ${S.es}</span><input type="range" min="6" max="60" value="${S.es}" data-a="rg2" aria-label="Eraser size"></div><p style="font:500 12px system-ui,sans-serif;margin:12px 0 0">${tl('A palm, fist or the eraser end of a stylus erases in any tool.')}</p>`;
-else if(n=='tools')h=H('Tools')+(vt('timer')?L('tm','Timer'):'')+(vt('picker')?L('stu','Pick a student'):'')+L('calc','Calculator')+L('exam','Exam mode')+L('ggb','GeoGebra')+(window.aiName&&aiName()?L('aiw',AD.aiOff?'AI writing: off':'AI writing: on',!AD.aiOff):'')+L('clk','Clock: '+(S.clk?'on':'off'),!!S.clk)+L('clr','Clear this page')+L('rs','Reset view')+(AD.nowr&&!S.wr?'':L('wr:'+(S.wr?'0':'1'),S.wr?'Back to normal mode':(AD.wrb?'Bottom toolbar mode':'Switch to Mr. Wrya'),S.wr));
+else if(n=='tools')h=H('Tools')+(vt('timer')?L('tm','Timer'):'')+(vt('picker')?L('stu','Pick a student'):'')+L('calc','Calculator')+L('present','Presentation')+L('exam','Exam mode')+L('ggb','GeoGebra')+(window.aiName&&aiName()?L('aiw',AD.aiOff?'AI writing: off':'AI writing: on',!AD.aiOff):'')+L('clk','Clock: '+(S.clk?'on':'off'),!!S.clk)+L('clr','Clear this page')+L('rs','Reset view')+(AD.nowr&&!S.wr?'':L('wr:'+(S.wr?'0':'1'),S.wr?'Back to normal mode':(AD.wrb?'Bottom toolbar mode':'Switch to Mr. Wrya'),S.wr));
 else if(n=='bg')h=H('Background')+L('bg:w','White',PB(CP())=='w')+L('bg:g','Grid',PB(CP())=='g')+L('bg:r','Gray',PB(CP())=='r')+`<div class="gh">${tl('Custom color')}</div><div class="cg">${COL.map(([m,c])=>`<button class="sw${PB(CP())=='u'&&PBC(CP())==c?' on':''}" data-a="bgc:${c}" aria-label="${m} background" style="background:${c}"></button>`).join('')}</div><label class="li" style="margin-top:0">${tl('Pick any color')}<input type="color" value="${PBC(CP())}" data-a="bgi" aria-label="Pick a custom background color" style="margin-left:auto;width:48px;height:32px;border:0;background:none"></label>`;
 else if(n=='pages')h=H('Pages')+`<div style="font:700 18px system-ui,sans-serif;margin-bottom:10px">${tl('Page')} ${S.cur+1} ${tl('of')} ${P.length}</div><div class="pgl">${P.map((p,i)=>`<button class="pt${i==S.cur?' on':''}" data-a="pg:${i}" aria-label="Page ${i+1}"><img alt="" src="${thumb(p,132,84)}"><span>${tl('Page')} ${i+1}${i==S.cur?' '+tl('(current)'):''}</span></button>`).join('')}</div>`+L('np','Add page')+L('dup','Duplicate page')+L('dp','Delete this page');
 else if(n=='images')h=H('Images')+L('img','Add image from device')+L('phph','Photo from phone')+L('pdf','Open PDF book');
@@ -620,6 +620,11 @@ function wgMark(k){try{localStorage.setItem('wbWGd',new Date().toDateString()+'|
 function wgTick(){if(!WG.on)return;var d=new Date(),now=d.getHours()*60+d.getMinutes();[['hi',WG.hiT,WG.hiMsg],['bye',WG.byeT,WG.byeMsg]].forEach(function(x){var mins=wgParse(x[1]);if(mins<0)return;if(now===mins&&!wgShown(x[0])){wgMark(x[0]);wgShow(x[0],x[2]);}});}
 function wgShow(kind,msg){var e=document.getElementById('wg');if(!e){e=document.createElement('div');e.id='wg';e.onclick=function(){e.classList.remove('on');};document.body.appendChild(e);}var name=bsName();var text=String(msg||'').replace(/\{board\.ID\}/g,name).trim()||name;e.className='wg '+(kind==='bye'?'bye':'hi')+' on';e.innerHTML='<div class="wg-rail"></div><div class="wg-mid"><div class="wg-kick"></div><div class="wg-msg"></div></div>';e.querySelector('.wg-kick').textContent=(kind==='bye'?'End of the day':'Welcome');e.querySelector('.wg-msg').textContent=text;clearTimeout(e._t);e._t=setTimeout(function(){e.classList.remove('on');},9000);log('info','Welcome/goodbye screen shown: '+kind);}
 wgLoad();setTimeout(wgTick,3000);setInterval(wgTick,20000);
+function zState(){var a=false,w=false,m=false;try{a=localStorage.getItem('wbAppr')=='1'}catch(e){}try{w=localStorage.getItem('wbWL')=='1'}catch(e){}try{m=localStorage.getItem('wbMaint')=='1'}catch(e){}return{a:a,w:w,m:m}}
+function zShow(kind){var e=document.getElementById('zblock');if(!e){e=document.createElement('div');e.id='zblock';document.body.appendChild(e)}var id='';try{id=BS.id||''}catch(x){}var lg='';try{var L=document.getElementById('lgo');if(L&&L.src)lg='<img src="'+L.src+'" alt="">'}catch(x){}var nm='';try{nm=bsName()}catch(x){}e.innerHTML='<div class="zb-c">'+lg+'<div class="zb-t">'+(kind=='maint'?'Under maintenance':'Waiting for approval')+'</div>'+(kind=='maint'?'<div class="zb-s">This board is temporarily unavailable.</div>':'<div class="zb-id">Board ID: '+id+(nm?' \u00b7 '+nm:'')+'</div><div class="zb-s">Ask the admin to approve this board.</div>')+'</div>';e.style.display='flex'}
+function zHide(){var e=document.getElementById('zblock');if(e)e.style.display='none'}
+function zlock(){var s=zState();if(s.m){zShow('maint');return}if(s.w&&!s.a){zShow('wl');return}zHide()}
+zlock();setInterval(zlock,15000);
 
 async function bsLoad(){if(BS.busy)return;BS.busy=true;BS.msg='Loading boards...';adRender();
 try{const v=await fetch(upBase()+'version.json?t='+Date.now(),{cache:'no-store'});if(v.ok){const j=await v.json();if(j&&j.build)BS.latest=j}}catch(e){}
@@ -651,6 +656,12 @@ const ADL={np:'New page',pv:'Previous page',nx:'Next page',un:'Undo',re:'Redo',p
 const ADH=[['marker','Marker pen type'],['dotted','Dotted pen type'],['laser','Laser pen type'],['text','Text tool'],['select','Select and move tool'],['whole','Whole-stroke eraser mode'],['timer','Timer'],['picker','Student picker'],['record','Record pen sizes']];
 const asIv=[[0,'Instant'],[30,'Every 30 s'],[60,'Every minute'],[300,'Every 5 min']];
 function adOpen(){$('#ad').style.display='flex';ADv.conf='';ADv.msg='';adRender();if(!BS.busy)bsLoad()}
+async function adImportPkg(f){try{const txt=await f.text();const m=/BUILD='([^']+)'/.exec(txt);if(!/<!doctype html>/i.test(txt)||!/const VER=/.test(txt)||!m||txt.length<50000){ADv.msg='That file is not a valid ZHSE-A app file.';adRender();return}
+if(window.ZHSE&&ZHSE.saveUpdate){if(ZHSE.saveUpdate(txt,m[1])!='ok')throw new Error('could not store')}
+else if(navigator.serviceWorker&&navigator.serviceWorker.controller){const c=await caches.open('zhse-update');await c.put(UPK,new Response(txt,{headers:{'content-type':'text/html;charset=utf-8'}}))}
+else{ADv.msg='This board can\'t apply an offline package (no update worker or bridge). Nothing changed.';adRender();return}
+try{localStorage.setItem('wbUpd',JSON.stringify({version:'offline',build:m[1],disp:m[1],t:Date.now()}))}catch(e){}
+try{save(true);saveS();saveAD()}catch(e){}ADv.msg='Offline package installed. Restarting...';adRender();setTimeout(()=>location.reload(),600)}catch(e){ADv.msg='Could not import: '+(e.message||e);adRender()}}
 function adRender(){const c=$('#adc'),st=c.scrollTop,d=AD.lock?' disabled':'';const sl=(k,l,mx,z)=>`<div class="adr"><span id="adl_${k}">${l}: ${AD[k]||(z?'Auto':0)}</span><input type="range" min="${z?0:1}" max="${mx}" value="${AD[k]}" data-a="ad_r:${k}" aria-label="${l}"></div>`;
 const tb=AD.tbo.map(id=>{const off=AD.tbh.includes(id);return `<div class="ar${off?' off':''}"><span class="al">${ADL[id]}</span><button class="ab" data-a="ad_up:${id}"${d} aria-label="Move up">&#9650;</button><button class="ab" data-a="ad_dn:${id}"${d} aria-label="Move down">&#9660;</button><button class="ab" data-a="ad_vis:${id}"${d}>${off?'Add':'Remove'}</button><button class="ab" data-a="ad_sz:${id}"${d}>Size ${AD.tbs[id]||'M'}</button></div>`}).join('');
 const qa=Object.keys(QA).map(k=>`<button class="ab${AD.qa.includes(k)?' on':''}" data-a="ad_qa:${k}"${d}>${QA[k][1]}</button>`).join(' ');
@@ -678,7 +689,7 @@ const FULL=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x"
 <div class="ar"><span class="al">Ask to continue or start new when the app reopens</span><button class="ab${AD.ask?' on':''}" data-a="ad_ask">${AD.ask?'On':'Off'}</button></div>
 <div class="ar"><span class="al">Keep a recovery backup (previous save, at most once a minute)</span><button class="ab${AD.bk?' on':''}" data-a="ad_bk">${AD.bk?'On':'Off'}</button></div>
 <div class="ar"><button class="ab" data-a="ad_sv">Save now</button><button class="ab${ADv.conf=='rbk'?' on':''}" data-a="ad_rbk">${ADv.conf=='rbk'?'Tap again to restore':'Restore recovery backup'}</button></div>
-<h3>Updates</h3><div class="adn">Running version ${VER}, build ${BD}.${upInfo()}</div><div class="ar"><button class="ab" data-a="ad_upc">Check for updates</button>${UPS.avail?`<button class="ab on" data-a="ad_upi">Install ${UPS.avail.version} (build ${UPS.avail.build})</button>`:''}<button class="ab${ADv.conf=='upr'?' on':''}" data-a="ad_upr">${ADv.conf=='upr'?'Tap again to confirm':'Use built-in version'}</button></div>${UPS.msg?`<div class="adn">${UPS.msg}</div>`:''}<h3>Handwriting beautification</h3><div class="ar"><span class="al">Smooth, neat handwriting while writing with the normal pen (also straightens and evens out words)</span><button class="ab${bwOn()?' on':''}" data-a="ad_bw">${bwOn()?'On':'Off'}</button></div><h3>Screen saver background</h3><div class="adn">Now: ${AD.ssBg=='img'?'custom picture':AD.ssBg&&AD.ssBg!='navy'?'set from the admin panel':'original (navy)'}</div><div class="ar"><button class="ab" data-a="ad_ssimg">Choose picture</button><button class="ab" data-a="ad_ssorig">Back to original</button><button class="ab" data-a="ad_sstest">Preview</button></div><input type="file" id="ssPic" accept="image/*" hidden>${bsHTML()}<h3>Reset</h3><div class="ar"><span class="al">Restores the default button order, sizes, quick-access row and toolbar position.</span><button class="ab${ADv.conf=='rtb'?' on':''}" data-a="ad_rtb"${d}>${ADv.conf=='rtb'?'Tap again to confirm':'Reset toolbar'}</button></div>`;
+<h3>Updates</h3><div class="adn">Running version ${VER}, build ${BD}.${upInfo()}</div><div class="ar"><button class="ab" data-a="ad_upc">Check for updates</button>${UPS.avail?`<button class="ab on" data-a="ad_upi">Install ${UPS.avail.version} (build ${UPS.avail.build})</button>`:''}<button class="ab${ADv.conf=='upr'?' on':''}" data-a="ad_upr">${ADv.conf=='upr'?'Tap again to confirm':'Use built-in version'}</button></div>${UPS.msg?`<div class="adn">${UPS.msg}</div>`:''}<div class="ar"><span class="al">Offline update package: import an app file (.html) from this device to update without the internet.</span><label class="ab" style="display:inline-flex;align-items:center">Import package<input type="file" id="upPkg" accept=".html,text/html" hidden></label></div><h3>Handwriting beautification</h3><div class="ar"><span class="al">Smooth, neat handwriting while writing with the normal pen (also straightens and evens out words)</span><button class="ab${bwOn()?' on':''}" data-a="ad_bw">${bwOn()?'On':'Off'}</button></div><h3>Screen saver background</h3><div class="adn">Now: ${AD.ssBg=='img'?'custom picture':AD.ssBg&&AD.ssBg!='navy'?'set from the admin panel':'original (navy)'}</div><div class="ar"><button class="ab" data-a="ad_ssimg">Choose picture</button><button class="ab" data-a="ad_ssorig">Back to original</button><button class="ab" data-a="ad_sstest">Preview</button></div><input type="file" id="ssPic" accept="image/*" hidden>${bsHTML()}<h3>Reset</h3><div class="ar"><span class="al">Restores the default button order, sizes, quick-access row and toolbar position.</span><button class="ab${ADv.conf=='rtb'?' on':''}" data-a="ad_rtb"${d}>${ADv.conf=='rtb'?'Tap again to confirm':'Reset toolbar'}</button></div>`;
 var _hdr=/^([\s\S]*?)(?=<h3>)/.exec(FULL)[1];var _parts=FULL.slice(_hdr.length).split(/(?=<h3>)/).filter(Boolean);var _tabs=[['overview','Overview'],['toolbar','Toolbar'],['pens','Pens & input'],['saver','Display & saver'],['boards','Boards'],['backup','Backup & updates'],['diag','Diagnostics']];var _to=function(t){if(/pen tip and pen back|palm and back of hand/.test(t))return 'pens';if(t===wnC())return 'pens';if(/App passcode/.test(t))return 'overview';if(/Toolbar layout|Quick-access|Visible tools/.test(t)||/^Reset$/.test(t))return 'toolbar';if(/Default sizes|Normal mode|Recorded pen size|Handwriting beautification/.test(t))return 'pens';if(/Screen saver background/.test(t))return 'saver';if(/Classes/.test(t))return 'boards';if(/Autosave and recovery|Updates|Temporary files/.test(t))return 'backup';if(/accuracy test|Rendering check|Diagnostic logs/.test(t))return 'diag';return 'overview';};var _g={};_parts.forEach(function(pt){var m=/^<h3>([\s\S]*?)<\/h3>/.exec(pt);var t=_to(m?m[1]:'');(_g[t]=_g[t]||[]).push(pt)});if(!ADv.tab||!_g[ADv.tab])ADv.tab=_tabs[0][0];var _op=$('#adpanel'),_ops=_op?_op.scrollTop:0;var _nav='<nav class="adnav">'+_tabs.filter(function(t){return _g[t[0]]}).map(function(t){return '<button class="adtab'+(ADv.tab==t[0]?' on':'')+'" data-a="ad_tab:'+t[0]+'">'+t[1]+'</button>'}).join('')+'</nav>';c.innerHTML=_hdr+'<div class="adwrap">'+_nav+'<div class="adpanel" id="adpanel">'+(_g[ADv.tab]||[]).join('')+'</div></div>';var _np=$('#adpanel');if(_np)_np.scrollTop=(ADv._rt===ADv.tab)?_ops:0;ADv._rt=ADv.tab;}
 function adTb(){saveAD();panel();posPanel();if(S.fly)fly(S.fly);adRender()}
 async function adChecks(){const r=[],add=(n,ok,t)=>r.push([n,ok,t]);
@@ -919,7 +930,7 @@ function phClose(){$('#ph').hidden=true;try{$('#phC').textContent='';$('#phL').t
 async function phQR(text){const c=$('#phQ'),g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
 if(!window.qrcode)await Promise.race([ld('https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'),new Promise((_,no)=>setTimeout(()=>no(new Error('timeout')),12000))]);
 const q=qrcode(0,'M');q.addData(text);q.make();const n=q.getModuleCount(),m=4,sz=Math.floor(c.width/(n+m*2)),o=Math.floor((c.width-sz*(n+m*2))/2)+sz*m;g.fillStyle='#111827';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))g.fillRect(o+k*sz,o+r*sz,sz,sz)}
-async function phOpen(m){phClose();PHN.mode=m;$('#ph').hidden=false;$('#phT').textContent=tl(m=='p'?'Photo from phone':'PDF from phone');$('#phH').textContent=tl('Scan this code with your phone camera');
+async function phOpen(m){phClose();PHN.mode=m;$('#ph').hidden=false;$('#phT').textContent=tl(m=='p'?'Photo from phone':m=='ppt'?'PowerPoint from phone':'PDF from phone');$('#phH').textContent=tl('Scan this code with your phone camera');
 const c=$('#phQ');c.getContext('2d').clearRect(0,0,c.width,c.height);phSt('');if(!navigator.onLine){phSt('Needs an internet connection');return}
 const AL='ABCDEFGHJKMNPQRSTUVWXYZ23456789',rb=new Uint8Array(8);crypto.getRandomValues(rb);const code=[...rb].map(b=>AL[b%AL.length]).join('');PHN.code=code;PHN.top=code.toLowerCase();const top=PHN.top;$('#phC').textContent='ntfy.sh/'+top;$('#phL').textContent=tl('On a laptop or PC: go to this address, click the paperclip, attach the file (under 2 MB) and send');
 try{await phQR(upBase()+'send.html#t='+top+'&m='+m+'&l='+(S.lang||'en'))}catch(e){if(PHN.top==top)phSt('Could not load the QR code. Check the internet.');log('warn','QR code could not load');return}
@@ -927,6 +938,7 @@ if(PHN.top!=top)return;phSt(m=='p'?'Waiting for a photo...':'Waiting for a PDF..
 try{PHN.es=new EventSource('https://ntfy.sh/'+top+'/sse');PHN.es.onmessage=ev=>{try{const e=JSON.parse(ev.data);if(e.event=='message'&&e.attachment&&PHN.top==top)phRecv(e.attachment)}catch(_){}}}catch(e){phSt('Could not receive the file')}
 PHN.t=setTimeout(phClose,20*60000);log('info','Waiting for '+(m=='p'?'a photo':'a PDF')+' from a phone')}
 async function phRecv(a){if(PHN.busy)return;PHN.busy=true;phSt('Receiving...');try{if(+a.size>16*1024*1024)throw new Error('too big');const r=await fetch(a.url);if(!r.ok)throw new Error('HTTP '+r.status);log('info','File received: '+(a.name||'')+' ('+Math.round((+a.size||0)/1024)+' KB)');const b=await r.blob(),ty=b.type||a.type||'';
+if(PHN.mode=='ppt'){const f=new File([b],a.name||'slides.pptx',{type:a.type||''});phClose();try{window.presStart&&window.presStart(f)}catch(e){}phSt('Opening presentation');log('info','Presentation received from a phone');return}
 if(PHN.mode=='p'){if(!/^image\//.test(ty)&&!/^image\//.test(a.type||''))throw new Error('not an image');await phPhoto(b);phSt('Photo added to the page');toast('Photo added to the page');log('info','Photo received from a phone')}
 else{if(!(/pdf/.test(ty)||/pdf/.test(a.type||'')||/\.pdf$/i.test(a.name||'')))throw new Error('not a PDF');const f=new File([b],a.name||'phone.pdf',{type:'application/pdf'});phClose();await openPdf(f);toast('PDF opened');log('info','PDF received from a phone')}}
 catch(e){phSt('Could not receive the file');log('error','Phone file failed: '+noUrl(e&&e.message||e))}PHN.busy=false}
@@ -970,6 +982,7 @@ setInterval(()=>{if(exActive()){const d=new Date();$('#exClk').textContent=p2(d.
 const SS={last:Date.now(),on:false,iv:0,idle:600000};
 function ssBusy(){try{if(window.exActive&&exActive())return true}catch(e){}if(TM.st=='run'||TM.st=='ring')return true;if(doc&&PV.on)return true;if($('#fu'))return true;if($('#ad').style.display=='flex'||$('#tt').style.display=='block')return true;return false}
 function ssClock(){const d=new Date(),p=n=>String(n).padStart(2,'0'),loc=S.lang=='ckb'?'ckb-u-nu-latn':S.lang=='ar'?'ar-u-nu-latn':undefined;const h=d.getHours(),ap=(S.lang=='ar'?['ص','م']:S.lang=='ckb'?['پ.ن','د.ن']:['AM','PM'])[h<12?0:1];$('#ssT').innerHTML=((h%12)||12)+':'+p(d.getMinutes())+'<small class="ss-ap">'+ap+'</small>';try{$('#ssD').textContent=d.toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long'})}catch(e){$('#ssD').textContent=d.toDateString()}}
+document.addEventListener('change',e=>{if(e.target&&e.target.id=='upPkg'){const f=e.target.files&&e.target.files[0];e.target.value='';if(f)adImportPkg(f);return}},true);
 document.addEventListener('change',e=>{if(!e.target||e.target.id!='ssPic')return;const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();r.onload=()=>{const m=new Image();m.onload=()=>{const k=Math.min(1,1600/Math.max(m.width,m.height)),c=document.createElement('canvas');c.width=Math.round(m.width*k);c.height=Math.round(m.height*k);c.getContext('2d').drawImage(m,0,0,c.width,c.height);
 let ok=false;for(const q of[.8,.65,.5]){const d=c.toDataURL('image/jpeg',q);try{localStorage.setItem('wbssimg',d);ok=true;break}catch(x){}}
 if(ok){AD.ssBg='img';saveAD();ssBgApply();ADv.msg='Screen saver picture saved.';log('info','Screen saver picture set')}else ADv.msg='That picture is too big to save. Try a smaller one.';adRender()};m.onerror=()=>{ADv.msg='That file is not a picture.';adRender()};m.src=r.result};r.readAsDataURL(f)});
@@ -1076,6 +1089,10 @@ else if(n=='closeAll'){fly(null);closePops();try{$('#cal').hidden=true;ggClose()
 else if(n=='restart'){try{save(true);saveS();saveAD()}catch(e){}setTimeout(()=>location.reload(),300)}
 else if(n=='toolbarReset'){AD.tbo=TBD.slice();AD.tbh=[];AD.tbs={};AD.qa=[];S.hid=false;S.tx=10;S.ty=10;saveAD();saveS();panel();posPanel()}
 else if(n=='wg'){wgSet(a)}
+else if(n=='approve'){try{localStorage.setItem('wbAppr','1')}catch(e){}zlock();log('info','Device approved')}
+else if(n=='revoke'){try{localStorage.removeItem('wbAppr')}catch(e){}zlock();log('info','Device approval revoked')}
+else if(n=='wlEnforce'){try{a.v?localStorage.setItem('wbWL','1'):localStorage.removeItem('wbWL')}catch(e){}zlock();log('info','Whitelist enforce '+(a.v?'on':'off'))}
+else if(n=='maint'){try{a.v?localStorage.setItem('wbMaint','1'):localStorage.removeItem('wbMaint')}catch(e){}zlock();log('info','Maintenance '+(a.v?'on':'off'))}
 log('info','Remote action: '+n)}
 function raExec(c,a){if(c=='set'&&a)raSet(a.k,a.v);else if(c=='act'&&a)raAct(a.n,a)}
 function raBanner(t,secs){let b=$('#amsg');if(b)b.remove();if(!t)return;b=document.createElement('div');b.id='amsg';b.setAttribute('role','alert');b.innerHTML='<div class="amsg-c"><div class="amsg-t"></div><button class="amsg-x" aria-label="Close">'+ic(I.x,20)+'</button></div>';b.querySelector('.amsg-t').textContent=t;b.querySelector('.amsg-x').onclick=()=>b.remove();document.body.append(b);if(secs>0)setTimeout(()=>{if(b.isConnected)b.remove()},secs*1000)}
@@ -1226,6 +1243,7 @@ if(k=='ad_r')return;
 if(k.startsWith('ad_')){if(e.target.tagName!='INPUT')adAct(k,v);return}
 if(k=='ggb'){fly(null);closePops();ggOpen();return}
 if(k=='calc'){fly(null);calOpen();return}
+if(k=='present'){fly(null);closePops();try{presOpen()}catch(e){}return}
 if(k=='exam'){fly(null);closePops();exSetup();return}
 if(k=='exs'){exAct(v);return}
 if(k=='phph'||k=='phpdf'){fly(null);closePops();phOpen(k=='phph'?'p':'f');return}
@@ -1345,6 +1363,12 @@ document.body.append(w);var ok=w.querySelector('.wn-ok');ok.onclick=function(){t
 #wg.bye .wg-kick{color:#bcd4f5}
 #wg .wg-msg{font:800 clamp(34px,8vw,82px)/1.08 system-ui,sans-serif}
 @keyframes wgfade{from{opacity:0}to{opacity:1}}
+#zblock{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;background:#fff;font-family:system-ui,sans-serif}
+#zblock .zb-c{text-align:center;padding:24px;max-width:90%}
+#zblock img{height:120px;width:auto;margin-bottom:18px}
+#zblock .zb-t{font:800 28px/1.1 system-ui,sans-serif;color:#0c2c69}
+#zblock .zb-id{margin-top:12px;font:700 16px ui-monospace,monospace;color:#14438f}
+#zblock .zb-s{margin-top:8px;font:500 15px system-ui,sans-serif;color:#64748b}
 #adc{width:min(960px,97vw);height:min(88vh,640px);max-height:88vh;padding:0;overflow:hidden;display:flex;flex-direction:column}
 #adc .ahd{position:static;top:auto;margin:0;padding:14px 18px;border-bottom:1px solid var(--fl)}
 .adwrap{display:flex;flex:1;min-height:0}
@@ -1497,6 +1521,7 @@ function commit(){
 }
 
 function onDown(e){
+ if(window.__pres){return;}
  if(RQ.open){return;}
  // disarm if a 2nd pointer joins
  if(RQ.cand&&e.pointerId!==RQ.cand.id){RQ.cand=null;clearTimeout(RQ.tmr);return;}
@@ -1545,6 +1570,91 @@ document.addEventListener('pointermove',onMove,true);
 document.addEventListener('pointerup',onUp,true);
 document.addEventListener('pointercancel',function(e){if(RQ.cand){RQ.cand=null;clearTimeout(RQ.tmr);}if(RQ.open&&e.pointerId===RQ.id)close();},true);
 window.__rqOpen=open; // for testing
+})();
+</script>
+
+<style id="presCSS">
+#pres{position:fixed;inset:0;z-index:107;display:none;background:#111;overflow:auto;touch-action:pan-y}
+#pres.on{display:block}
+#presSlides{min-height:100%;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 0}
+#presSlides .slide{background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.5)}
+#presInk{position:fixed;inset:0;z-index:2;touch-action:none}
+#presMsg{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;color:#fff;font:600 16px system-ui,sans-serif;text-align:center;max-width:80%}
+#presX{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:12px;z-index:5;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font:700 18px system-ui;opacity:.16;display:none;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s}
+#pres.on #presX{display:flex}
+#presX:hover,#presX:active{opacity:.7}
+#presCh{position:fixed;inset:0;z-index:109;display:none;align-items:center;justify-content:center;background:rgba(12,20,33,.6);font-family:system-ui,sans-serif}
+#presCh.on{display:flex}
+#presCh .card{background:#fff;border-radius:18px;padding:22px;max-width:420px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+#presCh h3{margin:0 0 4px;font:800 19px system-ui;color:#111827}
+#presCh p{margin:0 0 16px;color:#64748b;font-size:13.5px}
+#presCh .opt{display:flex;align-items:center;gap:12px;width:100%;border:1px solid #d7deea;border-radius:12px;padding:14px;margin-bottom:10px;background:#fff;cursor:pointer;font:700 15px system-ui;color:#14438f;text-align:left}
+#presCh .opt svg{width:24px;height:24px;flex:none}
+#presCh .x{margin-top:4px;border:0;background:transparent;color:#64748b;font:600 14px system-ui;cursor:pointer;width:100%;padding:8px}
+</style>
+<script>
+(function(){
+if(window.presOpen)return;
+var INK={strokes:[],cur:null};
+function svg(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
+function loadScript(src){return new Promise(function(ok,no){var s=document.createElement('script');s.src=src;s.onload=function(){ok()};s.onerror=function(){no(new Error('load'))};document.head.appendChild(s);setTimeout(function(){no(new Error('timeout'))},15000);});}
+async function ensurePptx(){
+ if(window.$&&window.$.fn&&window.$.fn.pptxToHtml)return;
+ if(!window.JSZip)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+ if(!window.JSZipUtils)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js');
+ if(!window.jQuery)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js');
+ if(!document.getElementById('pptxcss')){var l=document.createElement('link');l.id='pptxcss';l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@v1.21.1/css/pptxjs.min.css';document.head.appendChild(l);}
+ await loadScript('https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@v1.21.1/js/pptxjs.min.js');
+ await loadScript('https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@v1.21.1/js/divs2slides.min.js');
+ if(!(window.$&&window.$.fn&&window.$.fn.pptxToHtml))throw new Error('renderer');
+}
+function build(){
+ if(document.getElementById('pres'))return;
+ var p=document.createElement('div');p.id='pres';
+ p.innerHTML='<div id="presSlides"></div><canvas id="presInk"></canvas><div id="presMsg"></div><button id="presX" aria-label="Exit presentation">✕</button>';
+ document.body.appendChild(p);
+ var ch=document.createElement('div');ch.id='presCh';
+ ch.innerHTML='<div class="card"><h3>Presentation</h3><p>Open a PowerPoint (.pptx). Only a black pen works; tap the faint ✕ to exit.</p>'
+  +'<button class="opt" id="presDev">'+svg('<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/>')+'From this device</button>'
+  +'<button class="opt" id="presPhone">'+svg('<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>')+'From phone (QR)</button>'
+  +'<button class="x" id="presChX">Cancel</button>'
+  +'<input type="file" id="presFile" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" hidden></div>';
+ document.body.appendChild(ch);
+ ch.addEventListener('click',function(e){if(e.target===ch)ch.classList.remove('on');});
+ ch.querySelector('#presChX').onclick=function(){ch.classList.remove('on');};
+ ch.querySelector('#presDev').onclick=function(){ch.querySelector('#presFile').click();};
+ ch.querySelector('#presFile').onchange=function(e){var f=e.target.files[0];e.target.value='';if(!f)return;ch.classList.remove('on');presStart(f);};
+ ch.querySelector('#presPhone').onclick=function(){ch.classList.remove('on');try{phOpen('ppt')}catch(e){}};
+ document.getElementById('presX').onclick=presExit;
+ var cv=document.getElementById('presInk');
+ function rz(){cv.width=innerWidth;cv.height=innerHeight;redraw();}
+ function pt(e){return [e.clientX,e.clientY];}
+ function redraw(){var x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);x.strokeStyle='#000';x.lineWidth=3;x.lineCap=x.lineJoin='round';INK.strokes.forEach(function(st){x.beginPath();st.forEach(function(q,i){i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]);});x.stroke();});}
+ cv.addEventListener('pointerdown',function(e){e.preventDefault();cv.setPointerCapture(e.pointerId);INK.cur=[pt(e)];INK.strokes.push(INK.cur);});
+ cv.addEventListener('pointermove',function(e){if(!INK.cur)return;INK.cur.push(pt(e));redraw();});
+ cv.addEventListener('pointerup',function(e){INK.cur=null;});
+ cv.addEventListener('pointercancel',function(e){INK.cur=null;});
+ window.addEventListener('resize',function(){if(window.__pres)rz();});
+ build._rz=rz;
+}
+function presEnter(){build();window.__pres=1;document.getElementById('pres').classList.add('on');INK.strokes=[];INK.cur=null;build._rz&&build._rz();var m=document.getElementById('presMsg');m.style.display='block';m.textContent='Opening presentation…';}
+function presExit(){window.__pres=0;var p=document.getElementById('pres');if(p)p.classList.remove('on');var s=document.getElementById('presSlides');if(s)s.innerHTML='';INK.strokes=[];}
+async function presStart(file){
+ presEnter();
+ var url=null;try{url=URL.createObjectURL(file)}catch(e){}
+ try{
+  await ensurePptx();
+  window.$('#presSlides').empty();
+  window.$('#presSlides').pptxToHtml({pptxFileUrl:url,slideMode:false,keyBoardShortCut:false,mediaProcess:true});
+  var m=document.getElementById('presMsg');
+  setTimeout(function(){m.style.display='none';},1200);
+ }catch(e){
+  var m=document.getElementById('presMsg');m.style.display='block';
+  m.textContent=navigator.onLine?'Couldn’t open this presentation. Make sure it’s a .pptx file.':'Presentation rendering needs the internet the first time. Connect once, then it works.';
+ }
+}
+window.presOpen=function(){build();document.getElementById('presCh').classList.add('on');};
+window.presStart=presStart;window.presExit=presExit;
 })();
 </script>
 

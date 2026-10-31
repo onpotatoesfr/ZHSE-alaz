@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.31.71","disp":"31/10/65","force":true,"notes":"Improvements","items":["Duplicate page in the Pages menu","Smaller pen-size preview","GeoGebra switches itself online/offline","Scheduled welcome & goodbye screens (set from the admin panel)"]}
+{"version":"1.1","build":"2026.10.31.72","disp":"31/10/66","force":true,"notes":"Improvements","items":["Presentation mode (Tools) for PowerPoint, black pen only","Device approval / whitelist and maintenance mode (controlled from the admin panel)","Import an offline update package from the admin menu"]}
