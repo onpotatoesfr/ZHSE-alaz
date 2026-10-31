@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.74',BD='31/10/68';
+const VER='1.1',BUILD='2026.10.31.75',BD='31/10/69';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -1574,15 +1574,24 @@ window.__rqOpen=open; // for testing
 </script>
 
 <style id="presCSS">
-#pres{position:fixed;inset:0;z-index:107;display:none;background:#111;overflow:auto;touch-action:pan-y}
+#pres{position:fixed;inset:0;z-index:107;display:none;background:#111;overflow:auto;touch-action:pan-x pan-y}
 #pres.on{display:block}
 #presSlides{min-height:100%;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 0}
 #presSlides .slide{background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.5)}
-#presInk{position:fixed;inset:0;z-index:2;touch-action:none}
-#presMsg{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;color:#fff;font:600 16px system-ui,sans-serif;text-align:center;max-width:80%}
-#presX{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:12px;z-index:5;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font:700 18px system-ui;opacity:.16;display:none;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s}
+#presInk{position:fixed;inset:0;z-index:2;pointer-events:none}
+#presMsg{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:11;color:#fff;font:600 16px system-ui,sans-serif;text-align:center;max-width:80%}
+#presBar{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:12px;z-index:12;display:none;gap:8px}
+#pres.on #presBar{display:flex}
+#presBar button{height:40px;padding:0 14px;border-radius:20px;border:0;background:rgba(17,24,39,.55);color:#fff;font:700 14px system-ui;display:inline-flex;align-items:center;cursor:pointer;opacity:.6;transition:opacity .2s,background .2s}
+#presBar button:hover,#presBar button:active{opacity:.95}
+#presBar button.on{background:#14438f;opacity:.97}
+#presPages{position:fixed;top:58px;left:12px;z-index:12;background:#fff;border-radius:12px;box-shadow:0 12px 34px rgba(0,0,0,.45);padding:8px;max-height:72vh;overflow:auto;display:none;grid-template-columns:repeat(4,42px);gap:6px}
+#presPages.on{display:grid}
+#presPages button{width:42px;height:42px;border-radius:8px;border:1px solid #d7deea;background:#f5f8fd;color:#14438f;font:700 15px system-ui;cursor:pointer}
+#presPages button:hover,#presPages button:active{background:#e8effb}
+#presX{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:12px;z-index:12;width:40px;height:40px;border-radius:50%;border:0;background:rgba(17,24,39,.55);color:#fff;font:700 18px system-ui;opacity:.5;display:none;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s}
 #pres.on #presX{display:flex}
-#presX:hover,#presX:active{opacity:.7}
+#presX:hover,#presX:active{opacity:.95}
 #presCh{position:fixed;inset:0;z-index:109;display:none;align-items:center;justify-content:center;background:rgba(12,20,33,.6);font-family:system-ui,sans-serif}
 #presCh.on{display:flex}
 #presCh .card{background:#fff;border-radius:18px;padding:22px;max-width:420px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.4)}
@@ -1595,7 +1604,7 @@ window.__rqOpen=open; // for testing
 <script>
 (function(){
 if(window.presOpen)return;
-var INK={strokes:[],cur:null};
+var INK={strokes:[],cur:null,erase:false};
 function svg(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
 function loadScript(src){return new Promise(function(ok,no){var s=document.createElement('script');s.src=src;s.onload=function(){ok()};s.onerror=function(){no(new Error('load'))};document.head.appendChild(s);setTimeout(function(){no(new Error('timeout'))},15000);});}
 async function loadOpt(src){try{await loadScript(src)}catch(e){}}
@@ -1623,10 +1632,13 @@ async function ensurePptx(){
 function build(){
  if(document.getElementById('pres'))return;
  var p=document.createElement('div');p.id='pres';
- p.innerHTML='<div id="presSlides"></div><canvas id="presInk"></canvas><div id="presMsg"></div><button id="presX" aria-label="Exit presentation">✕</button>';
+ p.innerHTML='<div id="presSlides"></div><canvas id="presInk"></canvas>'
+  +'<div id="presBar"><button id="presPagesBtn" type="button">Pages</button><button id="presErase" type="button">Eraser</button><button id="presClear" type="button">Clear</button></div>'
+  +'<div id="presPages"></div>'
+  +'<div id="presMsg"></div><button id="presX" type="button" aria-label="Exit presentation">✕</button>';
  document.body.appendChild(p);
  var ch=document.createElement('div');ch.id='presCh';
- ch.innerHTML='<div class="card"><h3>Presentation</h3><p>Open a PowerPoint (.pptx). Only a black pen works; tap the faint ✕ to exit.</p>'
+ ch.innerHTML='<div class="card"><h3>Presentation</h3><p>Open a PowerPoint (.pptx). Write with the pen, move around with your finger. Use the buttons at the top to jump between pages, erase, or clear — and the ✕ (top-right) to exit.</p>'
   +'<button class="opt" id="presDev">'+svg('<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/>')+'From this device</button>'
   +'<button class="opt" id="presPhone">'+svg('<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>')+'From phone (QR)</button>'
   +'<button class="x" id="presChX">Cancel</button>'
@@ -1639,18 +1651,30 @@ function build(){
  ch.querySelector('#presPhone').onclick=function(){ch.classList.remove('on');try{phOpen('ppt')}catch(e){}};
  document.getElementById('presX').onclick=presExit;
  var cv=document.getElementById('presInk');
+ function sc(){return [p.scrollLeft||0,p.scrollTop||0];}
+ function ptC(e){var s=sc();return [e.clientX+s[0],e.clientY+s[1]];}
  function rz(){cv.width=innerWidth;cv.height=innerHeight;redraw();}
- function pt(e){return [e.clientX,e.clientY];}
- function redraw(){var x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);x.strokeStyle='#000';x.lineWidth=3;x.lineCap=x.lineJoin='round';INK.strokes.forEach(function(st){x.beginPath();st.forEach(function(q,i){i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]);});x.stroke();});}
- cv.addEventListener('pointerdown',function(e){e.preventDefault();cv.setPointerCapture(e.pointerId);INK.cur=[pt(e)];INK.strokes.push(INK.cur);});
- cv.addEventListener('pointermove',function(e){if(!INK.cur)return;INK.cur.push(pt(e));redraw();});
- cv.addEventListener('pointerup',function(e){INK.cur=null;});
- cv.addEventListener('pointercancel',function(e){INK.cur=null;});
+ function redraw(){var x=cv.getContext('2d'),s=sc();x.clearRect(0,0,cv.width,cv.height);x.lineCap=x.lineJoin='round';
+  INK.strokes.forEach(function(st){x.beginPath();if(st.e){x.globalCompositeOperation='destination-out';x.lineWidth=40;}else{x.globalCompositeOperation='source-over';x.strokeStyle='#000';x.lineWidth=3;}
+   st.p.forEach(function(q,i){var X=q[0]-s[0],Y=q[1]-s[1];i?x.lineTo(X,Y):x.moveTo(X,Y);});x.stroke();});
+  x.globalCompositeOperation='source-over';}
+ // pen/mouse writes; finger (touch) moves around (native scroll). Controls never draw.
+ p.addEventListener('pointerdown',function(e){if(e.target.closest('#presBar,#presPages,#presX'))return;if(e.pointerType==='touch')return;e.preventDefault();try{p.setPointerCapture(e.pointerId)}catch(_){}INK.cur={e:!!INK.erase,p:[ptC(e)]};INK.strokes.push(INK.cur);redraw();});
+ p.addEventListener('pointermove',function(e){if(!INK.cur||e.pointerType==='touch')return;INK.cur.p.push(ptC(e));redraw();});
+ var end=function(){INK.cur=null;};p.addEventListener('pointerup',end);p.addEventListener('pointercancel',end);
+ p.addEventListener('scroll',function(){if(window.__pres&&!redraw._r){redraw._r=1;requestAnimationFrame(function(){redraw._r=0;redraw();});}});
  window.addEventListener('resize',function(){if(window.__pres)rz();});
- build._rz=rz;
+ document.getElementById('presErase').onclick=function(){INK.erase=!INK.erase;this.classList.toggle('on',INK.erase);};
+ document.getElementById('presClear').onclick=function(){INK.strokes=[];INK.cur=null;redraw();var pg=document.getElementById('presPages'),pb=document.getElementById('presPagesBtn');pg.classList.remove('on');pb.classList.remove('on');};
+ document.getElementById('presPagesBtn').onclick=function(){var pg=document.getElementById('presPages'),open=!pg.classList.contains('on');if(open)buildPages();pg.classList.toggle('on',open);this.classList.toggle('on',open);};
+ build._rz=rz;build._redraw=redraw;
 }
-function presEnter(){build();window.__pres=1;document.getElementById('pres').classList.add('on');INK.strokes=[];INK.cur=null;build._rz&&build._rz();var m=document.getElementById('presMsg');m.style.display='block';m.textContent='Opening presentation…';}
-function presExit(){window.__pres=0;var p=document.getElementById('pres');if(p)p.classList.remove('on');var s=document.getElementById('presSlides');if(s)s.innerHTML='';INK.strokes=[];}
+function buildPages(){var host=document.getElementById('presSlides');if(!host)return;var slides=host.querySelectorAll('.slide, .pptx-slide, [data-slide]');if(!slides.length)slides=host.children;var pg=document.getElementById('presPages');pg.innerHTML='';
+ if(!slides.length){pg.innerHTML='<div style="grid-column:1/-1;color:#64748b;font:600 12px system-ui;padding:6px 8px">No slides yet</div>';return;}
+ Array.prototype.forEach.call(slides,function(sl,i){var b=document.createElement('button');b.type='button';b.textContent=i+1;b.onclick=function(){try{sl.scrollIntoView({behavior:'smooth',block:'start'})}catch(_){try{sl.scrollIntoView()}catch(e){}}document.getElementById('presPages').classList.remove('on');document.getElementById('presPagesBtn').classList.remove('on');};pg.appendChild(b);});}
+function presReset(){INK.strokes=[];INK.cur=null;INK.erase=false;var eb=document.getElementById('presErase');if(eb)eb.classList.remove('on');var pg=document.getElementById('presPages'),pb=document.getElementById('presPagesBtn');if(pg){pg.classList.remove('on');pg.innerHTML='';}if(pb)pb.classList.remove('on');}
+function presEnter(){build();window.__pres=1;document.getElementById('pres').classList.add('on');presReset();build._rz&&build._rz();var m=document.getElementById('presMsg');m.style.display='block';m.textContent='Opening presentation…';}
+function presExit(){window.__pres=0;var p=document.getElementById('pres');if(p)p.classList.remove('on');var s=document.getElementById('presSlides');if(s)s.innerHTML='';presReset();}
 async function presStart(file){
  presEnter();
  var url=null;try{url=URL.createObjectURL(file)}catch(e){}
