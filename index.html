@@ -850,6 +850,8 @@ cv.addEventListener('pointermove',e=>{const o=P2.get(e.pointerId);if(!o)return;c
 const up=e=>{P2.delete(e.pointerId);if(P2.size<2)GG.pz=null};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 cv.addEventListener('wheel',e=>{e.preventDefault();const q=loc(e);ggZoom(e.deltaY<0?1.15:1/1.15,q[0],q[1])},{passive:false})})();
 addEventListener('resize',()=>{if($('#gg').hidden)return;if(GG.mode=='off')ggDraw();else ggSize()});
+addEventListener('online',()=>{try{if(!$('#gg').hidden&&GG.mode!=='on')ggOnline()}catch(e){}});
+addEventListener('offline',()=>{try{if(!$('#gg').hidden&&GG.mode==='on')ggOffline('No internet: showing the offline graph.')}catch(e){}});
 function ggToBoard(src,iw,ih){const i=new Image();i.onload=()=>{const p=WB.page(),q=Math.min(1,700/Math.max(iw,ih)),w=iw*q,h=ih*q;A=WB;mut(a=>a.push({k:'i',img:i,src,x:(WB.W/2-p.ox)/p.z-w/2,y:(WB.H/2-p.oy)/p.z-h/2,w,h,c:'#000',al:1}));ggClose();toast('Graph added to the page');log('info','Graph copied to board')};i.src=src}
 function ggCopy(){try{if(GG.mode=='on'){if(!GG.api){toast('GeoGebra is still loading');return}const b=GG.api.getPNGBase64(1,false,72);if(!b)throw 0;const s='data:image/png;base64,'+b,im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0);ggToBoard(c.toDataURL('image/jpeg',.9),c.width,c.height)};im.src=s;return}
 const cv=$('#ggCv'),c=document.createElement('canvas');c.width=Math.round(cv.clientWidth);c.height=Math.round(cv.clientHeight);ggDraw(c);ggToBoard(c.toDataURL('image/jpeg',.9),c.width,c.height)}catch(e){toast('Could not copy the graph');log('error','Graph copy failed: '+(e&&e.message||e))}}
