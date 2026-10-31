@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.66',BD='31/10/60';
+const VER='1.1',BUILD='2026.10.31.67',BD='31/10/61';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -1398,7 +1398,7 @@ function cancelStroke(){
 
 function penTool(){try{return S.tool==='pen'||S.tool==='pen2'||S.tool==='laser';}catch(e){return false;}}
 
-function realToolbar(){var out=[];try{var MAP={'m:pen':['f:pen','pen'],'m:graphic':['f:graphic','shp'],'m:tools':['f:tools','tool'],'m:bg':['f:bg','bg'],'m:pages':['f:pages','pgs'],'m:images':['f:images','img']};AD.tbo.forEach(function(id){if(AD.tbh&&AD.tbh.indexOf(id)>=0)return;if(typeof TI!=='undefined'&&TI[id]){out.push([TI[id][0],I[TI[id][2]]])}else if(MAP[id]){out.push([MAP[id][0],I[MAP[id][1]]])}});}catch(e){}if(!out.length)out=TOOLS;return out;}
+function realToolbar(){var out=[];try{var MAP={'m:pen':['f:pen','pen'],'m:graphic':['f:graphic','shp'],'m:tools':['f:tools','tool'],'m:bg':['f:bg','bg'],'m:pages':['f:pages','pgs'],'m:images':['f:images','img']};AD.tbo.forEach(function(id){if(AD.tbh&&AD.tbh.indexOf(id)>=0)return;if(MAP[id]){out.push([MAP[id][0],I[MAP[id][1]]])}});}catch(e){}if(!out.length)out=[['f:pen',I.pen],['f:graphic',I.shp],['f:tools',I.tool],['f:bg',I.bg],['f:pages',I.pgs],['f:images',I.img]];return out;}
 function ensure(){
  if(el)return;
  el=document.createElement('div');el.id='rqm';document.body.appendChild(el);
