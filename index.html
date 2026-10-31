@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.72',BD='31/10/66';
+const VER='1.1',BUILD='2026.10.31.73',BD='31/10/67';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -934,9 +934,9 @@ async function phOpen(m){phClose();PHN.mode=m;$('#ph').hidden=false;$('#phT').te
 const c=$('#phQ');c.getContext('2d').clearRect(0,0,c.width,c.height);phSt('');if(!navigator.onLine){phSt('Needs an internet connection');return}
 const AL='ABCDEFGHJKMNPQRSTUVWXYZ23456789',rb=new Uint8Array(8);crypto.getRandomValues(rb);const code=[...rb].map(b=>AL[b%AL.length]).join('');PHN.code=code;PHN.top=code.toLowerCase();const top=PHN.top;$('#phC').textContent='ntfy.sh/'+top;$('#phL').textContent=tl('On a laptop or PC: go to this address, click the paperclip, attach the file (under 2 MB) and send');
 try{await phQR(upBase()+'send.html#t='+top+'&m='+m+'&l='+(S.lang||'en'))}catch(e){if(PHN.top==top)phSt('Could not load the QR code. Check the internet.');log('warn','QR code could not load');return}
-if(PHN.top!=top)return;phSt(m=='p'?'Waiting for a photo...':'Waiting for a PDF...');
+if(PHN.top!=top)return;phSt(m=='p'?'Waiting for a photo...':m=='ppt'?'Waiting for a PowerPoint...':'Waiting for a PDF...');
 try{PHN.es=new EventSource('https://ntfy.sh/'+top+'/sse');PHN.es.onmessage=ev=>{try{const e=JSON.parse(ev.data);if(e.event=='message'&&e.attachment&&PHN.top==top)phRecv(e.attachment)}catch(_){}}}catch(e){phSt('Could not receive the file')}
-PHN.t=setTimeout(phClose,20*60000);log('info','Waiting for '+(m=='p'?'a photo':'a PDF')+' from a phone')}
+PHN.t=setTimeout(phClose,20*60000);log('info','Waiting for '+(m=='p'?'a photo':m=='ppt'?'a PowerPoint':'a PDF')+' from a phone')}
 async function phRecv(a){if(PHN.busy)return;PHN.busy=true;phSt('Receiving...');try{if(+a.size>16*1024*1024)throw new Error('too big');const r=await fetch(a.url);if(!r.ok)throw new Error('HTTP '+r.status);log('info','File received: '+(a.name||'')+' ('+Math.round((+a.size||0)/1024)+' KB)');const b=await r.blob(),ty=b.type||a.type||'';
 if(PHN.mode=='ppt'){const f=new File([b],a.name||'slides.pptx',{type:a.type||''});phClose();try{window.presStart&&window.presStart(f)}catch(e){}phSt('Opening presentation');log('info','Presentation received from a phone');return}
 if(PHN.mode=='p'){if(!/^image\//.test(ty)&&!/^image\//.test(a.type||''))throw new Error('not an image');await phPhoto(b);phSt('Photo added to the page');toast('Photo added to the page');log('info','Photo received from a phone')}

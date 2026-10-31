@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.31.72","disp":"31/10/66","force":true,"notes":"Improvements","items":["Presentation mode (Tools) for PowerPoint, black pen only","Device approval / whitelist and maintenance mode (controlled from the admin panel)","Import an offline update package from the admin menu"]}
+{"version":"1.1","build":"2026.10.31.73","disp":"31/10/67","force":true,"notes":"Improvements","items":["PowerPoint from phone now works: the QR page accepts .pptx and the board shows the right \"Waiting for a PowerPoint\" message"]}
