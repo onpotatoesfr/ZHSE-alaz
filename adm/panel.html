@@ -116,7 +116,7 @@ aside .hd{display:flex;align-items:center;gap:8px;padding:12px 12px 8px}aside .h
 <div id="toast"></div>
 <script>
 (()=>{
-const PANEL_VER='13';
+const PANEL_VER='14';
 const ST='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4',CMD=ST+'-c',RSP=ST+'-r';
 const UPB=atob('aHR0cHM6Ly9vbnBvdGF0b2VzZnIuZ2l0aHViLmlvL1pIU0UtYWxhei8=');
 const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -144,7 +144,7 @@ $('#keyDot').className='dot '+(ok?'on':ok===false?'warn':'');$('#keyTxt').textCo
 let gateOk=null;function applyGate(ok){gateOk=ok;['reloadP','devChip','histChip','wgChip'].forEach(function(id){var el=$('#'+id);if(el)el.style.display=ok===true?'':'none'});const g=$('#gate');if(!g)return;if(ok){g.hidden=true;if(!B._loaded){B._loaded=true;loadBoards(false)}}else{g.hidden=false;$('#gateMsg').innerHTML=ok===false?'Your admin key isn\'t on the boards yet. Open <b>Key</b> (top-right), send the code to Claude, publish it, then click <b>Check again</b>. The boards and controls stay hidden until then.':'Couldn\'t check with GitHub — are you online? The boards stay hidden until the key is confirmed.'}}
 $('#gateCode').onclick=()=>$('#keyM').hidden=false;$('#gateChk').onclick=()=>{toast('Checking\u2026');keyState()};setInterval(()=>{if(gateOk!==true)keyState()},20000);
 $('#keyChip').onclick=()=>$('#keyM').hidden=false;$('#keyClose').onclick=()=>$('#keyM').hidden=true;
-function wgFill(){var H='';for(var i=1;i<=12;i++)H+='<option>'+i+'</option>';var Mn=['00','15','30','45'].map(m=>'<option>'+m+'</option>').join('');['wgHiH','wgByeH'].forEach(id=>{var e=$('#'+id);if(e)e.innerHTML=H;});['wgHiMn','wgByeMn'].forEach(id=>{var e=$('#'+id);if(e)e.innerHTML=Mn;});}
+function wgFill(){var H='';for(var i=1;i<=12;i++)H+='<option>'+i+'</option>';var Mn='';for(var k=0;k<60;k++)Mn+='<option>'+(k<10?'0'+k:k)+'</option>';['wgHiH','wgByeH'].forEach(id=>{var e=$('#'+id);if(e)e.innerHTML=H;});['wgHiMn','wgByeMn'].forEach(id=>{var e=$('#'+id);if(e)e.innerHTML=Mn;});}
 function wgSetT(pfx,t){var m=/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(t||'');if(!m)m=[0,'8','00','AM'];$('#'+pfx+'H').value=String(+m[1]||8);$('#'+pfx+'Mn').value=m[2]||'00';$('#'+pfx+'AP').value=(m[3]||'AM').toUpperCase();}
 function wgGetT(pfx){return $('#'+pfx+'H').value+':'+$('#'+pfx+'Mn').value+' '+$('#'+pfx+'AP').value;}
 $('#wgChip').onclick=()=>{wgFill();var c={};try{c=JSON.parse(localStorage.getItem('zhse-wg')||'{}')}catch(e){}$('#wgOn').checked=!!c.on;$('#wgHiMsg').value=c.hiMsg||'';$('#wgByeMsg').value=c.byeMsg||'';wgSetT('wgHi',c.hiT||'8:00 AM');wgSetT('wgBye',c.byeT||'3:00 PM');$('#wgMsg').textContent='';$('#wgM').hidden=false;};
