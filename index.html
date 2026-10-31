@@ -294,7 +294,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.81',BD='31/10/75';
+const VER='1.1',BUILD='2026.10.31.82',BD='31/10/76';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -682,7 +682,7 @@ const ht=ADH.map(([k,l])=>`<div class="ar"><span class="al">${l}</span><button c
 const chk=ADv.chk?ADv.chk.map(([n,r,t])=>`<div class="adres"><b>${r===true?'&#10003;':r===false?'&#10007;':'&#8226;'}</b>${n}: ${t}</div>`).join(''):'<div class="adn">Not run yet.</div>';
 const lg=ADv.logs?`<div class="adlog">${LOG.length?LOG.slice().reverse().slice(0,120).map(([t,l,m])=>new Date(t).toLocaleString()+'  ['+l+']  '+m.replace(/</g,'&lt;')).join('\n'):'No log entries.'}</div><div class="ar"><button class="ab" data-a="ad_logc">Copy</button><button class="ab" data-a="ad_logx">Clear logs</button></div>`:'';
 const FULL=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x">Close</button></div>${ADv.msg?`<div class="adn" style="color:var(--ac);font-weight:700">${ADv.msg}</div>`:''}
-<h3>About</h3><div class="adr"><span>Version</span>${VER}</div><div class="adr"><span>Build number</span>${BD}</div>
+<h3>About</h3><div class="adr"><span>Version</span>${VER}</div><div class="adr"><span>Build number</span>${BD}</div><div class="adr"><span>Board ID</span>${BS.id}</div>
 <h3>Toolbar layout</h3><div class="ar"><span class="al">Lock toolbar customization (also locks moving and hiding the toolbar)</span><button class="ab${AD.lock?' on':''}" data-a="ad_lock">${AD.lock?'Locked':'Unlocked'}</button></div>${tb}
 <h3>Quick-access tools (extra row at the top, up to 6)</h3><div class="ar">${qa}</div>
 <h3>Visible tools</h3>${ht}
