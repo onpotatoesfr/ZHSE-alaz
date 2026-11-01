@@ -280,7 +280,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <div id="rc"><div class="lkb"><h2 id="rct"></h2><div id="rcp">Press here</div><div id="rcv"></div><div id="rcb"></div></div></div>
 <div id="ec"></div>
 
-<div id="ap"><div class="lkb"><h2>Admin password</h2><input id="api" type="password" autocomplete="off" aria-label="Admin password"><button class="li" id="apb" style="justify-content:center">Enter</button><button class="li" id="apc" style="justify-content:center">Cancel</button><p id="ape" role="alert"></p></div></div>
+<div id="ap"><div class="lkb"><h2>Admin password</h2><input id="api" type="password" inputmode="text" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" style="-webkit-text-security:disc;text-security:disc" aria-label="Admin password"><button class="li" id="apb" style="justify-content:center">Enter</button><button class="li" id="apc" style="justify-content:center">Cancel</button><p id="ape" role="alert"></p></div></div>
 <div id="ad"><div id="adc"></div></div>
 <div id="tt"><canvas id="ttc"></canvas><div id="tth"></div><div id="tts"></div><div id="ttb"><button data-a="ad_ttr">Restart</button><button data-a="ad_ttx">Close</button></div></div>
 <div id="tm" hidden></div><div id="sp" hidden></div>
@@ -297,7 +297,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.87',BD='31/10/81';
+const VER='1.1',BUILD='2026.10.31.88',BD='31/10/82';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -672,7 +672,7 @@ function bsHTML(){const L=BS.latest,rows=(BS.list||[]).map(o=>{const on=Date.now
 return `<h3>Classes</h3><div class="adn">Each board reports in every 5 minutes while the app is open. Boards not seen in the last 12 hours are not listed. Log shows the errors each board reported in the last 12 hours.</div><div class="ar"><span class="al">This board's class name</span><input type="text" id="bsn" maxlength="40" placeholder="e.g. Class 12A-F" value="${bsEsc(bsName())}" aria-label="This board's class name"><button class="ab" data-a="ad_bsn">Save name</button></div><div class="adn">Update sends the newest published build to that board (or to every board). It shows a 5-second notice, then installs.</div><div class="ar"><button class="ab" data-a="ad_bsl">Refresh</button><button class="ab on" data-a="ad_bsa">Update all</button>${L?`<span class="adn">Latest published: build ${bsEsc(L.disp||L.build)}</span>`:''}</div>${BS.msg?`<div class="adn">${bsEsc(BS.msg)}</div>`:''}${BS.list?(rows||'<div class="adn">No boards have reported yet.</div>'):''}`}
 async function upRemove(){try{if(window.ZHSE&&ZHSE.clearUpdate)ZHSE.clearUpdate();await caches.delete('zhse-update');localStorage.removeItem('wbUpd')}catch(e){}UPS.avail=null;UPS.msg='Built-in version restored. Restarting...';log('info','Update removed');adRender();setTimeout(()=>location.reload(),900)}
 /* ---- admin menu ---- */
-const AH='81a6607bec39437b61567c70c776eb92218045bad91257ffea5dbbbff22d19dc',AF=2811130989,AT={n:0,t:0},ADv={chk:null,logs:false,upd:false,conf:'',msg:''};
+const AH='3bcb7d967f6c043edab9b2b0bdd0496f2ce5709789739e0498c35940284f9fda',AF=804838252,AT={n:0,t:0},ADv={chk:null,logs:false,upd:false,conf:'',msg:''};
 document.addEventListener('click',e=>{if(!e.target.closest('.mb'))return;const n=Date.now();if(n-AT.t>8000)AT.n=0;AT.t=n;AT.n++;if(AT.n>=11){AT.n=0;const a=$('#ap');a.style.display='flex';$('#api').value='';$('#ape').textContent='';setTimeout(()=>$('#api').focus(),60)}});
 async function apGo(){const v=$('#api').value;let ok=false;try{ok=crypto.subtle?(await sha(v))==AH:fnv(v)==AF}catch(e){ok=fnv(v)==AF}
 if(ok){$('#ap').style.display='none';log('info','Admin menu opened');adOpen()}else{log('warn','Admin password rejected');$('#ape').textContent='Wrong password';$('#api').value='';$('#api').focus()}}
