@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.11.03.94","disp":"03/11/88","force":true,"notes":"Improvements","items":["Presentation now shows one slide at a time with animations","Swipe right for the next slide, swipe left to go back","The black pen still works in presentation as before"]}
+{"version":"1.1","build":"2026.11.03.95","disp":"03/11/89","force":true,"notes":"Improvements","items":["You can now set how long to hold for the quick menu, in the admin menu (in milliseconds)"]}
