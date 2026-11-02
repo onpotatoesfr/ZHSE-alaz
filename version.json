@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.11.03.93","disp":"03/11/87","force":true,"notes":"Improvements","items":["Fixed: hold the logo screen for 4 seconds to enter the admin passcode and unlock a board (now works on the approval and maintenance screens)"]}
+{"version":"1.1","build":"2026.11.03.94","disp":"03/11/88","force":true,"notes":"Improvements","items":["Presentation now shows one slide at a time with animations","Swipe right for the next slide, swipe left to go back","The black pen still works in presentation as before"]}
