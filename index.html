@@ -624,7 +624,7 @@ const BSU='https://ntfy.sh/zhse-a-st-66fc6d0b33b1d4f5fdc55ec4';
 const BS={id:(()=>{let i='';try{i=localStorage.getItem('wbid')||''}catch(e){}if(!i){i=Math.random().toString(36).slice(2,8).toUpperCase();try{localStorage.setItem('wbid',i)}catch(e){}}return i})(),list:null,latest:null,msg:'',busy:false};
 const bsName=()=>{let n='';try{n=localStorage.getItem('wbn')||''}catch(e){}return n||('Board '+BS.id)};
 const bsEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-async function bsBeat(force){if(!navigator.onLine)return;let lb=0;try{lb=+localStorage.getItem('wbhb')||0}catch(e){}if(!force&&Date.now()-lb<30*60000)return;try{localStorage.setItem('wbhb',String(Date.now()))}catch(e){}try{await fetch(BSU,{method:'POST',body:JSON.stringify({z:1,id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER})})}catch(e){}}
+async function bsBeat(force){if(!navigator.onLine)return;let lb=0;try{lb=+localStorage.getItem('wbhb')||0}catch(e){}if(!force&&Date.now()-lb<30*60000)return;try{localStorage.setItem('wbhb',String(Date.now()))}catch(e){}var zs=zState();try{await fetch(BSU,{method:'POST',body:JSON.stringify({z:1,id:BS.id,n:bsName(),b:BUILD,d:BD,v:VER,ap:zs.a?1:0,mt:zs.m?1:0,wl:zs.w?1:0})})}catch(e){}}
 setTimeout(()=>bsBeat(),20000);addEventListener('online',()=>setTimeout(()=>bsBeat(),5000));
 /* ---- scheduled welcome / goodbye screens (one setting for all boards, from the admin panel) ---- */
 var WG={on:false,hiMsg:'',hiT:'',byeMsg:'',byeT:''};
@@ -665,7 +665,7 @@ setTimeout(bsListen,8000);setInterval(()=>{if(navigator.onLine&&(!bsES||bsES.rea
 async function bsSend(to){ADv.msg='Sending...';adRender();try{const r=await fetch(BSC,{method:'POST',body:JSON.stringify({z:2,cmd:'up',to,t:Date.now()})});ADv.msg=r.ok?(to==='all'?'Update sent to all boards. Each shows a 5-second notice, then installs.':'Update sent to '+((BS.list||[]).find(o=>o.id==to[0])||{n:to[0]}).n+'.'):'Could not send (HTTP '+r.status+').';log('info','Admin update sent to '+(to==='all'?'all':to.join(',')))}catch(e){ADv.msg='Could not send. Check the internet connection.'}adRender()}
 const BSE={q:[],t:0,open:{}};
 function bsErr(m){BSE.q.push([Date.now(),m.slice(0,250)]);if(BSE.q.length>30)BSE.q.splice(0,BSE.q.length-30);if(!BSE.t)BSE.t=setTimeout(bsFlush,Math.max(20000,(BSE.lf||0)+1800000-Date.now()))}
-async function bsFlush(){BSE.t=0;if(!BSE.q.length)return;if(!navigator.onLine){BSE.t=setTimeout(bsFlush,60000);return}const e=BSE.q.slice(0,10);try{const r=await fetch(BSU,{method:'POST',body:JSON.stringify({z:3,id:BS.id,n:bsName(),b:BUILD,d:BD,e})});if(r.ok){BSE.q.splice(0,e.length);BSE.lf=Date.now()}}catch(x){}if(BSE.q.length)BSE.t=setTimeout(bsFlush,1800000)}
+async function bsFlush(){BSE.t=0;if(!BSE.q.length)return;if(!navigator.onLine){BSE.t=setTimeout(bsFlush,60000);return}const e=BSE.q.slice(0,10);try{const zs=zState();const r=await fetch(BSU,{method:'POST',body:JSON.stringify({z:3,id:BS.id,n:bsName(),b:BUILD,d:BD,e,ap:zs.a?1:0,mt:zs.m?1:0,wl:zs.w?1:0})});if(r.ok){BSE.q.splice(0,e.length);BSE.lf=Date.now()}}catch(x){}if(BSE.q.length)BSE.t=setTimeout(bsFlush,1800000)}
 window.bsErr=bsErr;
 function bsAgo(t){const s=Math.max(0,Math.round(Date.now()/1000-t));if(s<90)return'just now';const m=Math.round(s/60);if(m<60)return m+' min ago';const h=Math.round(m/60);return h+' h ago'}
 function bsHTML(){const L=BS.latest,rows=(BS.list||[]).map(o=>{const on=Date.now()/1000-o.t<660,cur=!L||!bnew(L.build,o.b);return `<div class="ar"><span class="al"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:${on?'#16A34A':'#9CA3AF'}"></span>${bsEsc(o.n)}${o.id==BS.id?' (this board)':''}</span><span style="min-width:120px">${on?'Online':'Last seen '+bsAgo(o.t)}</span><span style="min-width:150px;font-weight:700;color:${cur?'#16A34A':'#D97706'}">Build ${bsEsc(o.d||o.b)} ${cur?'&#10003; up to date':'&#8593; needs update'}</span><button class="ab" data-a="ad_bsu:${bsEsc(o.id)}"${cur?' disabled':''}>Update</button><button class="ab${BSE.open[o.id]?' on':''}" data-a="ad_bsg:${bsEsc(o.id)}">Log (${((BS.logs||{})[o.id]||[]).length})</button></div>${BSE.open[o.id]?`<div class="adlog">${((BS.logs||{})[o.id]||[]).length?BS.logs[o.id].map(x=>new Date(x[0]).toLocaleString()+'  '+bsEsc(x[1])).join('\n'):'No errors reported in the last 12 hours.'}</div>`:''}`}).join('');
@@ -1118,10 +1118,10 @@ else if(n=='closeAll'){fly(null);closePops();try{$('#cal').hidden=true;ggClose()
 else if(n=='restart'){try{save(true);saveS();saveAD()}catch(e){}setTimeout(()=>location.reload(),300)}
 else if(n=='toolbarReset'){AD.tbo=TBD.slice();AD.tbh=[];AD.tbs={};AD.qa=[];S.hid=false;S.tx=10;S.ty=10;saveAD();saveS();panel();posPanel()}
 else if(n=='wg'){wgSet(a)}
-else if(n=='approve'){try{localStorage.setItem('wbAppr','1')}catch(e){}zlock();log('info','Device approved')}
-else if(n=='revoke'){try{localStorage.removeItem('wbAppr')}catch(e){}zlock();log('info','Device approval revoked')}
-else if(n=='wlEnforce'){try{a.v?localStorage.setItem('wbWL','1'):localStorage.removeItem('wbWL')}catch(e){}zlock();log('info','Whitelist enforce '+(a.v?'on':'off'))}
-else if(n=='maint'){try{a.v?localStorage.setItem('wbMaint','1'):localStorage.removeItem('wbMaint')}catch(e){}zlock();log('info','Maintenance '+(a.v?'on':'off'))}
+else if(n=='approve'){try{localStorage.setItem('wbAppr','1')}catch(e){}zlock();bsBeat(true);log('info','Device approved')}
+else if(n=='revoke'){try{localStorage.removeItem('wbAppr')}catch(e){}zlock();bsBeat(true);log('info','Device approval revoked')}
+else if(n=='wlEnforce'){try{a.v?localStorage.setItem('wbWL','1'):localStorage.removeItem('wbWL')}catch(e){}zlock();bsBeat(true);log('info','Whitelist enforce '+(a.v?'on':'off'))}
+else if(n=='maint'){try{a.v?localStorage.setItem('wbMaint','1'):localStorage.removeItem('wbMaint')}catch(e){}zlock();bsBeat(true);log('info','Maintenance '+(a.v?'on':'off'))}
 log('info','Remote action: '+n)}
 function raExec(c,a){if(c=='set'&&a)raSet(a.k,a.v);else if(c=='act'&&a)raAct(a.n,a)}
 function raBanner(t,secs){let b=$('#amsg');if(b)b.remove();if(!t)return;b=document.createElement('div');b.id='amsg';b.setAttribute('role','alert');b.innerHTML='<div class="amsg-c"><div class="amsg-t"></div><button class="amsg-x" aria-label="Close">'+ic(I.x,20)+'</button></div>';b.querySelector('.amsg-t').textContent=t;b.querySelector('.amsg-x').onclick=()=>b.remove();document.body.append(b);if(secs>0)setTimeout(()=>{if(b.isConnected)b.remove()},secs*1000)}
