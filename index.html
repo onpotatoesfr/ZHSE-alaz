@@ -299,7 +299,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.11.03.92',BD='03/11/86';
+const VER='1.1',BUILD='2026.11.03.93',BD='03/11/87';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -663,10 +663,12 @@ function zShow(kind){var e=document.getElementById('zblock');if(!e){e=document.c
  var id='';try{id=BS.id||''}catch(x){}var lg='';try{var L=document.getElementById('lgo');if(L&&L.src)lg='<img src="'+L.src+'" alt="">'}catch(x){}var nm='';try{nm=bsName()}catch(x){}
  e.innerHTML='<div class="zb-c">'+lg+'<div class="zb-t">'+(kind=='maint'?'Under maintenance':'Waiting for approval')+'</div>'+(kind=='maint'?'<div class="zb-s">This board is temporarily unavailable.</div>':'<div class="zb-id">Board ID: '+id+(nm?' \u00b7 '+nm:'')+'</div><div class="zb-s">Give this ID to the admin to approve this board.</div>')+'</div>';
  e.style.display='flex';e.dataset.kind=kind;
- if(kind=='wl'){try{if(!zShow._beat){zShow._beat=1;if(window.bsBeat)bsBeat(true)}}catch(x){}
-  var lgEl=e.querySelector('img')||e.querySelector('.zb-c'),ht=null;var dn=function(){clearTimeout(ht);ht=setTimeout(zAskPw,4000)},cx=function(){clearTimeout(ht)};
-  if(lgEl){lgEl.addEventListener('pointerdown',dn);['pointerup','pointercancel','pointerleave'].forEach(function(ev){lgEl.addEventListener(ev,cx)})}
- }}
+ if(kind=='wl'){try{if(!zShow._beat){zShow._beat=1;if(window.bsBeat)bsBeat(true)}}catch(x){}}
+ if(!e._hold){e._hold=1;var ht=null,hs=null;var cx=function(){clearTimeout(ht);hs=null};
+  e.addEventListener('pointerdown',function(ev){if(ev.target&&ev.target.closest&&ev.target.closest('#zpw'))return;hs=[ev.clientX,ev.clientY];clearTimeout(ht);ht=setTimeout(zAskPw,4000);try{e.setPointerCapture(ev.pointerId)}catch(_){}});
+  e.addEventListener('pointermove',function(ev){if(hs&&Math.hypot(ev.clientX-hs[0],ev.clientY-hs[1])>40)cx()});
+  e.addEventListener('pointerup',cx);e.addEventListener('pointercancel',cx)}
+ }
 function zAskPw(){var e=document.getElementById('zblock');if(!e||e.style.display=='none'||e.querySelector('#zpw'))return;var c=e.querySelector('.zb-c');if(!c)return;var w=document.createElement('div');w.id='zpw';w.style.cssText='margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap';w.innerHTML='<input type="password" id="zpwi" placeholder="Admin password" style="height:42px;border:1px solid #cbd5e1;border-radius:8px;padding:0 12px;font:600 15px system-ui"><button id="zpwb" style="height:42px;border:0;border-radius:8px;padding:0 16px;background:#14438f;color:#fff;font:700 14px system-ui;cursor:pointer">Unlock</button>';c.appendChild(w);var go=async function(){var i=document.getElementById('zpwi'),v=i?i.value:'';var ok=false;try{ok=crypto.subtle?(await sha(v))==AH:fnv(v)==AF}catch(x){try{ok=fnv(v)==AF}catch(_){}}if(ok){try{localStorage.setItem('wbAppr','1');localStorage.removeItem('wbMaint')}catch(_){}try{log('info','Board unlocked locally by owner')}catch(_){}zlock()}else if(i){i.value='';i.placeholder='Wrong password'}};document.getElementById('zpwb').onclick=go;var ii=document.getElementById('zpwi');if(ii){ii.addEventListener('keydown',function(ev){if(ev.key=='Enter')go()});try{ii.focus()}catch(_){}}}
 function zHide(){var e=document.getElementById('zblock');if(e)e.style.display='none'}
 function zlock(){var s=zState();if(s.m){zShow('maint');return}if(!s.a){zShow('wl');return}zHide()}
@@ -1417,7 +1419,8 @@ document.body.append(w);var ok=w.querySelector('.wn-ok');ok.onclick=function(){t
 #wg.bye .wg-kick{color:#bcd4f5}
 #wg .wg-msg{font:800 clamp(34px,8vw,82px)/1.08 system-ui,sans-serif}
 @keyframes wgfade{from{opacity:0}to{opacity:1}}
-#zblock{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg,#14438F,#0C2C69);font-family:system-ui,sans-serif}
+#zblock{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg,#14438F,#0C2C69);font-family:system-ui,sans-serif;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#zblock img{-webkit-user-drag:none;user-drag:none;pointer-events:none}
 #zblock .zb-c{text-align:center;padding:24px;max-width:90%}
 #zblock img{height:120px;width:auto;margin-bottom:18px}
 #zblock .zb-t{font:800 28px/1.1 system-ui,sans-serif;color:#fff}
