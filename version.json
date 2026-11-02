@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.11.03.95","disp":"03/11/89","force":true,"notes":"Improvements","items":["You can now set how long to hold for the quick menu, in the admin menu (in milliseconds)"]}
+{"version":"1.1","build":"2026.11.03.96","disp":"03/11/90","force":true,"notes":"Improvements","items":["You can now set the line-straighten hold time (in milliseconds)","The quick-menu and line-straighten hold times are together under Pens & input in the admin menu"]}
