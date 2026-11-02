@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.10.31.88","disp":"31/10/82","force":true,"notes":"Improvements","items":["Admin code updated; the code is hidden as you type it"]}
+{"version":"1.1","build":"2026.11.02.89","disp":"02/11/83","force":true,"notes":"Improvements","items":["Fixed: boards now accept approval and other admin commands even if the board's clock is wrong"]}

@@ -297,7 +297,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.10.31.88',BD='31/10/82';
+const VER='1.1',BUILD='2026.11.02.89',BD='02/11/83';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -646,7 +646,7 @@ function zShow(kind){var e=document.getElementById('zblock');if(!e){e=document.c
   var lgEl=e.querySelector('img')||e.querySelector('.zb-c'),ht=null;var dn=function(){clearTimeout(ht);ht=setTimeout(zAskPw,4000)},cx=function(){clearTimeout(ht)};
   if(lgEl){lgEl.addEventListener('pointerdown',dn);['pointerup','pointercancel','pointerleave'].forEach(function(ev){lgEl.addEventListener(ev,cx)})}
  }}
-function zAskPw(){var e=document.getElementById('zblock');if(!e||e.style.display=='none'||e.querySelector('#zpw'))return;var c=e.querySelector('.zb-c');if(!c)return;var w=document.createElement('div');w.id='zpw';w.style.cssText='margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap';w.innerHTML='<input type="password" id="zpwi" placeholder="Admin password" style="height:42px;border:1px solid #cbd5e1;border-radius:8px;padding:0 12px;font:600 15px system-ui"><button id="zpwb" style="height:42px;border:0;border-radius:8px;padding:0 16px;background:#14438f;color:#fff;font:700 14px system-ui;cursor:pointer">Unlock</button>';c.appendChild(w);var go=async function(){var i=document.getElementById('zpwi'),v=i?i.value:'';var ok=false;try{ok=crypto.subtle?(await sha(v))==AH:fnv(v)==AF}catch(x){try{ok=fnv(v)==AF}catch(_){}}if(ok){try{localStorage.setItem('wbAppr','1')}catch(_){}try{log('info','Board approved locally by owner')}catch(_){}zlock()}else if(i){i.value='';i.placeholder='Wrong password'}};document.getElementById('zpwb').onclick=go;var ii=document.getElementById('zpwi');if(ii){ii.addEventListener('keydown',function(ev){if(ev.key=='Enter')go()});try{ii.focus()}catch(_){}}}
+function zAskPw(){var e=document.getElementById('zblock');if(!e||e.style.display=='none'||e.querySelector('#zpw'))return;var c=e.querySelector('.zb-c');if(!c)return;var w=document.createElement('div');w.id='zpw';w.style.cssText='margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap';w.innerHTML='<input type="password" id="zpwi" placeholder="Admin password" style="height:42px;border:1px solid #cbd5e1;border-radius:8px;padding:0 12px;font:600 15px system-ui"><button id="zpwb" style="height:42px;border:0;border-radius:8px;padding:0 16px;background:#14438f;color:#fff;font:700 14px system-ui;cursor:pointer">Unlock</button>';c.appendChild(w);var go=async function(){var i=document.getElementById('zpwi'),v=i?i.value:'';var ok=false;try{ok=crypto.subtle?(await sha(v))==AH:fnv(v)==AF}catch(x){try{ok=fnv(v)==AF}catch(_){}}if(ok){try{localStorage.setItem('wbAppr','1');localStorage.removeItem('wbMaint')}catch(_){}try{log('info','Board unlocked locally by owner')}catch(_){}zlock()}else if(i){i.value='';i.placeholder='Wrong password'}};document.getElementById('zpwb').onclick=go;var ii=document.getElementById('zpwi');if(ii){ii.addEventListener('keydown',function(ev){if(ev.key=='Enter')go()});try{ii.focus()}catch(_){}}}
 function zHide(){var e=document.getElementById('zblock');if(e)e.style.display='none'}
 function zlock(){var s=zState();if(s.m){zShow('maint');return}if(!s.a){zShow('wl');return}zHide()}
 zlock();setInterval(zlock,15000);
@@ -1069,13 +1069,14 @@ const pairs=objs.map(o=>[nw.get(o),o.m||I3]),V=w.V,t0=performance.now();cancelAn
 const step=()=>{const t=Math.min(1,(performance.now()-t0)/220),e=1-Math.pow(1-t,3),Mt=I3.map((v,i)=>v+(M[i]-v)*e);pairs.forEach(([n,m0])=>{n.m=mm(Mt,m0)});draw(V);if(t<1)BWW.anim=requestAnimationFrame(step);else{BWW.anim=0;persist()}};BWW.anim=requestAnimationFrame(step);log('info','Word neatened')}
 /* ---- remote admin (PC panel): signed commands + direct encrypted live view/control ---- */
 const RA={key:null,seen:new Map(),pc:null,ch:null,live:false,lt:0,fid:0,sending:false,ptr:null,lastWho:0,lastPing:0};
+try{(JSON.parse(localStorage.getItem('wbra')||'[]')||[]).forEach(function(n){RA.seen.set(n,0)})}catch(e){}
 const RAT=BSU+'-r';
 const b64u8=b=>Uint8Array.from(atob(b),c=>c.charCodeAt(0));
 async function raKey(){if(!(window.crypto&&crypto.subtle))return null;let k='';try{const r=await fetch(upBase()+'admin.json?t='+Date.now(),{cache:'no-store'});if(r.ok){const j=await r.json();if(j&&j.k){k=String(j.k);try{localStorage.setItem('wbak',k)}catch(e){}}}}catch(e){}
 if(!k){try{k=localStorage.getItem('wbak')||''}catch(e){}}if(!k)return null;try{RA.key=await crypto.subtle.importKey('raw',b64u8(k),{name:'ECDSA',namedCurve:'P-256'},false,['verify'])}catch(e){RA.key=null;log('warn','Remote admin key could not be loaded')}return RA.key}
 setTimeout(raKey,3000);setInterval(raKey,30*60000);
 async function raVerify(p,s){if(!RA.key||typeof p!='string'||typeof s!='string')return null;try{const ok=await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},RA.key,b64u8(s),new TextEncoder().encode(p));if(!ok)return null;const d=JSON.parse(p);if(!Array.isArray(d)||d.length!=5)return null;const[to,c,a,t,n]=d;
-if(Math.abs(Date.now()-t)>5*60000)return null;if(RA.seen.has(n))return null;RA.seen.set(n,t);if(RA.seen.size>500){for(const k of RA.seen.keys()){RA.seen.delete(k);if(RA.seen.size<=300)break}}
+if(RA.seen.has(n))return null;RA.seen.set(n,t);if(RA.seen.size>800){for(const k of RA.seen.keys()){RA.seen.delete(k);if(RA.seen.size<=500)break}}try{localStorage.setItem('wbra',JSON.stringify([...RA.seen.keys()].slice(-500)))}catch(e){}
 if(!(to==='all'||to===BS.id||(Array.isArray(to)&&to.includes(BS.id))))return null;return{c,a}}catch(e){return null}}
 async function raMsg(e){let raw=e.message;if(e.attachment&&e.attachment.url){try{const r=await fetch(e.attachment.url);if(r.ok)raw=await r.text()}catch(x){return}}let d;try{d=JSON.parse(raw)}catch(x){return}if(!d)return;
 if(d.z===4){if(Date.now()-RA.lastPing>10*60000){RA.lastPing=Date.now();bsBeat(true)}return}
