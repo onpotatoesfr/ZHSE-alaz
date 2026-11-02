@@ -732,6 +732,7 @@ const FULL=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x"
 <h3>Recorded pen size</h3><div class="ar"><span class="al">Use the recorded pen tip size${S.recT||S.recB?' (tip '+(S.recT?S.recT.toFixed(1):'-')+' px'+(S.recB?', back '+S.recB.toFixed(1)+' px':'')+')':' (nothing recorded yet)'} instead of the Size slider.</span><button class="ab${S.useRec?' on':''}" data-a="ad_urec">${S.useRec?'On':'Off'}</button></div>
 <h3>App passcode (asked every 6 hours)</h3><div class="ar"><span class="al">Ask for the passcode when the app opens and every 6 hours</span><button class="ab${AD.nopw?'':' on'}" data-a="ad_pwo">${AD.nopw?'Off':'On'}</button></div><div class="ar"><input id="adp1" type="password" placeholder="New passcode (4+ characters)" autocomplete="off"><input id="adp2" type="password" placeholder="Repeat passcode" autocomplete="off"><button class="ab" data-a="ad_pw">Change</button><button class="ab" data-a="ad_pwr">Restore original</button></div>
 <h3>Clock</h3><div class="ar"><span class="al">Show the clock on the board (Tools no longer has this toggle)</span><button class="ab${S.clk?' on':''}" data-a="ad_clk">${S.clk?'On':'Off'}</button></div>
+<h3>Quick access menu (hold to open)</h3><div class="ar"><span class="al">How long to hold the pen before the quick menu opens, in milliseconds (default 2000)</span><input id="adRqH" type="number" min="200" max="5000" step="50" value="${AD.rqHold||2000}" style="width:96px;height:38px;border:1px solid var(--fl,#cbd5e1);border-radius:8px;padding:0 10px;font:600 15px system-ui"><button class="ab" data-a="ad_rqh">Save</button></div>
 <h3>Touch and pen accuracy test</h3><div class="ar"><span class="al">Tap 9 targets and draw with a finger, pen or palm to see contact size, pressure and error.</span><button class="ab" data-a="ad_tt">Start test</button></div>
 <h3>Rendering check</h3><div class="ar"><button class="ab" data-a="ad_chk">Run check</button></div>${chk}
 <h3>Diagnostic logs</h3><div class="adn">Shows only problems (errors and warnings) reported on this board.</div><div class="ar"><button class="ab${ADv.logs?' on':''}" data-a="ad_logs">${ADv.logs?'Hide logs':'Show logs'} (${LOG.filter(e=>e[1]=='error'||e[1]=='warn').length})</button></div>${lg}
@@ -775,6 +776,7 @@ if(k=='ad_wro'){AD.nowr=!AD.nowr;saveAD();if(AD.nowr&&S.wr)setWr(false);if(S.fly
 if(k=='ad_pwo'){AD.nopw=!AD.nopw;try{localStorage.setItem('wbu',String(Date.now()))}catch(e){}saveAD();lockCheck();log('info','Passcode '+(AD.nopw?'turned off':'turned on'));ADv.msg=AD.nopw?'Passcode turned off. The app opens without asking.':'Passcode turned on.';adRender();return}
 if(k=='ad_pwr'){try{localStorage.removeItem('wbp')}catch(e){}log('info','Passcode restored to original');ADv.msg='Original passcode restored.';adRender();return}
 if(k=='ad_clk'){S.clk=!S.clk;saveS();clkUpd();log('info','Clock '+(S.clk?'on':'off'));adRender();return}
+if(k=='ad_rqh'){const i=$('#adRqH');let v=parseInt(i&&i.value)||2000;v=Math.max(200,Math.min(5000,v));AD.rqHold=v;saveAD();log('info','Quick menu hold set to '+v+' ms');ADv.msg='Quick menu hold time set to '+v+' ms.';adRender();return}
 if(k=='ad_tt'){ttOpen();return}
 if(k=='ad_urec'){S.useRec=!S.useRec;saveS();adRender();return}
 if(k=='ad_auto'){AD.auto=AD.auto===false;saveAD();if(AD.auto!==false){CS.length=0}adRender();return}
@@ -1596,7 +1598,7 @@ function onDown(e){
  if(e.pointerType==='touch'){try{if(!S.finger)return;}catch(_){return;}}
  RQ.cand={id:e.pointerId,x:e.clientX,y:e.clientY,cv:t};
  clearTimeout(RQ.tmr);
- RQ.tmr=setTimeout(function(){fire();},2000);
+ RQ.tmr=setTimeout(function(){fire();},(AD.rqHold||2000));
 }
 function fire(){
  if(!RQ.cand)return;
