@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.11.03.96","disp":"03/11/90","force":true,"notes":"Improvements","items":["You can now set the line-straighten hold time (in milliseconds)","The quick-menu and line-straighten hold times are together under Pens & input in the admin menu"]}
+{"version":"1.1","build":"2026.11.03.97","disp":"03/11/91","force":false,"notes":"Improvements","items":["Groundwork for native pen tip / eraser / palm recognition (works once the updated APK is installed)"]}
