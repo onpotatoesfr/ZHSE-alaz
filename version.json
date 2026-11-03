@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.11.03.97","disp":"03/11/91","force":false,"notes":"Improvements","items":["Groundwork for native pen tip / eraser / palm recognition (works once the updated APK is installed)"]}
+{"version":"1.1","build":"2026.11.03.98","disp":"03/11/92","force":true,"notes":"Improvements","items":["Pen/palm size recording now takes many samples and locks onto a precise value","Tidied the diagnostics (a harmless fullscreen message no longer shows as an error)"]}
