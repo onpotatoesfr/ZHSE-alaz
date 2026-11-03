@@ -303,7 +303,7 @@ const VER='1.1',BUILD='2026.11.03.97',BD='03/11/91';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
-addEventListener('unhandledrejection',e=>log('error','Promise: '+(e.reason&&e.reason.message||e.reason)));
+addEventListener('unhandledrejection',e=>{var m=(e.reason&&e.reason.message||e.reason||'')+'';if(/Permissions check failed|fullscreen|fullScreen|Fullscreen/i.test(m))return;log('error','Promise: '+m)});
 ['error','warn'].forEach(k=>{const o=console[k];console[k]=function(){try{log(k,[...arguments].join(' '))}catch(e){}return o.apply(this,arguments)}});
 log('info','App started v'+VER+' build '+BD);
 const COL=[['Black','#000000'],['Dark gray','#4B5563'],['Gray','#9CA3AF'],['Brown','#78350F'],['Magenta','#BE185D'],['Red','#DC2626'],['Orange','#F97316'],['Yellow','#FACC15'],['Lime','#84CC16'],['Green','#16A34A'],['Teal','#0D9488'],['Cyan','#06B6D4'],['Blue','#2563EB'],['Indigo','#4F46E5'],['Purple','#7C3AED'],['Violet','#C026D3'],['Pink','#F472B6'],['Peach','#FDBA74'],['Mint','#86EFAC'],['Sky','#93C5FD']];
@@ -1384,7 +1384,7 @@ else if(k=='swp'){S.sw=!S.sw;dv.classList.remove('op');layout()}
 else if(k=='md'){S.mode=v;if(v=='pdf')A=PV;else if(v=='wb')A=WB;layout()}
 else if(k=='pdfx'){mTok++;doc=null;pdfN=0;Q=[];pdfKey='';bm={};sizes=[];offY=[];W0=612;A=WB;$('#jp').hidden=true;$('#pm').textContent=tl('Open a PDF book to read it here and draw on it.');layout()}
 else if(k=='fg')S.finger=!S.finger;
-else if(k=='fs'){if(window.goFullscreen)window.goFullscreen();else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}
+else if(k=='fs'){if(window.goFullscreen)window.goFullscreen();else try{var _q=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();if(_q&&_q.catch)_q.catch(function(){})}catch(_){}}
 else if(k=='th'){const r=document.documentElement,d=r.dataset.theme=='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark'}
 if(S.tool!='select'||(S.sel&&!pg().s.includes(S.sel)))S.sel=null;if(S.fly)fly(S.fly);mark();drawAll();save();saveS();if(k=='np'||k=='dup'||(['pv','nx','pg','dp'].includes(k)&&S.cur!==_c0))pgAnim((k=='np'||k=='dup')?'n':S.cur>_c0?'r':'l');clkUpd()});
 $('#fi').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const m=new Image();m.onload=()=>{const k=Math.min(1,800/Math.max(m.width,m.height)),c=document.createElement('canvas');c.width=m.width*k;c.height=m.height*k;c.getContext('2d').drawImage(m,0,0,c.width,c.height);const s=c.toDataURL('image/jpeg',.85),i=new Image();i.onload=()=>{const q=Math.min(1,500/Math.max(c.width,c.height)),p=WB.page(),w=c.width*q,h=c.height*q;A=WB;mut(a=>a.push({k:'i',img:i,src:s,x:(WB.W/2-p.ox)/p.z-w/2,y:(WB.H/2-p.oy)/p.z-h/2,w,h,c:'#000',al:1}))};i.src=s};m.src=r.result};r.readAsDataURL(f);e.target.value=''};
@@ -1445,7 +1445,7 @@ document.body.append(w);var ok=w.querySelector('.wn-ok');ok.onclick=function(){t
 </style>
 <script>(function(){var el=document.documentElement;
 function isFs(){return document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement||document.msFullscreenElement;}
-function go(){if(isFs())return;try{var r=el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen;if(!r)return;var p;try{p=r.call(el,{navigationUI:'hide'});}catch(e){p=r.call(el);}if(p&&p.catch)p.catch(function(){try{r.call(el);}catch(_){}});}catch(e){}}
+function go(){if(isFs())return;try{var r=el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen;if(!r)return;var p;try{p=r.call(el,{navigationUI:'hide'});}catch(e){try{p=r.call(el);}catch(_){}}if(p&&p.catch)p.catch(function(){});}catch(e){}}
 window.goFullscreen=go;
 /* auto-enter on launch; re-enter on the next interaction if we ever leave (handles all Android versions / exe / browser; APK still needs immersive mode for the system bars) */
 ['pointerdown','touchstart','mousedown','keydown','click'].forEach(function(t){try{window.addEventListener(t,go,{capture:true,passive:true});}catch(e){}});
