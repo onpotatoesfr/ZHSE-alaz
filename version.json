@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.11.03.98","disp":"03/11/92","force":true,"notes":"Improvements","items":["Pen/palm size recording now takes many samples and locks onto a precise value","Tidied the diagnostics (a harmless fullscreen message no longer shows as an error)"]}
+{"version":"1.1","build":"2026.11.03.99","disp":"03/11/93","force":true,"notes":"Improvements","items":["Size recording now locks after a short press-and-hold (no need for many taps)"]}
