@@ -468,8 +468,8 @@ const vis=()=>{const k=PVV.z*PV.b();return[pageAt(-PVV.oy/k),pageAt((PV.H-PVV.oy
 function updPI(){if(!doc)return;const k=PVV.z*PV.b();pdfView=pageAt((PV.H*.4-PVV.oy)/k);$('#pn2').textContent=(pdfView+1)+' / '+pdfN;arrowFade();if(pdfKey&&pvTarget==null){clearTimeout(updPI._t);const pk=pdfKey,v=pdfView;updPI._t=setTimeout(()=>{try{localStorage.setItem('pp:'+pk,String(v))}catch(e){}},500)}}
 const schedRender=()=>{updPI();clearTimeout(rt);rt=setTimeout(rv,150)};
 async function rv(){if(!doc||!PV.on)return;const tk=++rq,d=devicePixelRatio||1,[a,b]=vis(),s0=Math.min(4,Math.max(.75,PV.b()*PVV.z*d));
-for(let i=a;i<=b&&i<=a+12;i++){if(tk!=rq)return;const c=bm[i];if(c&&c.sc>=s0*.85&&c.sc<=s0*2.6)continue;try{const pp=await doc.getPage(i+1),sc=Math.min(s0,8192/Math.max(sz(i)[0],sz(i)[1])),vp=pp.getViewport({scale:sc}),cv=document.createElement('canvas');cv.width=Math.ceil(vp.width);cv.height=Math.ceil(vp.height);await pp.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;if(tk!=rq)return;bm[i]={cv,sc:s0};draw(PV)}catch(e){}}
-const ks=Object.keys(bm);if(ks.length>32){ks.sort((p1,p2)=>Math.abs(p1-a)-Math.abs(p2-a));ks.slice(32).forEach(q=>delete bm[q])}}
+const MAX=4096;for(let i=a;i<=b&&i<=a+8;i++){if(tk!=rq)return;const c=bm[i];if(c&&c.sc>=s0*.85&&c.sc<=s0*2.6)continue;try{const pp=await doc.getPage(i+1),mx=Math.max(sz(i)[0],sz(i)[1]),sc=Math.min(s0,MAX/mx),vp=pp.getViewport({scale:sc}),cv=document.createElement('canvas');cv.width=Math.min(MAX,Math.ceil(vp.width));cv.height=Math.min(MAX,Math.ceil(vp.height));await pp.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;if(tk!=rq)return;bm[i]={cv,sc:s0};draw(PV)}catch(e){}}
+const ks=Object.keys(bm).sort((p1,p2)=>Math.abs(p1-a)-Math.abs(p2-a));let px=0;const BUD=120e6;for(const q of ks){const c=bm[q];if(!c||!c.cv){delete bm[q];continue}px+=c.cv.width*c.cv.height;if(px>BUD)delete bm[q]}}
 function goPage(i){if(!doc)return;i=cl(i,0,pdfN-1);pdfCur=i;const k=PVV.z*PV.b();PVV.oy=-offY[i]*k;draw(PV);schedRender()}
 function jump(){const n=cl(parseInt($('#jn').value)||1,1,pdfN);$('#jp').hidden=true;goPage(n-1)}
 $('#jn').addEventListener('keydown',e=>{if(e.key=='Enter')jump()});
