@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.11.11.102","disp":"11/11/91","force":true,"notes":"Improvements","items":["PowerPoint (and PDF) now open in Presentation","Faster drawing and sharper PDFs","Pen size no longer changes when you zoom","PDF trash button now clears every page","New broom button on the toolbar clears the page"]}
+{"version":"1.1","build":"2026.11.11.103","disp":"11/11/92","force":true,"notes":"Improvements","items":["Big PDFs now load reliably (no more blank pages)","Send page to WhatsApp, with a subject label, on the set-up boards"]}
