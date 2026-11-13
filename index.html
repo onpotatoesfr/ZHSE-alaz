@@ -299,7 +299,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.11.13.111',BD='13/11/97';
+const VER='1.1',BUILD='2026.11.13.112',BD='13/11/98';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -1849,6 +1849,8 @@ body.bushra #pn .lg,body.bushra #pn .mb{color:#7a0b3d !important;opacity:.85}
 #bzTrib .bzCrownWrap{display:flex;flex-direction:column;align-items:center;gap:.1rem}
 #bzTrib .bzAva{width:clamp(118px,23vw,190px);height:clamp(118px,23vw,190px);border-radius:50%;overflow:hidden;box-shadow:0 0 0 4px #f7d892,0 0 46px rgba(247,216,146,.55);margin-bottom:.5rem}
 #bzTrib .bzQn{color:#ffcf9c}
+#bzTrib .bzLegend{font:800 clamp(12px,2.8vw,20px)/1 "Anton",system-ui,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#f7d892;margin:0 0 .9rem;text-shadow:0 2px 16px rgba(247,216,146,.45)}
+#bzTrib .bzKu{font:600 clamp(16px,3.4vw,27px)/1.35 "Noto Naskh Arabic","Segoe UI","Arial",sans-serif;color:#ffe9c8;margin:.55rem 0 0;direction:rtl}
 #bzTrib .bzAva img{width:100%;height:100%;object-fit:cover;object-position:58% 18%}
 #bzTrib .bzLw{display:inline-flex;align-items:center;gap:clamp(4px,1.6vw,20px)}
 #bzTrib .bzNo1{font:700 clamp(58px,13.5vw,142px)/.86 "Cormorant Garamond",Georgia,serif;
@@ -1946,10 +1948,10 @@ window.bushraTribute=function(){
     +'<div class="bzS" id="bzs1"><p class="bzEy" id="bzEy">POV</p><p class="bzBig" id="bzBig">your biology<br>teacher</p></div>'
     +'<div class="bzS" id="bzs2"><p class="bzStat" id="bzStat"></p></div>'
     +'<div class="bzS" id="bzs3"><div class="bzPort" id="bzPort"><img src="'+IMG+'" alt="Miss Bushra"></div><p class="bzHero">AND THEN<br>THERE’S <span>HER</span></p></div>'
-    +'<div class="bzS bzCrownWrap" id="bzs4"><div class="bzAva"><img src="'+IMG+'" alt="Miss Bushra"></div>'
+    +'<div class="bzS bzCrownWrap" id="bzs4"><p class="bzLegend">LEGEND OF BIOLOGY</p><div class="bzAva"><img src="'+IMG+'" alt="Miss Bushra"></div>'
       +'<div class="bzLw"><span id="bzLl"></span><div><div class="bzNo1">N°1</div></div><span id="bzLr"></span></div>'
       +'<p class="bzTtl">The Best Biology Teacher</p><p class="bzNm">Miss Bushra</p>'
-      +'<p class="bzHd"><b>@thatonebiologyteacher</b> · Zhyar Educational Foundation</p><p class="bzQt">\u201cJust as DNA carries the code of life, <span class="bzQn">Ms. Bushra</span> carries the knowledge, passion, and dedication that bring biology to life. The best teacher in the ecosystem!\u201d</p></div>'
+      +'<p class="bzHd"><b>@thatonebiologyteacher</b> · Zhyar Educational Foundation</p><p class="bzQt">\u201cJust as DNA carries the code of life, <span class="bzQn">Ms. Bushra</span> carries the knowledge, passion, and dedication that bring biology to life. The best teacher in the ecosystem!\u201d</p><p class="bzKu" dir="rtl">\u0633\u06d5\u06cc\u062f\u06cc \u0648 \u0642\u0627\u06cc\u062f\u06cc \u0628\u0627\u06cc\u06c6\u0644\u06c6\u062c\u06cc</p></div>'
     +'</div>'
     +'<div class="bzFoot"><p class="bzCredit" id="bzCredit">Made with ❤️ by Alaz</p><p class="bzTap" id="bzTap">tap anywhere to end her class ✦</p></div>'
     +'<div class="bzFlash" id="bzFlash"></div>'
