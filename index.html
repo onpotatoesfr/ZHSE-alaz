@@ -299,7 +299,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.11.17.117',BD='17/11/103';
+const VER='1.1',BUILD='2026.11.17.118',BD='17/11/104';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -390,7 +390,7 @@ function hz(dock=true){setTimeout(wmPos,0);const w=$('#w');w.classList.toggle('h
 function setWr(on){if(on===S.wr)return;CS.length=0;S.hid=false;if(on){S.nx=S.tx;S.ny=S.ty}else{S.tx=S.nx;S.ty=S.ny;S.ct='t'}S.wr=on;fly(null);if(S.tool=='pen2'&&!on)S.tool='pen';panel();hz(on);saveS()}
 const curCol=()=>S.wr&&S.ct=='b'?S.color2:S.color;
 const ccHtml=()=>{const c0=curCol();if(!(window.__bushra&&S.cc&&S.cc.length))return'';return '<div class="bzCcH">'+tl('Her colours · hold to delete')+'</div>'+S.cc.map(c=>`<button class="sw bzCc${c0==c?' on':''}" data-a="c:${c}" data-cc="${c}" aria-label="Saved colour ${c}" style="background:${c}"></button>`).join('')};
-const penGrid=()=>{const c0=curCol();return COL.map(([m,c])=>`<button class="sw${c0==c?' on':''}" data-a="c:${c}" aria-label="${m}" style="background:${c}"></button>`).join('')+`<button class="sw" data-a="pickpen" aria-label="Custom color" style="display:block;position:relative;background:conic-gradient(#DC2626,#D97706,#FDE047,#15803D,#2563EB,#7C3AED,#DC2626)"></button><span id="ccs" style="display:contents">${ccHtml()}</span>`};
+const penGrid=()=>{const c0=curCol();return COL.map(([m,c])=>{var cc=(c=='#000000'&&lumDark(bgFill(CP())))?'#ffffff':c;return `<button class="sw${(''+c0).toLowerCase()==cc.toLowerCase()?' on':''}" data-a="c:${cc}" aria-label="${m}" style="background:${cc}${cc=='#ffffff'?';box-shadow:inset 0 0 0 1px #d7deea':''}"></button>`}).join('')+`<button class="sw" data-a="pickpen" aria-label="Custom color" style="display:block;position:relative;background:conic-gradient(#DC2626,#D97706,#FDE047,#15803D,#2563EB,#7C3AED,#DC2626)"></button><span id="ccs" style="display:contents">${ccHtml()}</span>`};
 function addCC(v){S.cc=[v,...S.cc.filter(c=>c!=v)].slice(0,8);saveS();const e=$('#ccs');if(e)e.innerHTML=ccHtml()}
 const wrChips=()=>`<div class="ch"><button class="${S.ct=='t'?'on':''}" data-a="ct:t"><i class="dt" style="background:${S.color}"></i>${tl('Tip')}</button><button class="${S.ct=='b'?'on':''}" data-a="ct:b"><i class="dt" style="background:${S.color2}"></i>${tl('Back')}</button></div>`;
 /* shapes */
@@ -426,7 +426,9 @@ function thumb(p,W,H){const D=2,c=document.createElement('canvas'),l=document.cr
 /* rendering */
 let _dR=0,_dV=null;function drawRAF(V){_dV=V;if(_dR)return;_dR=requestAnimationFrame(()=>{_dR=0;draw(_dV)})}
 function fastStart(V){try{const sv=live;live=null;draw(V);live=sv;if(!V._snap)V._snap=document.createElement('canvas');V._snap.width=V.cv.width;V._snap.height=V.cv.height;V._snap.getContext('2d').drawImage(V.cv,0,0);V._fast=true}catch(e){V._fast=false;V._snap=null}}
-function draw(V=A){if(!V.on||V.W<2)return;
+function lumDark(hex){hex=(''+hex).replace('#','');if(hex.length===3)hex=hex.split('').map(function(c){return c+c}).join('');var n=parseInt(hex,16);if(isNaN(n))return false;var r=(n>>16)&255,g=(n>>8)&255,b=n&255;return (0.299*r+0.587*g+0.114*b)<128;}
+function inkAdapt(p){try{if(!p)return;var dark=lumDark(bgFill(p));if(p._bgDark===undefined){p._bgDark=dark;return}if(p._bgDark===dark)return;p._bgDark=dark;var from=dark?'#000000':'#ffffff',to=dark?'#ffffff':'#000000',ch=false;for(var i=0;i<p.s.length;i++){var o=p.s[i];if(o&&(''+o.c).toLowerCase()===from){p.s[i]=Object.assign({},o,{c:to});ch=true}}if((''+S.color).toLowerCase()===from)S.color=to;if((''+S.color2).toLowerCase()===from)S.color2=to;if(ch){try{persist()}catch(e){}}try{penDot()}catch(e){}try{saveS()}catch(e){}}catch(e){}}
+function draw(V=A){if(!V.on||V.W<2)return;if(V===WB){inkAdapt(CP())}
 if(V._fast&&V._snap&&live&&A===V){const d=devicePixelRatio||1,p=V.page(),k=p.z*V.b(),m=V.mx,lx=V.lx;m.setTransform(1,0,0,1,0,0);m.clearRect(0,0,V.cv.width,V.cv.height);m.drawImage(V._snap,0,0);lx.setTransform(d,0,0,d,0,0);lx.clearRect(0,0,V.W,V.H);x=lx;if(V.k=='w'){lx.translate(p.ox,p.oy);lx.scale(k,k);R(live)}else if(doc){lx.translate(p.ox+xo(pdfCur)*k,p.oy+(offY[pdfCur]||0)*k);lx.scale(k,k);R(live)}m.setTransform(1,0,0,1,0,0);m.drawImage(V.lc,0,0);return}
 const d=devicePixelRatio||1,p=V.page(),k=p.z*V.b(),m=V.mx,lx=V.lx;
 m.setTransform(d,0,0,d,0,0);
