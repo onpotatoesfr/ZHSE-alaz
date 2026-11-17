@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.11.11.106","disp":"11/11/92","force":true,"notes":"Improvements","items":["Big PDFs now load reliably (no more blank pages)","Send page to WhatsApp, with a subject label, on the set-up boards"]}
+{"version":"1.1","build":"2026.11.17.115","disp":"17/11/101","force":true,"notes":"Improvements","items":["New full colour picker — pick any colour for the pen and the background","Fixed: pen size not changing after a pen size was recorded","Send page to WhatsApp can now be set up per board"]}
