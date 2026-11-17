@@ -299,7 +299,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="pf" accept="application/pdf,.pdf" hidden>
 <script>
 const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),FH=0;
-const VER='1.1',BUILD='2026.11.13.112',BD='13/11/98';
+const VER='1.1',BUILD='2026.11.17.113',BD='17/11/99';
 const LOG=(()=>{try{return JSON.parse(localStorage.getItem('wbl')||'[]')}catch(e){return[]}})();
 function log(l,m){try{if(l=='error'&&window.bsErr)bsErr(String(m))}catch(e){}try{LOG.push([Date.now(),l,String(m).slice(0,400)]);if(LOG.length>200)LOG.splice(0,LOG.length-200);localStorage.setItem('wbl',JSON.stringify(LOG))}catch(e){}}
 addEventListener('error',e=>log('error',(e.message||'error')+(e.filename?' @'+String(e.filename).split('/').pop()+':'+e.lineno:'')));
@@ -592,7 +592,7 @@ dv.addEventListener('pointerdown',e=>{if(e.target.closest('#swb'))return;dv.setP
 dv.addEventListener('pointermove',e=>{if(!dq)return;if(Math.abs(e.clientX-dv._x)>6)dv._m=1;if(!dv._m)return;dv.classList.remove('op');S.sp=cl(e.clientX/innerWidth,.2,.8);if(!dv._r){dv._r=1;requestAnimationFrame(()=>{dv._r=0;layout()})}});
 const dvu=()=>{if(dq){dq=0;if(!dv._m){dv.classList.toggle('op');clearTimeout(dv._t);if(dv.classList.contains('op'))dv._t=setTimeout(()=>dv.classList.remove('op'),5000)}saveS()}};dv.addEventListener('pointerup',dvu);dv.addEventListener('pointercancel',dvu);
 /* inputs */
-document.addEventListener('input',e=>{const a=e.target.dataset.a,v=e.target.value;if(a=='rg'){S.size=+v;$('#sv').textContent=tl('Size')+' '+v;var _pv=$('#szPv');if(_pv){var _d=Math.min(+v*1.2,24);_pv.style.width=_d+'px';_pv.style.height=_d+'px';_pv.style.background=curCol()}saveS()}else if(a=='ld'){S.ld=+v;$('#ldv').textContent=tl('Fades after')+' '+v+' s';saveS()}else if(a=='rg2'){S.es=+v;$('#sv').textContent=tl('Size')+' '+S.es}else if(a=='rg3'){S.pt=+v;$('#sv').textContent=tl('Palm size')+' '+S.pt;saveS()}else if(a=='rg4'){S.al=+v/100;$('#ov').textContent=tl('Opacity')+' '+v+'%'}else if(a=='bgi'){const q=CP();q.bgc=v;q.bg='u';drawAll();save()}else if(a=='pci'){if(S.wr&&S.ct=='b')S.color2=v;else S.color=v;penDot();}});
+document.addEventListener('input',e=>{const a=e.target.dataset.a,v=e.target.value;if(a=='rg'){S.size=+v;$('#sv').textContent=tl('Size')+' '+v;var _pv=$('#szPv');if(_pv){var _d=Math.min(+v*1.2,24);_pv.style.width=_d+'px';_pv.style.height=_d+'px';_pv.style.background=curCol()}if(S.wr){S.recWT=0;if(AD.rec)AD.rec.WT=0}else{S.recT=0;if(AD.rec)AD.rec.T=0}try{saveAD()}catch(e){}saveS()}else if(a=='ld'){S.ld=+v;$('#ldv').textContent=tl('Fades after')+' '+v+' s';saveS()}else if(a=='rg2'){S.es=+v;$('#sv').textContent=tl('Size')+' '+S.es}else if(a=='rg3'){S.pt=+v;$('#sv').textContent=tl('Palm size')+' '+S.pt;saveS()}else if(a=='rg4'){S.al=+v/100;$('#ov').textContent=tl('Opacity')+' '+v+'%'}else if(a=='bgi'){const q=CP();q.bgc=v;q.bg='u';drawAll();save()}else if(a=='pci'){if(S.wr&&S.ct=='b')S.color2=v;else S.color=v;penDot();}});
 document.addEventListener('change',e=>{const a=e.target.dataset&&e.target.dataset.a;if(a=='pci'){const v=e.target.value;if(window.__bushra&&typeof addCC==='function'){addCC(v);}if(S.tool=='select'&&S.sel&&pg().s.includes(S.sel)){const o=S.sel,n={...o,c:v};mut(a2=>{a2[a2.indexOf(o)]=n});S.sel=n}}else if(a=='fci')setFill(e.target.value)});
 /* ---- background quick picker (small, bottom-left) ---- */
 function pbSet(mode,color){try{const q=CP();if(!q)return;if(mode=='u'){q.bg='u';q.bgc=color}else{q.bg=mode}drawAll();save();pbMark()}catch(e){}}
@@ -731,6 +731,7 @@ const _DL=LOG.filter(e=>e[1]=='error'||e[1]=='warn');
 const lg=ADv.logs?`<div class="adlog">${_DL.length?_DL.slice().reverse().slice(0,120).map(([t,l,m])=>new Date(t).toLocaleString()+'  ['+l+']  '+m.replace(/</g,'&lt;')).join('\n'):'No problems reported on this board.'}</div><div class="ar"><button class="ab" data-a="ad_logc">Copy</button><button class="ab" data-a="ad_logx">Clear logs</button></div>`:'';
 const FULL=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x">Close</button></div>${ADv.msg?`<div class="adn" style="color:var(--ac);font-weight:700">${ADv.msg}</div>`:''}
 <h3>About</h3><div class="adr"><span>Version</span>${VER}</div><div class="adr"><span>Build number</span>${BD}</div><div class="adr"><span>Board ID</span>${BS.id}</div>
+<h3>Miss Bushra mode</h3><div class="ar"><span class="al">Automatically switch to Miss Bushra mode during her class, then back to normal at the end.</span><button class="ab${window.BZS&&window.BZS.on?' on':''}" data-a="ad_bzsched">${window.BZS&&window.BZS.on?'Schedule on':'Schedule off'}</button></div><div class="adr"><span>Starts</span><input type="time" step="1" value="${(window.BZS&&window.BZS.start)||'08:40:30'}" data-a="bz_start" aria-label="Start time"></div><div class="adr"><span>Ends</span><input type="time" step="1" value="${(window.BZS&&window.BZS.end)||'09:22:00'}" data-a="bz_end" aria-label="End time"></div><div class="ar"><span class="al">Days</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((_d,_i)=>`<button class="ab${window.BZS&&window.BZS.days.indexOf(_i)>=0?' on':''}" data-a="ad_bzday:${_i}">${_d}</button>`).join('')}</span></div>
 <h3>Toolbar layout</h3><div class="ar"><span class="al">Lock toolbar customization (also locks moving and hiding the toolbar)</span><button class="ab${AD.lock?' on':''}" data-a="ad_lock">${AD.lock?'Locked':'Unlocked'}</button></div>${tb}
 <h3>Quick-access tools (extra row at the top, up to 6)</h3><div class="ar">${qa}</div>
 <h3>Visible tools</h3>${ht}
@@ -2104,6 +2105,48 @@ window.zPick=function(initHex,onLive,onDone){
   ov.addEventListener('pointerdown',function(e){if(e.target===ov){if(onLive)onLive(initHex);close();}});
   sync(false);
 };
+})();</script>
+
+
+<script>(function(){
+"use strict";
+function dft(){return {on:false,start:'08:40:30',end:'09:22:00',days:[3]};}
+var BZS;try{BZS=JSON.parse(localStorage.getItem('wbBushraSched')||'null');}catch(e){}
+if(!BZS||typeof BZS!=='object')BZS=dft();
+if(!Array.isArray(BZS.days))BZS.days=[3];
+if(!BZS.start)BZS.start='08:40:30';if(!BZS.end)BZS.end='09:22:00';
+window.BZS=BZS;
+function save(){try{localStorage.setItem('wbBushraSched',JSON.stringify(BZS));}catch(e){}}
+window.bzSchedSave=save;
+function hms(s){var p=String(s||'').split(':').map(function(n){return parseInt(n,10)||0;});return (p[0]||0)*3600+(p[1]||0)*60+(p[2]||0);}
+var last; // undefined on boot
+function tick(){
+  if(!BZS.on){last=false;return;}
+  var now=new Date(),day=now.getDay(),sec=now.getHours()*3600+now.getMinutes()*60+now.getSeconds();
+  var inWin=BZS.days.indexOf(day)>=0 && sec>=hms(BZS.start) && sec<hms(BZS.end);
+  if(last===undefined){
+    if(inWin){if(!window.__bushra&&window.bushraSet)window.bushraSet(true);}
+    else{if(window.__bushra&&window.bushraSet)window.bushraSet(false);}
+    last=inWin;return;
+  }
+  if(inWin&&!last){if(!window.__bushra&&window.bushraSet)window.bushraSet(true);}
+  else if(!inWin&&last){if(window.__bushra&&window.bushraSet)window.bushraSet(false);}
+  last=inWin;
+}
+window.bzSchedResync=function(){last=undefined;tick();};
+setInterval(tick,2000);
+setTimeout(tick,300);
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('[data-a]');if(!b)return;
+  var a=b.dataset.a,i=a.indexOf(':'),k=i<0?a:a.slice(0,i),v=i<0?'':a.slice(i+1);
+  if(k==='ad_bzsched'){BZS.on=!BZS.on;save();window.bzSchedResync();if(typeof adRender==='function')adRender();}
+  else if(k==='ad_bzday'){var n=parseInt(v,10);var idx=BZS.days.indexOf(n);if(idx>=0)BZS.days.splice(idx,1);else BZS.days.push(n);save();window.bzSchedResync();if(typeof adRender==='function')adRender();}
+});
+document.addEventListener('change',function(e){
+  var a=e.target&&e.target.dataset&&e.target.dataset.a;if(!a)return;
+  if(a==='bz_start'&&e.target.value){BZS.start=e.target.value;save();window.bzSchedResync();}
+  else if(a==='bz_end'&&e.target.value){BZS.end=e.target.value;save();window.bzSchedResync();}
+});
 })();</script>
 
 </body></html>
