@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>ZHSE-A Admin</title>
+<title>Alaz Admin</title>
 <style>
 :root{--bg:#E9EDF5;--card:#fff;--ink:#111827;--mute:#5B6475;--line:#DCE3EE;--ac:#14438F;--ac2:#2E6FC9;--ok:#16A34A;--warn:#D97706;--bad:#DC2626;--sel:#E8EFFB;--sh:0 1px 2px rgba(10,27,69,.06),0 6px 20px rgba(10,27,69,.08);--shm:0 24px 70px rgba(5,15,45,.45)}
 *{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -85,7 +85,7 @@ aside .hd{padding:14px 12px 10px}aside .hd b{font-weight:800}
 </style>
 </head>
 <body>
-<header><h1>ZHSE-A Admin</h1><span id="pver" style="opacity:.75;font-size:12px;font-weight:600"></span><span class="sp"></span><button class="chip" id="reloadP" title="Load the newest panel" style="display:none">Update panel</button><button class="chip" id="devChip" title="Devices & approval" style="display:none">Devices</button><button class="chip" id="histChip" title="Activity history" style="display:none">History</button><button class="chip" id="wgChip" title="Welcome & goodbye screens" style="display:none">Welcome screens</button><button class="chip" id="annChip" title="Send an announcement to all boards" style="display:none">Announce</button><button class="chip" id="keyChip"><span class="dot" id="keyDot"></span><span id="keyTxt">Key</span></button></header>
+<header><h1>Alaz Admin</h1><span id="pver" style="opacity:.75;font-size:12px;font-weight:600"></span><span class="sp"></span><button class="chip" id="reloadP" title="Load the newest panel" style="display:none">Update panel</button><button class="chip" id="devChip" title="Devices & approval" style="display:none">Devices</button><button class="chip" id="histChip" title="Activity history" style="display:none">History</button><button class="chip" id="wgChip" title="Welcome & goodbye screens" style="display:none">Welcome screens</button><button class="chip" id="annChip" title="Send an announcement to all boards" style="display:none">Announce</button><button class="chip" id="keyChip"><span class="dot" id="keyDot"></span><span id="keyTxt">Key</span></button></header>
 <main>
 <aside><div class="hd"><b>Boards</b><button class="btn sm" id="catBtn">Categories</button><button class="btn sm" id="refresh">Refresh</button></div><div id="list"></div><div class="muted" style="padding:8px 14px 12px">Boards answer within a few seconds of Refresh. Grey = not seen recently.</div></aside>
 <section id="view">
@@ -108,7 +108,7 @@ aside .hd{padding:14px 12px 10px}aside .hd b{font-weight:800}
 </div></div>
 <div class="modal" id="devM" hidden><div class="mc">
 <h3>Devices &amp; approval</h3>
-<p class="muted">Strict whitelist: when enforced, a board shows only the Zhyar logo until you approve it. Approving sends permission over the encrypted relay. <b>Turning enforcement on locks every unapproved board.</b></p>
+<p class="muted">Strict whitelist: when enforced, a board shows only the Alaz logo until you approve it. Approving sends permission over the encrypted relay. <b>Turning enforcement on locks every unapproved board.</b></p>
 <label class="row" style="gap:8px;align-items:center"><input type="checkbox" id="wlOn"> Enforce whitelist on all boards</label>
 <div class="row" style="gap:8px;margin-top:8px"><input type="text" id="devAddId" placeholder="Board ID (shown on the board's screen)" maxlength="12" style="flex:1;text-transform:uppercase"><button class="btn pri" id="devAddBtn">Approve this ID</button></div>
 <div class="row" style="margin-top:6px"><button class="btn" id="apprAll">Approve all boards seen recently</button></div>
