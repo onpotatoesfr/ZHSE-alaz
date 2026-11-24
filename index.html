@@ -736,7 +736,7 @@ const _DL=LOG.filter(e=>e[1]=='error'||e[1]=='warn');
 const lg=ADv.logs?`<div class="adlog">${_DL.length?_DL.slice().reverse().slice(0,120).map(([t,l,m])=>new Date(t).toLocaleString()+'  ['+l+']  '+m.replace(/</g,'&lt;')).join('\n'):'No problems reported on this board.'}</div><div class="ar"><button class="ab" data-a="ad_logc">Copy</button><button class="ab" data-a="ad_logx">Clear logs</button></div>`:'';
 const FULL=`<div class="ahd"><h2>Admin menu</h2><button class="ab" data-a="ad_x">Close</button></div>${ADv.msg?`<div class="adn" style="color:var(--ac);font-weight:700">${ADv.msg}</div>`:''}
 <h3>About</h3><div class="adr"><span>Version</span>${VER}</div><div class="adr"><span>Build number</span>${BD}</div><div class="adr"><span>Board ID</span>${BS.id}</div>
-<h3>Miss Bushra mode</h3><div class="ar"><span class="al">Automatically switch to Miss Bushra mode during her class, then back to normal at the end.</span><button class="ab${window.BZS&&window.BZS.on?' on':''}" data-a="ad_bzsched">${window.BZS&&window.BZS.on?'Schedule on':'Schedule off'}</button></div><div class="adr"><span>Starts</span><input type="time" step="1" value="${(window.BZS&&window.BZS.start)||'08:40:30'}" data-a="bz_start" aria-label="Start time"></div><div class="adr"><span>Ends</span><input type="time" step="1" value="${(window.BZS&&window.BZS.end)||'09:22:00'}" data-a="bz_end" aria-label="End time"></div><div class="ar"><span class="al">Days</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((_d,_i)=>`<button class="ab${window.BZS&&window.BZS.days.indexOf(_i)>=0?' on':''}" data-a="ad_bzday:${_i}">${_d}</button>`).join('')}</span></div>
+<h3>Miss Bushra mode</h3><div class="ar"><span class="al">Automatically switch to Miss Bushra mode during her class, then back to normal at the end.</span><button class="ab${window.BZS&&window.BZS.on?' on':''}" data-a="ad_bzsched">${window.BZS&&window.BZS.on?'Schedule on':'Schedule off'}</button></div><div class="adn" style="opacity:.7">Set the class time for each day. Tap a day to turn it on or off.</div>${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((_d,_i)=>{var _t=window.BZS&&window.BZS.times&&window.BZS.times[_i];return `<div class="adr" style="flex-wrap:wrap;gap:6px;justify-content:flex-start;align-items:center"><button class="ab${_t?' on':''}" data-a="ad_bzday:${_i}" style="min-width:54px">${_d}</button>${_t?`<input type="time" step="1" value="${_t.s}" data-a="bz_s:${_i}" aria-label="${_d} start"><span>to</span><input type="time" step="1" value="${_t.e}" data-a="bz_e:${_i}" aria-label="${_d} end">`:`<span class="al" style="opacity:.55">off</span>`}</div>`}).join('')}
 <h3>Toolbar layout</h3><div class="ar"><span class="al">Lock toolbar customization (also locks moving and hiding the toolbar)</span><button class="ab${AD.lock?' on':''}" data-a="ad_lock">${AD.lock?'Locked':'Unlocked'}</button></div>${tb}
 <h3>Quick-access tools (extra row at the top, up to 6)</h3><div class="ar">${qa}</div>
 <h3>Visible tools</h3>${ht}
@@ -2117,11 +2117,10 @@ window.zPick=function(initHex,onLive,onDone){
 
 <script>(function(){
 "use strict";
-function dft(){return {on:false,start:'08:40:30',end:'09:22:00',days:[3]};}
+function dft(){return {on:false,times:{0:{s:'09:40:00',e:'10:20:30'},1:{s:'10:20:30',e:'11:02:00'},2:{s:'12:01:00',e:'12:41:00'},3:{s:'08:41:00',e:'09:21:00'},4:{s:'10:20:30',e:'11:02:00'}}};}
 var BZS;try{BZS=JSON.parse(localStorage.getItem('wbBushraSched')||'null');}catch(e){}
 if(!BZS||typeof BZS!=='object')BZS=dft();
-if(!Array.isArray(BZS.days))BZS.days=[3];
-if(!BZS.start)BZS.start='08:40:30';if(!BZS.end)BZS.end='09:22:00';
+if(!BZS.times||typeof BZS.times!=='object'){BZS.times=dft().times;delete BZS.start;delete BZS.end;delete BZS.days;}
 window.BZS=BZS;
 function save(){try{localStorage.setItem('wbBushraSched',JSON.stringify(BZS));}catch(e){}}
 window.bzSchedSave=save;
@@ -2130,7 +2129,8 @@ var last; // undefined on boot
 function tick(){
   if(!BZS.on){last=false;return;}
   var now=new Date(),day=now.getDay(),sec=now.getHours()*3600+now.getMinutes()*60+now.getSeconds();
-  var inWin=BZS.days.indexOf(day)>=0 && sec>=hms(BZS.start) && sec<hms(BZS.end);
+  var t=BZS.times&&BZS.times[day];
+  var inWin=!!t && sec>=hms(t.s) && sec<hms(t.e);
   if(last===undefined){
     if(inWin){if(!window.__bushra&&window.bushraSet)window.bushraSet(true);}
     else{if(window.__bushra&&window.bushraSet)window.bushraSet(false);}
@@ -2147,12 +2147,12 @@ document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('[data-a]');if(!b)return;
   var a=b.dataset.a,i=a.indexOf(':'),k=i<0?a:a.slice(0,i),v=i<0?'':a.slice(i+1);
   if(k==='ad_bzsched'){BZS.on=!BZS.on;save();window.bzSchedResync();if(typeof adRender==='function')adRender();}
-  else if(k==='ad_bzday'){var n=parseInt(v,10);var idx=BZS.days.indexOf(n);if(idx>=0)BZS.days.splice(idx,1);else BZS.days.push(n);save();window.bzSchedResync();if(typeof adRender==='function')adRender();}
+  else if(k==='ad_bzday'){var n=parseInt(v,10);if(BZS.times[n])delete BZS.times[n];else BZS.times[n]={s:'08:00:00',e:'08:40:00'};save();window.bzSchedResync();if(typeof adRender==='function')adRender();}
 });
 document.addEventListener('change',function(e){
   var a=e.target&&e.target.dataset&&e.target.dataset.a;if(!a)return;
-  if(a==='bz_start'&&e.target.value){BZS.start=e.target.value;save();window.bzSchedResync();}
-  else if(a==='bz_end'&&e.target.value){BZS.end=e.target.value;save();window.bzSchedResync();}
+  if(a.indexOf('bz_s:')===0&&e.target.value){var ns=parseInt(a.slice(5),10);if(BZS.times[ns]){BZS.times[ns].s=e.target.value;save();window.bzSchedResync();}}
+  else if(a.indexOf('bz_e:')===0&&e.target.value){var ne=parseInt(a.slice(5),10);if(BZS.times[ne]){BZS.times[ne].e=e.target.value;save();window.bzSchedResync();}}
 });
 })();</script>
 
