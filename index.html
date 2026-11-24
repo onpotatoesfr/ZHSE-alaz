@@ -121,7 +121,7 @@ hr{border:0;height:1px;background:rgba(255,255,255,.35);margin:6px 0}
 #spl.out{opacity:0;visibility:hidden}
 #spl .spl-sl{position:relative;width:150px;height:150px;display:grid;place-items:center}
 #spl .spl-sr{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,255,255,.7);animation:splR 1.6s ease-out .5s infinite}
-#spl .spl-sc{width:150px;height:150px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 10px 40px rgba(5,15,45,.45);animation:splL .8s cubic-bezier(.2,.8,.2,1) both}
+#spl .spl-sc{width:150px;height:150px;border-radius:50%;background:transparent;display:grid;place-items:center;animation:splL .8s cubic-bezier(.2,.8,.2,1) both}
 #spl .spl-sc img{max-width:96px;max-height:110px}
 #spl .spl-st{text-align:center;animation:splU .6s ease-out .45s both}
 #spl .spl-sn{font:800 60px system-ui,sans-serif;letter-spacing:-1px;line-height:1}
@@ -251,7 +251,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 #ss{position:fixed;inset:0;z-index:102;display:block;overflow:hidden;background:radial-gradient(circle at 50% 45%,#10255A 0%,#0A1838 55%,#050C1F 100%);color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;text-align:center;cursor:pointer;touch-action:none;user-select:none;animation:ssIn 1.2s ease both}#ss[hidden]{display:none}
 #ss.out{animation:ssOut .35s ease both}
 #ss .ss-d{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;animation:ssDrift 60s ease-in-out infinite}
-#ss .ss-l{width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 0 60px rgba(46,111,201,.35);animation:ssBr 6s ease-in-out infinite}#ss .ss-l img{height:92px;width:auto}
+#ss .ss-l{width:132px;height:132px;border-radius:50%;background:transparent;display:grid;place-items:center;animation:ssBr 6s ease-in-out infinite}#ss .ss-l img{height:92px;width:auto}
 #ssT{font:800 112px system-ui,sans-serif;letter-spacing:-3px;line-height:1;font-variant-numeric:tabular-nums;opacity:.92}
 #ssD{font:600 24px system-ui,sans-serif;opacity:.7}#ssT .ss-ap{font:700 34px system-ui,sans-serif;letter-spacing:0;margin-inline-start:12px;opacity:.75}
 #ss .ss-m{font:700 18px system-ui,sans-serif;letter-spacing:3px;text-transform:uppercase;opacity:.45;margin-top:6px}
@@ -266,7 +266,7 @@ html.rtl #exs{direction:rtl}html.rtl #exs .exd,html.rtl #exs .exu{direction:ltr}
 #amsg .amsg-c{position:relative;max-width:min(760px,90vw);background:var(--fb);color:var(--ff);border-radius:20px;padding:34px 56px 34px 34px;box-shadow:0 20px 60px rgba(5,15,45,.45);animation:zaCard .3s cubic-bezier(.2,.8,.2,1)}
 #amsg .amsg-t{font:700 30px/1.35 system-ui,sans-serif;white-space:pre-wrap;word-break:break-word}
 #amsg .amsg-x{position:absolute;top:10px;right:10px;width:44px;height:44px;border:0;border-radius:12px;background:var(--fm);color:var(--ff);display:grid;place-items:center;cursor:pointer}
-</style><style>#pn .b.dim,#pb button.dim{opacity:.32;transition:opacity .2s ease}#pn .b,#pb button{transition:opacity .2s ease}</style></head><body>
+</style><style>#pn .b.dim,#pb button.dim{opacity:.32;transition:opacity .2s ease}#pn .b,#pb button{transition:opacity .2s ease}</style></head><body><script>window.ALOGO='<svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="aglow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#aglow)" stroke="#22E3FF" stroke-width="6.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M50 24 L34 78"/><path d="M50 24 L66 78"/><path d="M40 61 L60 61"/><path d="M20 38 L10 52 L20 66"/><path d="M80 38 L90 52 L80 66"/></g><path d="M63 22 L41 80" stroke="#22E3FF" stroke-width="4" stroke-linecap="round" opacity="0.6" filter="url(#aglow)"/></svg>';</script>
 <div id="spl" aria-label="Alaz is loading" role="status"><div class="spl-sl"><div class="spl-sr" aria-hidden="true"></div><div class="spl-sc"><span id="splImg" style="font:800 66px system-ui,sans-serif;color:#14438F;line-height:1">A</span></div></div><div class="spl-st"><div class="spl-sn">Alaz</div><div class="spl-sf"></div></div><div class="spl-sb" aria-hidden="true"><i></i></div><div class="spl-sa">made by <b>Alaz</b></div><div class="spl-sv"><span id="splB"></span><b aria-hidden="true">12F</b></div></div>
 <div id="clk" aria-hidden="true"><div id="clkT"></div><div id="clkD"></div></div>
 <div id="gg" hidden><div class="gg-hd"><b>GeoGebra</b><div class="ch gg-tabs"><button data-a="gg_on" id="ggTOn">GeoGebra</button><button data-a="gg_off" id="ggTOff">Offline graph</button></div><span class="gg-sp"></span><button class="li" data-a="gg_cp">Copy to board</button><button class="b" data-a="gg_x" aria-label="Close GeoGebra"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div><div id="ggMsg" role="status"></div><div id="ggOn" hidden><div id="ggbHost"></div><div id="ggLd">Loading GeoGebra...</div></div><div id="ggOff" hidden><div id="ggList"></div><div class="gg-cv"><canvas id="ggCv" aria-label="Graph"></canvas><div class="gg-zm"><button data-a="gg_zi" aria-label="Zoom in">+</button><button data-a="gg_zo" aria-label="Zoom out">&minus;</button><button data-a="gg_zr" aria-label="Reset view">&#8634;</button></div></div></div></div>
@@ -672,7 +672,7 @@ wgLoad();setTimeout(wgTick,3000);setInterval(wgTick,20000);
 function zState(){var a=false,w=false,m=false;try{a=localStorage.getItem('wbAppr')=='1'}catch(e){}try{w=localStorage.getItem('wbWL')=='1'}catch(e){}try{m=localStorage.getItem('wbMaint')=='1'}catch(e){}return{a:a,w:w,m:m}}
 function zShow(kind){var e=document.getElementById('zblock');if(!e){e=document.createElement('div');e.id='zblock';document.body.appendChild(e)}
  if(e.style.display=='flex'&&e.dataset.kind==kind)return; // already showing this lock; don't rebuild (keeps the password box)
- var id='';try{id=BS.id||''}catch(x){}var lg='';try{var L=document.getElementById('lgo');if(L&&L.src)lg='<img src="'+L.src+'" alt="">'}catch(x){}var nm='';try{nm=bsName()}catch(x){}
+ var id='';try{id=BS.id||''}catch(x){}var lg=window.ALOGO||'';var nm='';try{nm=bsName()}catch(x){}
  e.innerHTML='<div class="zb-c">'+lg+'<div class="zb-t">'+(kind=='maint'?'Under maintenance':'Waiting for approval')+'</div>'+(kind=='maint'?'<div class="zb-s">This board is temporarily unavailable.</div>':'<div class="zb-id">Board ID: '+id+(nm?' \u00b7 '+nm:'')+'</div><div class="zb-s">Give this ID to the admin to approve this board.</div>')+'</div>';
  e.style.display='flex';e.dataset.kind=kind;
  if(kind=='wl'){try{if(!zShow._beat){zShow._beat=1;if(window.bsBeat)bsBeat(true)}}catch(x){}}
@@ -1423,7 +1423,7 @@ if(navigator.onLine)setTimeout(()=>{pdfLib().catch(()=>{})},4000);
 try{if(window.ZHSE&&ZHSE.ready)ZHSE.ready()}catch(e){}
 
 
-(function(){var sp=document.getElementById('spl');if(!sp)return;try{var l=document.getElementById('lgo');if(l)document.getElementById('splImg').src=l.src;document.getElementById('splB').textContent='Build '+(typeof BD!='undefined'?BD:'')}catch(e){}var done=false,hide=function(){if(done)return;done=true;sp.classList.add('out');setTimeout(function(){sp.remove()},500)};sp.addEventListener('pointerdown',hide);setTimeout(hide,2900)})();
+(function(){var sp=document.getElementById('spl');if(!sp)return;try{var si=document.getElementById('splImg');if(si)si.innerHTML=window.ALOGO;var ssi=document.getElementById('ssI');if(ssi)ssi.innerHTML=window.ALOGO;document.getElementById('splB').textContent='Build '+(typeof BD!='undefined'?BD:'')}catch(e){}var done=false,hide=function(){if(done)return;done=true;sp.classList.add('out');setTimeout(function(){sp.remove()},500)};sp.addEventListener('pointerdown',hide);setTimeout(hide,2900)})();
 
 (function(){var u=null;try{u=JSON.parse(localStorage.getItem('wbUpd')||'null')}catch(e){}if(!u||u.build!==BUILD)return;var seen='';try{seen=localStorage.getItem('wbSeen')||''}catch(e){}if(seen===BUILD)return;
 var esc=function(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
