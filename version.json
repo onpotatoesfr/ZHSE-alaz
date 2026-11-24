@@ -1,1 +1,1 @@
-{"version":"1.1","build":"2026.11.24.119","disp":"24/11/105","force":true,"notes":"Improvements","items":["Miss Bushra mode now follows a per-day schedule (Sun–Thu, each day its own time)","PDF page controls (‹ 1/5 ›) now appear only while you move the page; the clear button stays","App rebranded to Alaz"]}
+{"version": "1.1", "build": "2026.11.24.120", "disp": "24/11/106", "force": true, "notes": "Improvements", "items": ["PDF side scroll bar no longer jumps when you tap it — it only scrolls when you drag"]}
